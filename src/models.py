@@ -110,6 +110,14 @@ class Decoder(nn.Module):
     self.layer = nn.LSTMCell(hparams.d_word_vec + hparams.d_model * 2, 
                              hparams.d_model)
     self.dropout = nn.Dropout(hparams.dropout)
+    if self.hparams.cuda:
+      self.bridge = self.bridge.cuda()
+      self.enc_to_k = self.enc_to_k.cuda()
+      self.ctx_to_readout = self.ctx_to_readout.cuda()
+      self.readout = self.readout.cuda()
+      self.word_emb = self.word_emb.cuda()
+      self.layer = self.layer.cuda()
+      self.dropout = self.dropout.cuda()
 
   def forward(self, x_enc, x_ht, x_ct, x_mask, y_train, y_mask):
     # get decoder init state and cell, use x_ct
@@ -127,6 +135,8 @@ class Decoder(nn.Module):
 
     x_enc_k = self.enc_to_k(x_enc)
     input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=True)
+    if self.hparams.cuda:
+      input_feed = input_feed.cuda()
     # [batch_size, y_len, d_word_vec]
     trg_emb = self.word_emb(y_train)
     logits = []
@@ -146,7 +156,7 @@ class Decoder(nn.Module):
       input_feed = ctx
       hidden = (h_t, c_t)
     # [len_y, batch_size, trg_vocab_size]
-    logits = torch.stack(logits).view(batch_size, y_max_len, -1).contiguous()
+    logits = torch.stack(logits).transpose(0, 1).contiguous()
     #print(logits)
     return logits
 

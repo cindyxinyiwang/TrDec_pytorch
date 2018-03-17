@@ -12,9 +12,9 @@ import time
 
 import numpy as np
 
-DATA_PATH = "data/orm_data"
-INP_NAMES = ["set0-trainunfilt.tok.piece.eng", "set0-trainunfilt.tok.piece.orm"]
-OUT_NAMES = ["vocab.eng", "vocab.orm"]
+DATA_PATH = "/projects/tir2/users/xinyiw1/kftt-data-1.0/data/tok/"
+INP_NAMES = ["kyoto-train.lowpiece.en", "kyoto-train.lowpiece.ja"]
+OUT_NAMES = ["full-vocab.en", "full-vocab.ja"]
 
 def main():
   for inp_name, out_name in zip(INP_NAMES, OUT_NAMES):
@@ -33,7 +33,7 @@ def main():
       line = line.strip()
       if not line:
         continue
-      tokens = line.split(" ")
+      tokens = line.split()
       for token in tokens:
         if token not in vocab:
           index = len(vocab)
@@ -47,7 +47,7 @@ def main():
 
     log_string = ""
     for word, idx in vocab.iteritems():
-      log_string += "{0}~~{1}\n".format(word, idx)
+      log_string += "{0} {1}\n".format(word, idx)
 
     out_name = os.path.join(DATA_PATH, out_name)
     print("Saving vocab to '{0}'".format(out_name))

@@ -32,12 +32,12 @@ class DataLoader(object):
 
     # vocab
     (self.source_word_to_index,
-     self.source_index_to_word) = self._build_vocab(self.hparams.source_vocab)
-    self.source_vocab_size = len(self.source_word_to_index)
+     self.source_index_to_word, self.source_vocab_size) = self._build_vocab(self.hparams.source_vocab)
+    #self.source_vocab_size = len(self.source_word_to_index)
 
     (self.target_word_to_index,
-     self.target_index_to_word) = self._build_vocab(self.hparams.target_vocab)
-    self.target_vocab_size = len(self.target_word_to_index)
+     self.target_index_to_word, self.target_vocab_size) = self._build_vocab(self.hparams.target_vocab)
+    #self.target_vocab_size = len(self.target_word_to_index)
 
     assert self.source_word_to_index[self.hparams.pad] == self.target_word_to_index[self.hparams.pad]
     assert self.source_word_to_index[self.hparams.unk] == self.target_word_to_index[self.hparams.unk]
@@ -343,14 +343,15 @@ class DataLoader(object):
     file_name = os.path.join(self.hparams.data_path, file_name)
     with open(file_name, encoding='utf-8') as finp:
       lines = finp.read().split("\n")
-
+    missed_word = 0
     word_to_index, index_to_word = {}, {}
     for line in lines:
       line = line.strip()
       if not line:
         continue
-      word_index = line.split("~~")
+      word_index = line.split(" ")
       if len(word_index) != 2:
+        missed_word += 1
         print("Weird line: '{0}'. split_len={1}".format(line, len(word_index)))
         continue
       word, index = word_index
@@ -369,7 +370,7 @@ class DataLoader(object):
     assert len(word_to_index) == len(index_to_word), (
       "|word_to_index|={0} != |index_to_word|={1}".format(len(word_to_index),
                                                         len(index_to_word)))
-    print("Done. vocab_size = {0}".format(len(word_to_index)))
+    print("Done. vocab_size = {0}".format(len(word_to_index) + missed_word))
 
-    return word_to_index, index_to_word
+    return word_to_index, index_to_word, len(word_to_index) + missed_word
 
