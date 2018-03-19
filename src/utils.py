@@ -46,3 +46,7 @@ class Logger(object):
   def flush(self):
     self.terminal.flush()
     self.log.flush()
+
+def set_lr(optim, lr):
+  for param_group in optim.param_groups:
+    param_group["lr"] = lr

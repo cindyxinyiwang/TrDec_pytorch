@@ -283,23 +283,24 @@ class DataLoader(object):
         continue
 
       source_indices, target_indices = [self.bos_id], [self.bos_id]
-      source_tokens = source_line.split(" ")
-      target_tokens = target_line.split(" ")
+      source_tokens = source_line.split()
+      target_tokens = target_line.split()
       if is_training and len(target_line) > self.hparams.max_len:
         continue
 
       total_sents += 1
 
       for source_token in source_tokens:
-        source_token = source_token.strip()
+        #source_token = source_token.strip()
         if source_token not in self.source_word_to_index:
           source_token = self.hparams.unk
           source_unk_count += 1
+          #print(source_token)
         source_index = self.source_word_to_index[source_token]
         source_indices.append(source_index)
 
       for target_token in target_tokens:
-        target_token = target_token.strip()
+        #target_token = target_token.strip()
         if target_token not in self.target_word_to_index:
           target_token = self.hparams.unk
           target_unk_count += 1

@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
-import cPickle as pickle
+#import cPickle as pickle
 import os
 import re
 import shutil
@@ -19,7 +19,7 @@ OUT_NAMES = ["full-vocab.en", "full-vocab.ja"]
 def main():
   for inp_name, out_name in zip(INP_NAMES, OUT_NAMES):
     inp_file_name = os.path.join(DATA_PATH, inp_name)
-    with open(inp_file_name) as finp:
+    with open(inp_file_name, "r", encoding="utf-8") as finp:
       lines = finp.read().split("\n")
 
     vocab = {
@@ -46,13 +46,13 @@ def main():
     sys.stdout.flush()
 
     log_string = ""
-    for word, idx in vocab.iteritems():
+    for word, idx in vocab.items():
       log_string += "{0} {1}\n".format(word, idx)
 
     out_name = os.path.join(DATA_PATH, out_name)
     print("Saving vocab to '{0}'".format(out_name))
     sys.stdout.flush()
-    with open(out_name, "w") as fout:
+    with open(out_name, "w", encoding="utf-8") as fout:
       fout.write(log_string)
 
 if __name__ == "__main__":

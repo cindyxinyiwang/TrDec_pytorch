@@ -49,7 +49,8 @@ parser.add_argument("--batcher", type=str, default="sent", help="sent|word. Batc
 parser.add_argument("--n_train_steps", type=int, default=100000, help="n_train_steps")
 parser.add_argument("--dropout", type=float, default=0.1, help="probability of dropping")
 parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
-parser.add_argument("--lr_dec", type=float, default=1., help="learning rate decay")
+parser.add_argument("--lr_dec", type=float, default=0.5, help="learning rate decay")
+parser.add_argument("--clip_grad", type=float, default=5., help="gradient clipping")
 parser.add_argument("--patience", type=int, default=-1, help="patience")
 
 parser.add_argument("--seed", type=int, default=19920206, help="random seed")
@@ -190,6 +191,7 @@ def train():
     trainable_params = [
       p for p in model.parameters() if p.requires_grad]
     optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
+    #optim = torch.optim.Adam(trainable_params)
 
     step = 0
     best_val_ppl = 1e10
@@ -225,6 +227,7 @@ def train():
     step += 1
 
     tr_loss.div_(batch_size).backward()
+    grad_norm = torch.nn.utils.clip_grad_norm(model.parameters(), args.clip_grad)
     optim.step()
 
     if step % args.log_every == 0:
@@ -236,6 +239,7 @@ def train():
       log_string += " steps={0:<6.2f}".format(step / 1000)
       log_string += " lr={0:<9.7f}".format(lr)
       log_string += " loss={0:<7.2f}".format(tr_loss.data[0])
+      log_string += " |g|={0:<5.2f}".format(grad_norm)
       log_string += " ppl={0:<8.2f}".format(np.exp(total_loss / target_words))
       log_string += " acc={0:<5.4f}".format(total_corrects / target_words)
       log_string += " wpm(k)={0:<5.2f}".format(target_words / (1000 * elapsed))
@@ -248,12 +252,18 @@ def train():
       	save = True
       else:
       	if best_val_ppl >= val_ppl:
-      	  save = True 
+          save = True
+          best_val_ppl = val_ppl
+          cur_attempt = 0 
       	else:
           save = False
+          cur_attempt += 1
       if save:
       	save_checkpoint([step, best_val_ppl, best_val_bleu, cur_attempt, lr], 
       		             model, optim, hparams, args.output_dir)
+      else:
+        lr = lr * args.lr_dec
+        set_lr(optim, lr)
       # reset counter after eval
       log_start_time = time.time()
       target_words = total_corrects = total_loss = 0
