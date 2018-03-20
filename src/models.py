@@ -232,7 +232,7 @@ class Seq2Seq(nn.Module):
     hyps = []
     for x, l in zip(x_train, x_len):
       hyp = self.translate_sent(x, l, max_len=max_len, beam_size=beam_size)[0]
-      hyps.append(hyp[1:-1])
+      hyps.append(hyp.y[1:-1])
     return hyps
 
   def translate_sent(self, x_train, x_len, max_len=100, beam_size=5):
@@ -244,6 +244,8 @@ class Seq2Seq(nn.Module):
     length = 0
     completed_hyp = []
     input_feed = Variable(torch.zeros(1, self.hparams.d_model * 2), requires_grad=False)
+    if self.hparams.cuda:
+      input_feed = input_feed.cuda()
     active_hyp = [Hyp(state=dec_init, y=[self.hparams.bos_id], ctx_tm1=input_feed, score=0.)]
     while len(completed_hyp) < beam_size and length < max_len:
       new_hyp_score_list = []
