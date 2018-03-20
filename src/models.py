@@ -31,7 +31,7 @@ class MlpAttn(nn.Module):
     att_src_weights = self.w_att(att_src_hidden).squeeze(2)
     if not attn_mask is None:
       att_src_weights.data.masked_fill_(attn_mask, -self.hparams.inf)
-    att_src_weights = F.softmax(att_src_weights)
+    att_src_weights = F.softmax(att_src_weights, dim=-1)
     ctx = torch.bmm(att_src_weights.unsqueeze(1), v).squeeze(1)
     return ctx
 
@@ -121,16 +121,11 @@ class Encoder(nn.Module):
     #enc_output, (ht, ct) = self.layer(word_emb)
     enc_output, _ = pad_packed_sequence(enc_output,  padding_value=self.hparams.pad_id)
     enc_output = enc_output.permute(1, 0, 2)
-    #print(enc_output)
-    #print(ht.size())
 
     dec_init_cell = self.bridge(torch.cat([ct[0], ct[1]], 1))
     dec_init_state = F.tanh(dec_init_cell)
     #dec_init_state = self.bridge(torch.cat([ht[0], ht[1]], 1))
     dec_init = (dec_init_state, dec_init_cell)
-    #print(dec_init_state)
-    #print(dec_init_cell)
-    #exit(0)
     return enc_output, dec_init
 
 class Decoder(nn.Module):
@@ -138,8 +133,6 @@ class Decoder(nn.Module):
     super(Decoder, self).__init__()
     self.hparams = hparams
     
-    # transform encoder state vectors into attention key vector
-    self.enc_to_k = nn.Linear(hparams.d_model * 2, hparams.d_model, bias=False)
     #self.attention = DotProdAttn(hparams)
     self.attention = MlpAttn(hparams)
     # transform [ctx, h_t] to readout state vectors before softmax
@@ -149,18 +142,17 @@ class Decoder(nn.Module):
                                  self.hparams.d_word_vec,
                                  padding_idx=hparams.pad_id)
     # input: [y_t-1, input_feed]
-    self.layer = nn.LSTMCell(hparams.d_word_vec + hparams.d_model, 
+    self.layer = nn.LSTMCell(hparams.d_word_vec + hparams.d_model * 2, 
                              hparams.d_model)
     self.dropout = nn.Dropout(hparams.dropout)
     if self.hparams.cuda:
-      self.enc_to_k = self.enc_to_k.cuda()
       self.ctx_to_readout = self.ctx_to_readout.cuda()
       self.readout = self.readout.cuda()
       self.word_emb = self.word_emb.cuda()
       self.layer = self.layer.cuda()
       self.dropout = self.dropout.cuda()
 
-  def forward(self, x_enc, dec_init, x_mask, y_train, y_mask):
+  def forward(self, x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask):
     # get decoder init state and cell, use x_ct
     """
     x_enc: [batch_size, max_x_len, d_model * 2]
@@ -172,9 +164,8 @@ class Decoder(nn.Module):
 
     hidden = dec_init 
     #x_enc_k = self.enc_to_k(x_enc.contiguous().view(-1, self.hparams.d_model * 2)).contiguous().view(batch_size, -1, self.hparams.d_model)
-    x_enc_k = self.enc_to_k(x_enc)
-    #input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model), requires_grad=False)
-    input_feed = Variable(dec_init[1][1].data.new(batch_size, self.hparams.d_model).zero_(), requires_grad=False)
+    input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=False)
+    #input_feed = Variable(dec_init[1][1].data.new(batch_size, self.hparams.d_model).zero_(), requires_grad=False)
     if self.hparams.cuda:
       input_feed = input_feed.cuda()
     # [batch_size, y_len, d_word_vec]
@@ -185,6 +176,9 @@ class Decoder(nn.Module):
       y_input = torch.cat([y_emb_tm1, input_feed], dim=1)
       
       h_t, c_t = self.layer(y_input, hidden)
+      #print(y_input.size())
+      #print(h_t.size())
+      #print(c_t.size())
       ctx = self.attention(h_t, x_enc_k, x_enc, attn_mask=x_mask)
       pre_readout = F.tanh(self.ctx_to_readout(torch.cat([h_t, ctx], dim=1)))
       pre_readout = self.dropout(pre_readout)
@@ -192,11 +186,24 @@ class Decoder(nn.Module):
       score_t = self.readout(pre_readout)
       logits.append(score_t)
 
-      input_feed = pre_readout
+      input_feed = ctx
       hidden = (h_t, c_t)
     # [len_y, batch_size, trg_vocab_size]
     logits = torch.stack(logits).transpose(0, 1).contiguous()
     return logits
+
+  def step(self, x_enc, x_enc_k, y_tm1, dec_state, ctx_t):
+    y_emb_tm1 = self.word_emb(y_tm1)
+    y_input = torch.cat([y_emb_tm1, ctx_t], dim=1)
+    #print (y_input.size())
+    #print (dec_state[0].size())
+    #print (dec_state[1].size())
+    h_t, c_t = self.layer(y_input, dec_state)
+    ctx = self.attention(h_t, x_enc_k, x_enc)
+    pre_readout = F.tanh(self.ctx_to_readout(torch.cat([h_t, ctx], dim=1)))
+    logits = self.readout(pre_readout)
+
+    return logits, (h_t, c_t), ctx
 
 class Seq2Seq(nn.Module):
   
@@ -204,6 +211,11 @@ class Seq2Seq(nn.Module):
     super(Seq2Seq, self).__init__()
     self.encoder = Encoder(hparams)
     self.decoder = Decoder(hparams)
+    # transform encoder state vectors into attention key vector
+    self.enc_to_k = nn.Linear(hparams.d_model * 2, hparams.d_model, bias=False)
+    self.hparams = hparams
+    if self.hparams.cuda:
+      self.enc_to_k = self.enc_to_k.cuda()
 
   def forward(self, x_train, x_mask, x_len, y_train, y_mask, y_len):
     # [batch_size, x_len, d_model * 2]
@@ -211,10 +223,72 @@ class Seq2Seq(nn.Module):
     #print("x_mask", x_mask)
     #print("x_len", x_len)
     x_enc, dec_init = self.encoder(x_train, x_len)
+    x_enc_k = self.enc_to_k(x_enc)
     # [batch_size, y_len-1, trg_vocab_size]
-    logits = self.decoder(x_enc, dec_init, x_mask, y_train, y_mask)
+    logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask)
     return logits
 
-  #def translate(self, x_train, x_mask, x_len):
-  #  x_enc, x_ht, x_ct = self.encoder(x_train, x_len)
+  def translate(self, x_train, x_len, max_len=100, beam_size=5):
+    hyps = []
+    for x, l in zip(x_train, x_len):
+      hyp = self.translate_sent(x, l, max_len=max_len, beam_size=beam_size)[0]
+      hyps.append(hyp[1:-1])
+    return hyps
 
+  def translate_sent(self, x_train, x_len, max_len=100, beam_size=5):
+    assert len(x_train.size()) == 1
+    x_train = x_train.unsqueeze(0)
+    x_len = [x_len]
+    x_enc, dec_init = self.encoder(x_train, x_len)
+    x_enc_k = self.enc_to_k(x_enc)
+    length = 0
+    completed_hyp = []
+    input_feed = Variable(torch.zeros(1, self.hparams.d_model * 2), requires_grad=False)
+    active_hyp = [Hyp(state=dec_init, y=[self.hparams.bos_id], ctx_tm1=input_feed, score=0.)]
+    while len(completed_hyp) < beam_size and length < max_len:
+      new_hyp_score_list = []
+      #hyp_num = len(active_hyp)
+      #cur_x_enc = x_enc.repeat(hyp_num, 1, 1)
+      #cur_x_enc_k = x_enc_k.repeat(hyp_num, 1, 1)
+      #y_tm1 = Variable(torch.LongTensor([hyp.y[-1] for hyp in active_hyp]), volatile=True)
+      #if self.hparams.cuda:
+      #  y_tm1 = y_tm1.cuda()
+      #logits = self.decoder.step(cur_x_enc, cur_x_enc_k, y_tm1, )
+      for i, hyp in enumerate(active_hyp):
+        y_tm1 = Variable(torch.LongTensor([int(hyp.y[-1])] ), volatile=True)
+        if self.hparams.cuda:
+          y_tm1 = y_tm1.cuda()
+        logits, dec_state, ctx = self.decoder.step(x_enc, x_enc_k, y_tm1, hyp.state, hyp.ctx_tm1)
+        hyp.state = dec_state
+        hyp.ctx_tm1 = ctx 
+
+        p_t = F.softmax(logits, -1).data
+        new_hyp_scores = hyp.score + p_t 
+        new_hyp_score_list.append(new_hyp_scores)
+
+      live_hyp_num = beam_size - len(completed_hyp)
+      new_hyp_scores = np.concatenate(new_hyp_score_list).flatten()
+      new_hyp_pos = (-new_hyp_scores).argsort()[:live_hyp_num]
+      prev_hyp_ids = new_hyp_pos / self.hparams.target_vocab_size
+      word_ids = new_hyp_pos % self.hparams.target_vocab_size
+      new_hyp_scores = new_hyp_scores[new_hyp_pos]
+
+      new_hypotheses = []
+      for prev_hyp_id, word_id, hyp_score in zip(prev_hyp_ids, word_ids, new_hyp_scores):
+        prev_hyp = active_hyp[int(prev_hyp_id)]
+        hyp = Hyp(state=prev_hyp.state, y=prev_hyp.y+[word_id], ctx_tm1=prev_hyp.ctx_tm1, score=hyp_score)
+        if word_id == self.hparams.eos_id:
+          completed_hyp.append(hyp)
+        else:
+          new_hypotheses.append(hyp)
+      active_hyp = new_hypotheses
+    if len(completed_hyp) == 0:
+      completed_hyp.append(active_hyp[0])
+    return sorted(completed_hyp, key=lambda x: x.score, reverse=True)
+
+class Hyp(object):
+  def __init__(self, state, y, ctx_tm1, score):
+    self.state = state
+    self.y = y 
+    self.ctx_tm1 = ctx_tm1
+    self.score = score

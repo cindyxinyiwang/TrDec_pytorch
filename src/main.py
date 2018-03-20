@@ -90,26 +90,19 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
       y_valid[:, :-1], y_mask[:, :-1], y_len)
     logits = logits.view(-1, hparams.target_vocab_size)
     n_batches += 1
-    # if n_batches >= 1:
-    #   print(logits[5])
-    #   return
     labels = y_valid[:, 1:].contiguous().view(-1)
 
     val_loss, val_acc = get_performance(crit, logits, labels, hparams)
-    # valid_loss += val_loss.data[0]
     valid_loss += val_loss.data[0]
     valid_acc += val_acc.data[0]
     # print("{0:<5d} / {1:<5d}".format(val_acc.data[0], y_count))
 
     # BLEU eval
     if eval_bleu:
-      all_hyps, all_scores = model.translate_batch(
-        x_valid, x_mask, x_len, args.beam_size, args.max_len)
-      filtered_tokens = set([hparams.bos_id, hparams.eos_id])
-      for h in all_hyps:
-        h_best = h[0]
-        h_best_words = map(lambda wi: data.target_index_to_word[wi],
-                           filter(lambda wi: wi not in filtered_tokens, h_best))
+      hyps = model.translate(
+        x_valid, x_len, beam_size=args.beam_size, max_len=args.max_len)
+      for h in hyps:
+        h_best_words = map(lambda wi: data.target_index_to_word[wi], h)
         line = ''.join(h_best_words)
         line = line.replace('▁', ' ').strip()
         out_file.write(line + '\n')
@@ -132,6 +125,7 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     bleu_str = bleu_str.split('\n')[-1].strip()
     reg = re.compile("BLEU = ([^,]*).*")
     valid_bleu = float(reg.match(bleu_str).group(1))
+    log_string += " val_bleu={0:<.2f}".format(valid_bleu)
   print(log_string)
   model.train()
   return val_ppl, valid_bleu
@@ -246,10 +240,16 @@ def train():
       log_string += " time(min)={0:<5.2f}".format(since_start)
       print(log_string)
     if step % args.eval_every == 0:
-      val_ppl, val_bleu = eval(model, data, crit, step, hparams, valid_batch_size=20)	
+      val_ppl, val_bleu = eval(model, data, crit, step, hparams, eval_bleu=args.eval_bleu, valid_batch_size=20)	
       based_on_bleu = args.eval_bleu
       if based_on_bleu:
-      	save = True
+        if best_val_bleu <= val_bleu:
+          save = True 
+          best_val_bleu = val_bleu
+          cur_attempt = 0
+        else:
+          save = False
+          cur_attempt += 1
       else:
       	if best_val_ppl >= val_ppl:
           save = True
