@@ -16,7 +16,7 @@ import numpy as np
 #INP_NAMES = ["kyoto-train.lowpiece.en", "kyoto-train.lowpiece.ja"]
 #OUT_NAMES = ["full-vocab.en", "full-vocab.ja"]
 DATA_PATH = "data/orm_data/"
-INP_NAMES = ["set0-trainunfilt.tok.eng", "set0-trainunfilt.tok.orm"]
+INP_NAMES = ["set0-trainunfilt.tok.piece.eng", "set0-trainunfilt.tok.piece.orm"]
 OUT_NAMES = ["vocab.eng", "vocab.orm"]
 
 

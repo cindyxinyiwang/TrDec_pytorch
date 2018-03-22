@@ -209,106 +209,24 @@ class Seq2Seq(nn.Module):
   
   def __init__(self, hparams):
     super(Seq2Seq, self).__init__()
+    self.encoder = Encoder(hparams)
+    self.decoder = Decoder(hparams)
+    # transform encoder state vectors into attention key vector
+    self.enc_to_k = nn.Linear(hparams.d_model * 2, hparams.d_model, bias=False)
     self.hparams = hparams
-    self.src_embed = nn.Embedding(self.hparams.source_vocab_size, 
-                                  self.hparams.d_word_vec, 
-                                  padding_idx=self.hparams.pad_id)
-    self.trg_embed = nn.Embedding(self.hparams.target_vocab_size, 
-                                  self.hparams.d_word_vec, 
-                                  padding_idx=self.hparams.pad_id)
-    self.encoder_lstm = nn.LSTM(self.hparams.d_word_vec, 
-                                self.hparams.d_model, 
-                                bidirectional=True, 
-                                dropout=self.hparams.dropout)
-    self.decoder_lstm = nn.LSTMCell(self.hparams.d_word_vec + self.hparams.d_model, 
-                                self.hparams.d_model)  
-    # dot prod attn
-    self.att_src_linear = nn.Linear(self.hparams.d_model*2, self.hparams.d_model, bias=False)
-    # prereadout
-    self.att_vec_linear = nn.Linear(self.hparams.d_model*2+self.hparams.d_model, self.hparams.d_model, bias=False) 
-    self.readout = nn.Linear(self.hparams.d_model, self.hparams.target_vocab_size, bias=False)
-    self.dropout = nn.Dropout(self.hparams.dropout)
-    # init decoder 
-    self.decoder_cell_init = nn.Linear(self.hparams.d_model*2, self.hparams.d_model)
     if self.hparams.cuda:
-      self.src_embed = self.src_embed.cuda()
-      self.trg_embed = self.trg_embed.cuda()
-      self.encoder_lstm = self.encoder_lstm.cuda()
-      self.decoder_lstm = self.decoder_lstm.cuda()
-      self.att_src_linear = self.att_src_linear.cuda()
-      self.att_vec_linear = self.att_vec_linear.cuda()
-      self.readout = self.readout.cuda()
-      self.dropout = self.dropout.cuda()
-      self.decoder_cell_init = self.decoder_cell_init.cuda()
+      self.enc_to_k = self.enc_to_k.cuda()
 
   def forward(self, x_train, x_mask, x_len, y_train, y_mask, y_len):
-    #print(x_train)
-    #print(x_len)
-    #print(y_train)
-    #print(y_mask)
-    src_encodings, dec_init_vec = self.encode(x_train, x_len)
-    scores = self.decode(src_encodings, dec_init_vec, y_train, x_mask)
-    return scores
-
-  def encode(self, x_train, x_len):
-    """
-    param x_train: [x_max_len, batch_size], sorted by length of source
-    param x_len: [batch_size]
-    """
-    src_word_embed = self.src_embed(x_train)
-    #packed_src_embed = pack_padded_sequence(src_word_embed, x_len)
-    output, (last_state, last_cell) = self.encoder_lstm(src_word_embed)
-    #output, _ = pad_packed_sequence(output, padding_value=self.hparams.pad_id)
-
-    dec_init_cell = self.decoder_cell_init(torch.cat([last_cell[0], last_cell[1]], 1))
-    dec_init_state = F.tanh(dec_init_cell)
-
-    return output, (dec_init_state, dec_init_cell)
-
-  def decode(self, src_encodings, dec_init_vec, y_train, x_mask):
-    """
-    param: src_encodings [x_max_len, batch_size, d_model]
-    param: dec_init_vec [batch_size, d_model]
-    param: y_train [y_max_len, batch_size]
-    """
-    init_state, init_cell = dec_init_vec
-    batch_size = src_encodings.size(1)
-    hidden = dec_init_vec
-
-    src_encodings = src_encodings.permute(1, 0, 2)
-    src_encodings_att = self.att_src_linear(src_encodings)
-    att_tm1 = Variable(init_cell.data.new(batch_size, self.hparams.d_model).zero_(), requires_grad=False)
-
-    trg_word_embed = self.trg_embed(y_train)
-    scores = []
-    for y_tm1_embed in trg_word_embed.split(split_size=1):
-      x = torch.cat([y_tm1_embed.squeeze(0), att_tm1], 1)
-      h_t, cell_t = self.decoder_lstm(x, hidden)
-      h_t = self.dropout(h_t)
-
-      ctx_t, alpha_t = self.dot_prod_attention(h_t, src_encodings, src_encodings_att)
-      att_t = F.tanh(self.att_vec_linear(torch.cat([h_t, ctx_t], 1)))
-      att_t = self.dropout(att_t)
-      score_t = self.readout(att_t)
-      scores.append(score_t)
-
-      att_tm1 = att_t
-      hidden = h_t, cell_t
-    scores = torch.stack(scores)
-    return scores
-
-  def dot_prod_attention(self, h_t, src_enc, src_enc_linear, mask=None):
-    """
-    param h_t: [batch_size, d_model]
-    param src_enc: [batch_size, src_sent_len, d_model * 2]
-    param src_enc_linear: [batch_size, src_sent_len, d_model]
-    param: mask [batch_size, src_sent_len]
-    """
-    att_weight = torch.bmm(src_enc_linear, h_t.unsqueeze(2)).squeeze(2)
-    att_weight = F.softmax(att_weight, dim=-1)
-    ctx = torch.bmm(att_weight.unsqueeze(1), src_enc).squeeze(1)
-
-    return ctx, att_weight
+    # [batch_size, x_len, d_model * 2]
+    #print("x_train", x_train)
+    #print("x_mask", x_mask)
+    #print("x_len", x_len)
+    x_enc, dec_init = self.encoder(x_train, x_len)
+    x_enc_k = self.enc_to_k(x_enc)
+    # [batch_size, y_len-1, trg_vocab_size]
+    logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask)
+    return logits
 
   def translate(self, x_train, x_len, max_len=100, beam_size=5):
     hyps = []
@@ -321,7 +239,7 @@ class Seq2Seq(nn.Module):
     assert len(x_train.size()) == 1
     x_train = x_train.unsqueeze(0)
     x_len = [x_len]
-    x_enc, dec_init = self.encode(x_train, x_len)
+    x_enc, dec_init = self.encoder(x_train, x_len)
     x_enc_k = self.enc_to_k(x_enc)
     length = 0
     completed_hyp = []

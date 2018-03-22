@@ -87,10 +87,10 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
 
     logits = model.forward(
       x_valid, x_mask, x_len,
-      y_valid[:, :-1], y_mask[:, :-1], y_len)
+      y_valid[:-1, :], y_mask[:-1, :], y_len)
     logits = logits.view(-1, hparams.target_vocab_size)
     n_batches += 1
-    labels = y_valid[:, 1:].contiguous().view(-1)
+    labels = y_valid[1:, :].contiguous().view(-1)
 
     val_loss, val_acc = get_performance(crit, logits, labels, hparams)
     valid_loss += val_loss.data[0]
@@ -208,12 +208,14 @@ def train():
     ((x_train, x_mask, x_len, x_count),
      (y_train, y_mask, y_len, y_count),
      batch_size) = data.next_train()
-
+    #print(y_train)
+    #print(y_mask)
+    #exit(0)
     optim.zero_grad()
 
-    logits = model.forward(x_train, x_mask, x_len, y_train[:, :-1], y_mask[:, :-1], y_len)
+    logits = model.forward(x_train, x_mask, x_len, y_train[:-1, :], y_mask[:-1, :], y_len)
     logits = logits.view(-1, hparams.target_vocab_size)
-    labels = y_train[:, 1:].contiguous().view(-1)
+    labels = y_train[1:, :].contiguous().view(-1)
     tr_loss, tr_acc = get_performance(crit, logits, labels, hparams)
     total_loss += tr_loss.data[0]
     total_corrects += tr_acc.data[0]
