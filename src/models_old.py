@@ -27,8 +27,10 @@ class MlpAttn(nn.Module):
     assert 2*d_k == d_v
     assert len_k == len_v
     # (batch_size, len_k, d_k)
-    att_src_hidden = k + self.w_trg(q).unsqueeze(1)
+    att_src_hidden = nn.functional.tanh(k + self.w_trg(q).unsqueeze(1))
+    # (batch_size, len_k)
     att_src_weights = self.w_att(att_src_hidden).squeeze(2)
+    #att_src_weights = self.w_att(att_src_hidden.view(-1, d_k)).view(batch_size, len_v)
     if not attn_mask is None:
       att_src_weights.data.masked_fill_(attn_mask, -self.hparams.inf)
     att_src_weights = F.softmax(att_src_weights, dim=-1)
