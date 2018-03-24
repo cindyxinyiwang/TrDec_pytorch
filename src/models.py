@@ -310,76 +310,98 @@ class Seq2Seq(nn.Module):
 
     return ctx, att_weight
 
-  def translate(self, x_train, x_len, max_len=100, beam_size=5):
+  def translate(self, src_sents, src_len, max_len=100, beam_size=5):
     hyps = []
-    for x, l in zip(x_train, x_len):
+    #src_sents = src_sents.transpose(0, 1)
+    batch_size = src_sents.size(1)
+    for i in range(batch_size):
+      x = src_sents[:, i]
+      l = src_len[i]
       hyp = self.translate_sent(x, l, max_len=max_len, beam_size=beam_size)[0]
-      hyps.append(hyp.y[1:-1])
+      hyps.append(hyp)
     return hyps
 
-  def translate_sent(self, x_train, x_len, max_len=100, beam_size=5):
-    assert len(x_train.size()) == 1
-    x_train = x_train.unsqueeze(0)
-    x_len = [x_len]
-    x_enc, dec_init = self.encode(x_train, x_len)
-    x_enc_k = self.enc_to_k(x_enc)
-    length = 0
-    completed_hyp = []
-    input_feed = Variable(torch.zeros(1, self.hparams.d_model * 2), requires_grad=False)
+  def translate_sent(self, src, l, max_len=100, beam_size=5):
+    assert len(src.size()) == 1
+    src = src.unsqueeze(1)
+    x_len = [l]
+
+    src_encodings, dec_init_vec = self.encode(src, x_len)
+    src_encodings_att = self.att_src_linear(src_encodings)
+     
+    init_state, init_cell = dec_init_vec
+    hidden = dec_init_vec
+
+    att_tm1 = Variable(torch.zeros(1, self.hparams.d_model), volatile=True)
+    hyp_scores = Variable(torch.zeros(1), volatile=True)
     if self.hparams.cuda:
-      input_feed = input_feed.cuda()
-    active_hyp = [Hyp(state=dec_init, y=[self.hparams.bos_id], ctx_tm1=input_feed, score=0.)]
-    while len(completed_hyp) < beam_size and length < max_len:
+      att_tm1 = att_tm1.cuda()
+      hyp_scores = hyp_scores.cuda()
+
+    length = 0
+    hypothesis = [[self.hparams.bos_id]]
+    completed_hypothesis = []
+    completed_hypothesis_scores = []
+    while len(completed_hypothesis) < beam_size and length < max_len:
       length += 1
-      new_hyp_score_list = []
-      #hyp_num = len(active_hyp)
-      #cur_x_enc = x_enc.repeat(hyp_num, 1, 1)
-      #cur_x_enc_k = x_enc_k.repeat(hyp_num, 1, 1)
-      #y_tm1 = Variable(torch.LongTensor([hyp.y[-1] for hyp in active_hyp]), volatile=True)
-      #if self.hparams.cuda:
-      #  y_tm1 = y_tm1.cuda()
-      #logits = self.decoder.step(cur_x_enc, cur_x_enc_k, y_tm1, )
-      for i, hyp in enumerate(active_hyp):
-        y_tm1 = Variable(torch.LongTensor([int(hyp.y[-1])] ), volatile=True)
-        if self.hparams.cuda:
-          y_tm1 = y_tm1.cuda()
-        logits, dec_state, ctx = self.decoder.step(x_enc, x_enc_k, y_tm1, hyp.state, hyp.ctx_tm1)
-        hyp.state = dec_state
-        hyp.ctx_tm1 = ctx 
+      hyp_num = len(hypothesis)
 
-        p_t = F.softmax(logits, -1).data
-        new_hyp_scores = hyp.score + p_t 
-        #print(new_hyp_scores)
-        #print(p_t)
-        new_hyp_score_list.append(new_hyp_scores)
-        #print(hyp.y)
-        #print(dec_state)
-        #if len(active_hyp) > i+1:
-        #  print(active_hyp[i+1].state)
-      #print()
-      #exit(0)
-      live_hyp_num = beam_size - len(completed_hyp)
-      new_hyp_scores = np.concatenate(new_hyp_score_list).flatten()
-      new_hyp_pos = (-new_hyp_scores).argsort()[:live_hyp_num]
-      prev_hyp_ids = new_hyp_pos / self.hparams.target_vocab_size
-      word_ids = new_hyp_pos % self.hparams.target_vocab_size
-      new_hyp_scores = new_hyp_scores[new_hyp_pos]
+      exp_src_encoding = src_encodings.expand(src_encodings.size(0), hyp_num, src_encodings.size(2)).permute(1, 0, 2)
+      exp_src_encoding_att = src_encodings_att.expand(src_encodings_att.size(0), hyp_num, src_encodings_att.size(2)).permute(1, 0, 2)
 
-      new_hypotheses = []
-      for prev_hyp_id, word_id, hyp_score in zip(prev_hyp_ids, word_ids, new_hyp_scores):
-        prev_hyp = active_hyp[int(prev_hyp_id)]
-        hyp = Hyp(state=prev_hyp.state, y=prev_hyp.y+[word_id], ctx_tm1=prev_hyp.ctx_tm1, score=hyp_score)
+      y_tm1 = Variable(torch.LongTensor([hyp[-1] for hyp in hypothesis]), volatile=True)
+      if self.hparams.cuda:
+        y_tm1 = y_tm1.cuda()
+      y_tm1_embed = self.trg_embed(y_tm1)
+      x = torch.cat([y_tm1_embed, att_tm1], 1)
+      h_t, cell_t = self.decoder_lstm(x, hidden)
+      h_t = self.dropout(h_t)
+
+      ctx_t, alpha_t = self.dot_prod_attention(h_t, exp_src_encoding, exp_src_encoding_att)
+
+      att_t = F.tanh(self.att_vec_linear(torch.cat([h_t, ctx_t], 1)))
+      att_t = self.dropout(att_t)
+
+      score_t = self.readout(att_t)
+      p_t = F.softmax(score_t, dim=-1)
+
+      live_hyp_num = beam_size - len(completed_hypothesis) 
+      new_hyp_scores = (hyp_scores.unsqueeze(1).expand_as(p_t)+p_t).view(-1)
+      top_new_hyp_scores, top_new_hyp_pos = torch.topk(new_hyp_scores, k=live_hyp_num)
+      prev_hyp_ids = top_new_hyp_pos / self.hparams.target_vocab_size
+      word_ids = top_new_hyp_pos % self.hparams.target_vocab_size
+
+      new_hypothesis = []
+      live_hyp_ids = []
+      new_hyp_scores = []
+      for prev_hyp_id, word_id, new_hyp_score in zip(prev_hyp_ids.cpu().data, word_ids.cpu().data, top_new_hyp_scores.cpu().data):
+        hyp_trg_words = hypothesis[prev_hyp_id] + [word_id]
         if word_id == self.hparams.eos_id:
-          completed_hyp.append(hyp)
+          completed_hypothesis.append(hyp_trg_words)
+          completed_hypothesis_scores.append(new_hyp_scores)
         else:
-          new_hypotheses.append(hyp)
-        #print(word_id, hyp_score)
-      #exit(0)
-      active_hyp = new_hypotheses
+          new_hypothesis.append(hyp_trg_words)
+          live_hyp_ids.append(prev_hyp_id)
+          new_hyp_scores.append(new_hyp_score)
+      if len(completed_hypothesis) == beam_size: break
 
-    if len(completed_hyp) == 0:
-      completed_hyp.append(active_hyp[0])
-    return sorted(completed_hyp, key=lambda x: x.score, reverse=True)
+      live_hyp_ids = torch.LongTensor(live_hyp_ids)
+      if self.hparams.cuda:
+        live_hyp_ids = live_hyp_ids.cuda()
+      hidden = (h_t[live_hyp_ids], cell_t[live_hyp_ids])
+      att_tm1 = att_t[live_hyp_ids]
+
+      hyp_scores = Variable(torch.FloatTensor(new_hyp_scores), volatile=True)
+      if self.hparams.cuda:
+        hyp_scores = hyp_scores.cuda()
+      hypothesis = new_hypothesis
+    if len(completed_hypothesis) == 0:
+      completed_hypothesis = [hypothesis[0]]
+      completed_hypothesis_scores = [0.0]
+
+    ranked_hypothesis = sorted(zip(completed_hypothesis, completed_hypothesis_scores), key=lambda x:x[1], reverse=True)
+    return [hyp for hyp, score in ranked_hypothesis]
+    #return sorted(completed_hyp, key=lambda x: x.score, reverse=True)
 
 class Hyp(object):
   def __init__(self, state, y, ctx_tm1, score):

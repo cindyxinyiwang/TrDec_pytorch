@@ -68,7 +68,7 @@ class DataLoader(object):
       self.reset_valid()
 
 
-  def reset_train_old(self):
+  def reset_train(self):
     """Shuffle training data. Prepare the batching scheme if necessary."""
 
     if self.hparams.batcher == "word":
@@ -116,7 +116,7 @@ class DataLoader(object):
     # pad data
     x_test = self.x_test[start_index: end_index]
     y_test = self.y_test[start_index: end_index]
-    x_test, y_test = self.sort_by_xlen(x_test, y_test)
+    #x_test, y_test = self.sort_by_xlen(x_test, y_test)
 
     x_test, x_mask, x_len, x_count = self._pad(
       sentences=x_test, pad_id=self.pad_id, volatile=True)

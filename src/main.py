@@ -4,15 +4,17 @@ import time
 import shutil
 import gc
 import random
+import subprocess
+import re
 
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
-from data_utils import DataLoader
+from data_utils_old import DataLoader
 from hparams import *
 from utils import *
-from models import *
+from models_old import *
 
 parser = argparse.ArgumentParser(description="Neural MT")
 
@@ -55,9 +57,13 @@ parser.add_argument("--patience", type=int, default=-1, help="patience")
 
 parser.add_argument("--seed", type=int, default=19920206, help="random seed")
 
+parser.add_argument("--init_range", type=float, default=0.1, help="L2 init range")
+parser.add_argument("--init_type", type=str, default="uniform", help="uniform|xavier_uniform|xavier_normal|kaiming_uniform|kaiming_normal")
+
 args = parser.parse_args()
 def eval(model, data, crit, step, hparams, eval_bleu=False,
          valid_batch_size=20):
+  valid_batch_size = 2
   print("Eval at step {0}. valid_batch_size={1}".format(step, valid_batch_size))
 
   model.eval()
@@ -78,7 +84,10 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     ((x_valid, x_mask, x_len, x_count),
      (y_valid, y_mask, y_len, y_count),
      batch_size, end_of_epoch) = data.next_valid(valid_batch_size=valid_batch_size)
-
+    #print(x_valid)
+    #print(x_mask)
+    #print(y_valid)
+    #print(y_mask)
     # do this since you shift y_valid[:, 1:] and y_valid[:, :-1]
     y_count -= batch_size
 
@@ -87,10 +96,10 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
 
     logits = model.forward(
       x_valid, x_mask, x_len,
-      y_valid[:-1, :], y_mask[:-1, :], y_len)
+      y_valid[:,:-1], y_mask[:,:-1], y_len)
     logits = logits.view(-1, hparams.target_vocab_size)
     n_batches += 1
-    labels = y_valid[1:, :].contiguous().view(-1)
+    labels = y_valid[:,1:].contiguous().view(-1)
 
     val_loss, val_acc = get_performance(crit, logits, labels, hparams)
     valid_loss += val_loss.data[0]
@@ -128,6 +137,7 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     log_string += " val_bleu={0:<.2f}".format(valid_bleu)
   print(log_string)
   model.train()
+  #exit(0)
   return val_ppl, valid_bleu
 
 def train():
@@ -154,7 +164,9 @@ def train():
       batcher=args.batcher,
       n_train_steps=args.n_train_steps,
       dropout=args.dropout,
-      lr=args.lr
+      lr=args.lr,
+      init_type=args.init_type,
+      init_range=args.init_range,
     )
   data = DataLoader(hparams=hparams)
   hparams.add_param("source_vocab_size", data.source_vocab_size)
@@ -182,6 +194,10 @@ def train():
     step, best_val_ppl, best_val_bleu, cur_attempt, lr = torch.load(extra_file_name)
   else:
     model = Seq2Seq(hparams=hparams)
+    if args.init_type == "uniform":
+      print("initialize uniform with range {}".format(args.init_range))
+      for p in model.parameters():
+        p.data.uniform_(-args.init_range, args.init_range)
     trainable_params = [
       p for p in model.parameters() if p.requires_grad]
     optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
@@ -208,14 +224,16 @@ def train():
     ((x_train, x_mask, x_len, x_count),
      (y_train, y_mask, y_len, y_count),
      batch_size) = data.next_train()
+    #print(x_train)
+    #print(x_mask)
     #print(y_train)
     #print(y_mask)
     #exit(0)
     optim.zero_grad()
 
-    logits = model.forward(x_train, x_mask, x_len, y_train[:-1, :], y_mask[:-1, :], y_len)
+    logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1], y_mask[:,:-1], y_len)
     logits = logits.view(-1, hparams.target_vocab_size)
-    labels = y_train[1:, :].contiguous().view(-1)
+    labels = y_train[:,1:].contiguous().view(-1)
     tr_loss, tr_acc = get_performance(crit, logits, labels, hparams)
     total_loss += tr_loss.data[0]
     total_corrects += tr_acc.data[0]
@@ -224,6 +242,7 @@ def train():
 
     tr_loss.div_(batch_size).backward()
     grad_norm = torch.nn.utils.clip_grad_norm(model.parameters(), args.clip_grad)
+    #grad_norm = 0
     optim.step()
 
     if step % args.log_every == 0:

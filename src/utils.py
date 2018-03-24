@@ -50,3 +50,48 @@ class Logger(object):
 def set_lr(optim, lr):
   for param_group in optim.param_groups:
     param_group["lr"] = lr
+
+def init_param(p, init_type="uniform", init_range=None):
+  if init_type == "xavier_normal":
+    init.xavier_normal(p)
+  elif init_type == "xavier_uniform":
+    init.xavier_uniform(p)
+  elif init_type == "kaiming_normal":
+    init.kaiming_normal(p)
+  elif init_type == "kaiming_uniform":
+    init.kaiming_uniform(p)
+  elif init_type == "uniform":
+    assert init_range is not None and init_range > 0
+    init.uniform(p, -init_range, init_range)
+  else:
+    raise ValueError("Unknown init_type '{0}'".format(init_type))
+
+def add_argument(parser, name, type, default, help):
+  """Add an argument.
+
+  Args:
+    name: arg's name.
+    type: must be ["bool", "int", "float", "str"].
+    default: corresponding type of value.
+    help: help message.
+  """
+
+  if type == "bool":
+    feature_parser = parser.add_mutually_exclusive_group(required=False)
+    feature_parser.add_argument("--{0}".format(name), dest=name,
+                                action="store_true", help=help)
+    feature_parser.add_argument("--no_{0}".format(name), dest=name,
+                                action="store_false", help=help)
+    parser.set_defaults(name=default)
+  elif type == "int":
+    parser.add_argument("--{0}".format(name),
+                        type=int, default=default, help=help)
+  elif type == "float":
+    parser.add_argument("--{0}".format(name),
+                        type=float, default=default, help=help)
+  elif type == "str":
+    parser.add_argument("--{0}".format(name),
+                        type=str, default=default, help=help)
+  else:
+    raise ValueError("Unknown type '{0}'".format(type))
+
