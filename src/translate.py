@@ -72,37 +72,41 @@ data = DataLoader(hparams=hparams, decode=True)
 out_file = open(hparams.out_file, 'w', encoding='utf-8')
 end_of_epoch = False
 num_sentences = 0
-while not end_of_epoch:
-  ((x_test, x_mask, x_len, x_count),
-   (y_test, y_mask, y_len, y_count),
-   batch_size, end_of_epoch) = data.next_test(test_batch_size=hparams.batch_size)
 
-  num_sentences += batch_size
+x_test = data.x_test.tolist()
+hyps = model.translate(
+      x_test, beam_size=args.beam_size, max_len=args.max_len)
+#while not end_of_epoch:
+#  ((x_test, x_mask, x_len, x_count),
+#   (y_test, y_mask, y_len, y_count),
+#   batch_size, end_of_epoch) = data.next_test(test_batch_size=hparams.batch_size)
+#
+#  num_sentences += batch_size
+#
+#  # The normal, correct way:
+#  hyps = model.translate(
+#        x_test, x_len, beam_size=args.beam_size, max_len=args.max_len)
+#  # For debugging:
+#  # model.debug_translate_batch(
+#  #   x_test, x_mask, x_pos_emb_indices, hparams.beam_size, hparams.max_len,
+#  #   y_test, y_mask, y_pos_emb_indices)
+#  # sys.exit(0)
 
-  # The normal, correct way:
-  hyps = model.translate(
-        x_test, x_len, beam_size=args.beam_size, max_len=args.max_len)
-  # For debugging:
-  # model.debug_translate_batch(
-  #   x_test, x_mask, x_pos_emb_indices, hparams.beam_size, hparams.max_len,
-  #   y_test, y_mask, y_pos_emb_indices)
-  # sys.exit(0)
+for h in hyps:
+  #print(h)
+  h_best_words = map(lambda wi: data.target_index_to_word[wi],
+                     filter(lambda wi: wi not in hparams.filtered_tokens, h))
+  if hparams.merge_bpe:
+    line = ''.join(h_best_words)
+    line = line.replace('▁', ' ')
+  else:
+    line = ' '.join(h_best_words)
+  line = line.strip()
+  out_file.write(line + '\n')
+  out_file.flush()
 
-  for h in hyps:
-    #print(h)
-    h_best_words = map(lambda wi: data.target_index_to_word[wi],
-                       filter(lambda wi: wi not in hparams.filtered_tokens, h))
-    if hparams.merge_bpe:
-      line = ''.join(h_best_words)
-      line = line.replace('▁', ' ')
-    else:
-      line = ' '.join(h_best_words)
-    line = line.strip()
-    out_file.write(line + '\n')
-    out_file.flush()
-  
-  print("Translated {0} sentences".format(num_sentences))
-  sys.stdout.flush()
+print("Translated {0} sentences".format(num_sentences))
+sys.stdout.flush()
 
 out_file.close()
 

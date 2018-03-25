@@ -105,18 +105,21 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     valid_loss += val_loss.data[0]
     valid_acc += val_acc.data[0]
     # print("{0:<5d} / {1:<5d}".format(val_acc.data[0], y_count))
-
-    # BLEU eval
-    if eval_bleu:
-      hyps = model.translate(
-        x_valid, x_len, beam_size=args.beam_size, max_len=args.max_len)
-      for h in hyps:
-        h_best_words = map(lambda wi: data.target_index_to_word[wi], h)
-        line = ''.join(h_best_words)
-        line = line.replace('▁', ' ').strip()
-        out_file.write(line + '\n')
     if end_of_epoch:
       break
+  # BLEU eval
+  if eval_bleu:
+    x_valid = data.x_valid.tolist()
+    #print(x_valid)
+    #x_valid = Variable(torch.LongTensor(x_valid), volatile=True)
+    hyps = model.translate(
+      x_valid, beam_size=args.beam_size, max_len=args.max_len)
+    for h in hyps:
+      h_best_words = map(lambda wi: data.target_index_to_word[wi], h)
+      line = ''.join(h_best_words)
+      line = line.replace('▁', ' ').strip()
+      out_file.write(line + '\n')
+
   val_ppl = np.exp(valid_loss / valid_words)
   log_string = "val_step={0:<6d}".format(step)
   log_string += " loss={0:<6.2f}".format(valid_loss / valid_words)
@@ -125,7 +128,7 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
   if eval_bleu:
     out_file.close()
     if args.target_valid_ref:
-      ref_file = args.target_valid_ref
+      ref_file = os.path.join(hparams.data_path, args.target_valid_ref)
     else:
       ref_file = os.path.join(hparams.data_path, args.target_valid)
     bleu_str = subprocess.getoutput(
@@ -187,6 +190,9 @@ def train():
 
     optim_file_name = os.path.join(args.output_dir, "optimizer.pt")
     print("Loading optimizer from {}".format(optim_file_name))
+    trainable_params = [
+      p for p in model.parameters() if p.requires_grad]
+    optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
     optimizer_state = torch.load(optim_file_name)
     optim.load_state_dict(optimizer_state)
 

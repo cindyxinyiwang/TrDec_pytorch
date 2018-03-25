@@ -230,17 +230,20 @@ class Seq2Seq(nn.Module):
     logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask)
     return logits
 
-  def translate(self, x_train, x_len, max_len=100, beam_size=5):
+  def translate(self, x_train, max_len=100, beam_size=5):
     hyps = []
-    for x, l in zip(x_train, x_len):
-      hyp = self.translate_sent(x, l, max_len=max_len, beam_size=beam_size)[0]
+    for x in x_train:
+      x = Variable(torch.LongTensor(x), volatile=True)
+      if self.hparams.cuda:
+        x = x.cuda()
+      hyp = self.translate_sent(x, max_len=max_len, beam_size=beam_size)[0]
       hyps.append(hyp.y[1:-1])
     return hyps
 
-  def translate_sent(self, x_train, x_len, max_len=100, beam_size=5):
+  def translate_sent(self, x_train, max_len=100, beam_size=5):
     assert len(x_train.size()) == 1
+    x_len = [x_train.size(0)]
     x_train = x_train.unsqueeze(0)
-    x_len = [x_len]
     x_enc, dec_init = self.encoder(x_train, x_len)
     x_enc_k = self.enc_to_k(x_enc)
     length = 0
