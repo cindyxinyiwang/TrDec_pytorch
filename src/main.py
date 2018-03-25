@@ -11,10 +11,10 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
-from data_utils_old import DataLoader
+from data_utils import DataLoader
 from hparams import *
 from utils import *
-from models_old import *
+from models import *
 
 parser = argparse.ArgumentParser(description="Neural MT")
 

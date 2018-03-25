@@ -8,8 +8,6 @@ import shutil
 import os
 import sys
 import time
-import math
-from collections import defaultdict
 
 import torch
 import torch.nn as nn
@@ -60,32 +58,46 @@ class DataLoader(object):
 
       # signifies that x_train, y_train are not ready for batching
       self.train_size = len(self.x_train)
-      self.train_batched_data = self.data_bucket(self.x_train, self.y_train, self.hparams.batch_size)
-      self.n_train_batches = len(self.train_batched_data)
+      self.n_train_batches = None  
       self.reset_train()
+
       # valid data
       self.x_valid, self.y_valid = self._build_parallel(
         self.hparams.source_valid, self.hparams.target_valid, is_training=False)
-      self.valid_batched_data = self.data_bucket(self.x_valid, self.y_valid, self.hparams.batch_size)
-      self.n_valid_batches = len(self.valid_batched_data)
+      self.valid_size = len(self.x_valid)
       self.reset_valid()
 
-  def data_bucket(self, src, trg, batch_size):
-    buckets = defaultdict(list)
-    for x, y in zip(src, trg):
-      buckets[len(x)].append((x, y))
-
-    batch_data = []
-    for l, pairs in buckets.items():
-      start = 0
-      while start < len(pairs):
-        end = min(len(pairs), start + batch_size)
-        batch_data.append(pairs[start:end])
-        start = end
-    return batch_data
 
   def reset_train(self):
     """Shuffle training data. Prepare the batching scheme if necessary."""
+
+    if self.hparams.batcher == "word":
+      if self.n_train_batches is None:
+        start_indices, end_indices = [], []
+        start_index = 0
+        while start_index < self.train_size:
+          end_index = start_index
+          word_count = 0
+          while (end_index + 1 < self.train_size and
+                 (word_count +
+                  len(self.x_train[end_index + 1]) +
+                  len(self.y_train[end_index + 1])) <= self.hparams.batch_size):
+            end_index += 1
+            word_count += (len(self.x_train[end_index]) +
+                           len(self.y_train[end_index]))
+          start_indices.append(start_index)
+          end_indices.append(end_index + 1)
+          start_index = end_index + 1
+        assert len(start_indices) == len(end_indices)
+        self.n_train_batches = len(start_indices)
+        self.start_indices = start_indices
+        self.end_indices = end_indices
+    elif self.hparams.batcher == "sent":
+      if self.n_train_batches is None:
+        self.n_train_batches = ((self.train_size + self.hparams.batch_size - 1)
+                                // self.hparams.batch_size)
+    else:
+      raise ValueError("Unknown batcher scheme '{0}'".format(self.batcher))
     self.train_queue = np.random.permutation(self.n_train_batches)
     self.train_index = 0
 
@@ -104,7 +116,7 @@ class DataLoader(object):
     # pad data
     x_test = self.x_test[start_index: end_index]
     y_test = self.y_test[start_index: end_index]
-    x_test, y_test = self.sort_by_xlen(x_test, y_test)
+    #x_test, y_test = self.sort_by_xlen(x_test, y_test)
 
     x_test, x_mask, x_len, x_count = self._pad(
       sentences=x_test, pad_id=self.pad_id, volatile=True)
@@ -117,10 +129,6 @@ class DataLoader(object):
     else:
       self.test_index += batch_size
 
-    x_test = x_test.transpose(0, 1)
-    y_test = y_test.transpose(0, 1)
-    x_mask = x_mask.transpose(0, 1)
-    y_mask = y_mask.transpose(0, 1)
     return ((x_test, x_mask, x_len, x_count),
             (y_test, y_mask, y_len, y_count),
             batch_size, end_of_epoch)
@@ -137,29 +145,27 @@ class DataLoader(object):
     """
 
     end_of_epoch = False
-    pairs = self.valid_batched_data[self.valid_index]
-    self.valid_index += 1
+    start_index = self.valid_index
+    end_index = min(start_index + valid_batch_size, self.valid_size)
+    batch_size = end_index - start_index
 
-    x_valid, y_valid = [], []
-    for x, y in pairs:
-      x_valid.append(x)
-      y_valid.append(y)
+    # pad data
+    x_valid = self.x_valid[start_index : end_index]
+    y_valid = self.y_valid[start_index : end_index]
+    x_valid, y_valid = self.sort_by_xlen(x_valid, y_valid)
 
     x_valid, x_mask, x_len, x_count = self._pad(
       sentences=x_valid, pad_id=self.pad_id, volatile=True)
     y_valid, y_mask, y_len, y_count = self._pad(
       sentences=y_valid, pad_id=self.pad_id, volatile=True)
 
-    self.valid_index += 1
-    if self.valid_index >= self.n_valid_batches:
+    # shuffle if reaches the end of data
+    if end_index >= self.valid_size:
       end_of_epoch = True
       self.valid_index = 0
-    
-    batch_size = len(x_valid)
-    x_valid = x_valid.transpose(0, 1)
-    y_valid = y_valid.transpose(0, 1)
-    x_mask = x_mask.transpose(0, 1)
-    y_mask = y_mask.transpose(0, 1)
+    else:
+      self.valid_index += batch_size
+
     return ((x_valid, x_mask, x_len, x_count),
             (y_valid, y_mask, y_len, y_count),
             batch_size, end_of_epoch)
@@ -174,30 +180,33 @@ class DataLoader(object):
         and [batch_size].
       end_of_epoch: whether we reach the end of training examples.
     """
-    
-    pairs = self.train_batched_data[self.train_queue[self.train_index]]
-    np.random.shuffle(pairs)
-    x_train, y_train = [], []
+    if self.hparams.batcher == "word":
+      start_index = self.start_indices[self.train_queue[self.train_index]]
+      end_index = self.end_indices[self.train_queue[self.train_index]]
+    elif self.hparams.batcher == "sent":
+      start_index = (self.train_queue[self.train_index] *
+                     self.hparams.batch_size)
+      end_index = min(start_index + self.hparams.batch_size, self.train_size)
+    else:
+      raise ValueError("Unknown batcher '{0}'".format(self.hparams.batcher))
 
-    for x, y in pairs:
-      x_train.append(x)
-      y_train.append(y)
+    x_train = self.x_train[start_index : end_index]
+    y_train = self.y_train[start_index : end_index]
     self.train_index += 1
-    if self.train_index >= self.n_train_batches:
-      self.reset_train()
     batch_size = len(x_train)
+    #x_train[0] = x_train[0][:3]
     # sort based on x_len
-    #x_train, y_train = self.sort_by_xlen(x_train, y_train)
+    x_train, y_train = self.sort_by_xlen(x_train, y_train)
     # pad data
     x_train, x_mask, x_len, x_count = self._pad(
       sentences=x_train, pad_id=self.pad_id)
     y_train, y_mask, y_len, y_count = self._pad(
       sentences=y_train, pad_id=self.pad_id)
 
-    x_train = x_train.transpose(0, 1)
-    y_train = y_train.transpose(0, 1)
-    x_mask = x_mask.transpose(0, 1)
-    y_mask = y_mask.transpose(0, 1)
+    # shuffle if reaches the end of data
+    if self.train_index > self.n_train_batches - 1:
+      self.reset_train()
+
     return ((x_train, x_mask, x_len, x_count),
             (y_train, y_mask, y_len, y_count),
             batch_size)
