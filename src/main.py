@@ -18,6 +18,8 @@ from models import *
 
 parser = argparse.ArgumentParser(description="Neural MT")
 
+parser.add_argument("--trdec", action="store_true", help="use the trdec model")
+
 parser.add_argument("--load_model", action="store_true", help="load an existing model")
 parser.add_argument("--reset_output_dir", action="store_true", help="delete output directory if it exists")
 parser.add_argument("--output_dir", type=str, default="outputs", help="path to output directory")
@@ -45,6 +47,12 @@ parser.add_argument("--source_vocab", type=str, default=None, help="source vocab
 parser.add_argument("--target_vocab", type=str, default=None, help="target vocab file")
 parser.add_argument("--source_test", type=str, default=None, help="source test file")
 parser.add_argument("--target_test", type=str, default=None, help="target test file")
+
+parser.add_argument("--target_tree_train", type=str, default=None, help="target train tree file")
+parser.add_argument("--target_tree_valid", type=str, default=None, help="target valid tree file")
+parser.add_argument("--target_tree_test", type=str, default=None, help="target test file")
+parser.add_argument("--target_tree_vocab", type=str, default=None, help="target rule vocab file")
+parser.add_argument("--target_word_vocab", type=str, default=None, help="target word vocab file")
 
 parser.add_argument("--batch_size", type=int, default=32, help="batch_size")
 parser.add_argument("--batcher", type=str, default="sent", help="sent|word. Batch either by number of words or number of sentences")
@@ -170,10 +178,20 @@ def train():
       lr=args.lr,
       init_type=args.init_type,
       init_range=args.init_range,
+      trdec=args.trdec,
+      target_tree_vocab=args.target_tree_vocab,
+      target_word_vocab=args.target_word_vocab,
+      target_tree_train=args.target_tree_train,
+      target_tree_valid=args.target_tree_valid,
+      target_tree_test=args.target_tree_test,
     )
   data = DataLoader(hparams=hparams)
   hparams.add_param("source_vocab_size", data.source_vocab_size)
-  hparams.add_param("target_vocab_size", data.target_vocab_size)
+  if args.trdec:
+    hparams.add_param("target_rule_vocab_size", data.target_rule_vocab_size)
+    hparams.add_param("target_word_vocab_size", data.target_word_vocab_size)
+  else:
+    hparams.add_param("target_vocab_size", data.target_vocab_size)
   hparams.add_param("pad_id", data.pad_id)
   hparams.add_param("unk_id", data.unk_id)
   hparams.add_param("bos_id", data.bos_id)
@@ -199,15 +217,18 @@ def train():
     extra_file_name = os.path.join(args.output_dir, "extra.pt")
     step, best_val_ppl, best_val_bleu, cur_attempt, lr = torch.load(extra_file_name)
   else:
-    model = Seq2Seq(hparams=hparams)
-    if args.init_type == "uniform":
-      print("initialize uniform with range {}".format(args.init_range))
-      for p in model.parameters():
-        p.data.uniform_(-args.init_range, args.init_range)
-    trainable_params = [
-      p for p in model.parameters() if p.requires_grad]
-    optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
-    #optim = torch.optim.Adam(trainable_params)
+    if args.trdec:
+      model = None
+    else:
+      model = Seq2Seq(hparams=hparams)
+      if args.init_type == "uniform":
+        print("initialize uniform with range {}".format(args.init_range))
+        for p in model.parameters():
+          p.data.uniform_(-args.init_range, args.init_range)
+      trainable_params = [
+        p for p in model.parameters() if p.requires_grad]
+      optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
+      #optim = torch.optim.Adam(trainable_params)
 
     step = 0
     best_val_ppl = 1e10
@@ -215,17 +236,17 @@ def train():
     cur_attempt = 0
     lr = hparams.lr
 
-  crit = get_criterion(hparams)
-  trainable_params = [
-    p for p in model.parameters() if p.requires_grad]
-  num_params = count_params(trainable_params)
-  print("Model has {0} params".format(num_params))
+  #crit = get_criterion(hparams)
+  #trainable_params = [
+  #  p for p in model.parameters() if p.requires_grad]
+  #num_params = count_params(trainable_params)
+  #print("Model has {0} params".format(num_params))
 
   print("-" * 80)
   print("start training...")
   start_time = log_start_time = time.time()
   target_words, total_loss, total_corrects = 0, 0, 0
-  model.train()
+  #model.train()
   while True:
     ((x_train, x_mask, x_len, x_count),
      (y_train, y_mask, y_len, y_count),

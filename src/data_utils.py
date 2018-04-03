@@ -12,6 +12,7 @@ import time
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+from tree_utils import *
 
 import numpy as np
 
@@ -35,14 +36,21 @@ class DataLoader(object):
      self.source_index_to_word, self.source_vocab_size) = self._build_vocab(self.hparams.source_vocab)
     #self.source_vocab_size = len(self.source_word_to_index)
 
-    (self.target_word_to_index,
-     self.target_index_to_word, self.target_vocab_size) = self._build_vocab(self.hparams.target_vocab)
-    #self.target_vocab_size = len(self.target_word_to_index)
-
-    assert self.source_word_to_index[self.hparams.pad] == self.target_word_to_index[self.hparams.pad]
-    assert self.source_word_to_index[self.hparams.unk] == self.target_word_to_index[self.hparams.unk]
-    assert self.source_word_to_index[self.hparams.bos] == self.target_word_to_index[self.hparams.bos]
-    assert self.source_word_to_index[self.hparams.eos] == self.target_word_to_index[self.hparams.eos]
+    if self.hparams.trdec:
+      self.target_tree_vocab, self.target_word_vocab = self._build_tree_vocab(self.hparams.target_tree_vocab, 
+                                                                              self.hparams.target_word_vocab)
+      self.target_rule_vocab_size = len(self.target_tree_vocab)
+      self.target_word_vocab_size = len(self.target_word_vocab)
+    else:
+      (self.target_word_to_index,
+       self.target_index_to_word, self.target_vocab_size) = self._build_vocab(self.hparams.target_vocab)
+      #self.target_vocab_size = len(self.target_word_to_index)
+    
+    if not self.hparams.trdec:
+      assert self.source_word_to_index[self.hparams.pad] == self.target_word_to_index[self.hparams.pad]
+      assert self.source_word_to_index[self.hparams.unk] == self.target_word_to_index[self.hparams.unk]
+      assert self.source_word_to_index[self.hparams.bos] == self.target_word_to_index[self.hparams.bos]
+      assert self.source_word_to_index[self.hparams.eos] == self.target_word_to_index[self.hparams.eos]
 
     if self.decode:
       self.x_test, self.y_test = self._build_parallel(
@@ -52,9 +60,14 @@ class DataLoader(object):
       return
     else:
       # train data
-      self.x_train, self.y_train = self._build_parallel(
-        self.hparams.source_train, self.hparams.target_train, is_training=True,
-        sort=True)
+      if self.hparams.trdec:
+        self.x_train, self.y_word_train, self.y_train = self._build_tree_parallel(
+          self.hparams.source_train, self.hparams.target_train, self.hparams.target_tree_train,
+          is_training=True, sort=True)
+      else:
+        self.x_train, self.y_train = self._build_parallel(
+          self.hparams.source_train, self.hparams.target_train, is_training=True,
+          sort=True)
 
       # signifies that x_train, y_train are not ready for batching
       self.train_size = len(self.x_train)
@@ -62,8 +75,13 @@ class DataLoader(object):
       self.reset_train()
 
       # valid data
-      self.x_valid, self.y_valid = self._build_parallel(
-        self.hparams.source_valid, self.hparams.target_valid, is_training=False)
+      if self.hparams.trdec:
+        self.x_valid, self.y_word_valid, self.y_valid = self._build_tree_parallel(
+          self.hparams.source_valid, self.hparams.target_valid, self.hparams.target_tree_valid,
+          is_training=False)
+      else:
+        self.x_valid, self.y_valid = self._build_parallel(
+          self.hparams.source_valid, self.hparams.target_valid, is_training=False)
       self.valid_size = len(self.x_valid)
       self.reset_valid()
 
@@ -200,8 +218,12 @@ class DataLoader(object):
     # pad data
     x_train, x_mask, x_len, x_count = self._pad(
       sentences=x_train, pad_id=self.pad_id)
-    y_train, y_mask, y_len, y_count = self._pad(
-      sentences=y_train, pad_id=self.pad_id)
+    if self.hparams.trdec:
+      y_train, y_mask, y_len, y_count = self._pad_tree(
+        sentences=y_train, pad_id=self.pad_id)
+    else:
+      y_train, y_mask, y_len, y_count = self._pad(
+        sentences=y_train, pad_id=self.pad_id)
 
     # shuffle if reaches the end of data
     if self.train_index > self.n_train_batches - 1:
@@ -240,6 +262,30 @@ class DataLoader(object):
 
     padded_sentences = [
       sentence + ([pad_id] * (max_len - len(sentence)))
+      for sentence in sentences]
+    mask = [
+      ([0] * len(sentence)) + ([1] * (max_len - len(sentence)))
+      for sentence in sentences]
+
+    padded_sentences = Variable(torch.LongTensor(padded_sentences))
+    mask = torch.ByteTensor(mask)
+    #l = Variable(torch.FloatTensor(lengths))
+
+    if self.hparams.cuda:
+      padded_sentences = padded_sentences.cuda()
+      mask = mask.cuda()
+      #l = l.cuda()
+
+    return padded_sentences, mask, lengths, sum_len
+
+  def _pad_tree(self, sentences, pad_id, volatile=False):
+    lengths = [len(sentence) for sentence in sentences]
+    sum_len = sum(lengths)
+    max_len = max(lengths)
+    
+    item_size = len(sentences[0][0])
+    padded_sentences = [
+      sentence + ([[pad_id]*item_size] * (max_len - len(sentence)))
       for sentence in sentences]
     mask = [
       ([0] * len(sentence)) + ([1] * (max_len - len(sentence)))
@@ -375,3 +421,107 @@ class DataLoader(object):
 
     return word_to_index, index_to_word, len(word_to_index) + missed_word
 
+  def _build_tree_vocab(self, rule_file_name, word_file_name):
+    """Build word_to_index and index_to word dicts."""
+    print("-" * 80)
+    print("Loading rule vocab from '{0}' and '{1}".format(rule_file_name, word_file_name))
+    rule_file_name = os.path.join(self.hparams.data_path, rule_file_name)
+    word_file_name = os.path.join(self.hparams.data_path, word_file_name)
+
+    word_vocab = Vocab(hparams=self.hparams, vocab_file=word_file_name)
+    rule_vocab = RuleVocab(hparams=self.hparams, vocab_file=rule_file_name, offset=len(word_vocab))
+
+    print("Done. rule_vocab_size = {0}".format(len(rule_vocab)))
+    print("Done. word_vocab_size = {0}".format(len(word_vocab)))
+    return rule_vocab, word_vocab
+
+  def _build_tree_parallel(self, source_file, target_file, trg_tree_file, is_training, sort=False):
+    """Build pair of data."""
+
+    print("-" * 80)
+    print("Loading parallel tree data from '{0}' and '{1}' and '{2}'".format(
+      source_file, target_file, trg_tree_file))
+
+    source_file = os.path.join(self.hparams.data_path, source_file)
+    with open(source_file, encoding='utf-8') as finp:
+      source_lines = finp.read().split("\n")
+
+    target_file = os.path.join(self.hparams.data_path, target_file)
+    with open(target_file, encoding='utf-8') as finp:
+      target_lines = finp.read().split("\n")
+
+    trg_tree_file = os.path.join(self.hparams.data_path, trg_tree_file)
+    with open(trg_tree_file, encoding='utf-8') as finp:
+      trg_tree_lines = finp.read().split("\n")
+
+    source_data, target_data, trg_tree_data = [], [], []
+    source_lens = []
+    total_sents = 0
+    source_unk_count, target_unk_count, trg_tree_unk_count = 0, 0, 0
+    for i, (source_line, target_line, trg_tree_line) in enumerate(
+        zip(source_lines, target_lines, trg_tree_lines)):
+      source_line = source_line.strip()
+      target_line = target_line.strip()
+      trg_tree_line = trg_tree_line.strip()
+      if not source_line or not target_line or not trg_tree_line:
+        continue
+
+      source_indices, target_indices, trg_tree_indices = [self.bos_id], [self.bos_id], [self.bos_id]
+      source_tokens = source_line.split()
+      target_tokens = target_line.split()
+      if is_training and len(target_line) > self.hparams.max_len:
+        continue
+
+      total_sents += 1
+
+      for source_token in source_tokens:
+        #source_token = source_token.strip()
+        if source_token not in self.source_word_to_index:
+          source_token = self.hparams.unk
+          source_unk_count += 1
+          #print(source_token)
+        source_index = self.source_word_to_index[source_token]
+        source_indices.append(source_index)
+
+      for target_token in target_tokens:
+        target_index = self.target_word_vocab.convert(target_token)
+        target_indices.append(target_index)
+
+      # Process tree
+      tree = Tree(parse_root(tokenize(trg_tree_line)))
+      remove_preterminal_POS(tree.root)
+      pieces = sent_piece_segs(target_line)
+      split_sent_piece(tree.root, pieces, 0)
+      add_preterminal_wordswitch(tree.root, add_eos=True)
+      tree.reset_timestep()
+      trg_tree_indices = tree.get_data_root(self.target_tree_vocab, self.target_word_vocab)
+
+      source_indices += [self.eos_id]
+      target_indices += [self.eos_id]
+      #assert source_indices[-1] == self.eos_id
+      #assert target_indices[-1] == self.eos_id
+
+      source_lens.append(len(source_indices))
+      source_data.append(source_indices)
+      target_data.append(target_indices)
+      trg_tree_data.append(trg_tree_indices)
+      #print(trg_tree_indices)
+      if (self.hparams.n_train_sents is not None and
+          self.hparams.n_train_sents <= total_sents):
+        break
+
+      if total_sents % 10000 == 0:
+        print("{0:>6d} pairs. src_unk={1}. tgt_unk={2}".format(
+          total_sents, source_unk_count, target_unk_count))
+
+    assert len(source_data) == len(target_data)
+    print("{0:>6d} pairs. src_unk={1}. tgt_unk={2}".format(
+      total_sents, source_unk_count, target_unk_count))
+
+    if sort:
+      print("Heuristic sort based on source lens")
+      indices = np.argsort(source_lens)
+      source_data = [source_data[index] for index in indices]
+      target_data = [target_data[index] for index in indices]
+
+    return np.array(source_data), np.array(target_data), np.array(trg_tree_data)
