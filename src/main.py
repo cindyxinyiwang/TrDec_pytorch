@@ -15,6 +15,7 @@ from data_utils import DataLoader
 from hparams import *
 from utils import *
 from models import *
+from trdec import *
 
 parser = argparse.ArgumentParser(description="Neural MT")
 
@@ -102,14 +103,21 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     # word count
     valid_words += y_count
 
-    logits = model.forward(
-      x_valid, x_mask, x_len,
-      y_valid[:,:-1], y_mask[:,:-1], y_len)
-    logits = logits.view(-1, hparams.target_vocab_size)
+    if args.trdec:
+      logits = model.forward(
+        x_valid, x_mask, x_len,
+        y_valid[:,:-1,:], y_mask[:,:-1], y_len)
+      logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
+      labels = y_valid[:,1:,0].contiguous().view(-1)
+      val_loss, val_acc = get_performance(crit, logits, labels, hparams, offset=hparams.target_word_vocab_size)
+    else:
+      logits = model.forward(
+        x_valid, x_mask, x_len,
+        y_valid[:,:-1], y_mask[:,:-1], y_len)
+      logits = logits.view(-1, hparams.target_vocab_size)
+      labels = y_valid[:,1:].contiguous().view(-1)
+      val_loss, val_acc = get_performance(crit, logits, labels, hparams)
     n_batches += 1
-    labels = y_valid[:,1:].contiguous().view(-1)
-
-    val_loss, val_acc = get_performance(crit, logits, labels, hparams)
     valid_loss += val_loss.data[0]
     valid_acc += val_acc.data[0]
     # print("{0:<5d} / {1:<5d}".format(val_acc.data[0], y_count))
@@ -218,17 +226,17 @@ def train():
     step, best_val_ppl, best_val_bleu, cur_attempt, lr = torch.load(extra_file_name)
   else:
     if args.trdec:
-      model = None
+      model = TrDec(hparams=hparams)
     else:
       model = Seq2Seq(hparams=hparams)
-      if args.init_type == "uniform":
-        print("initialize uniform with range {}".format(args.init_range))
-        for p in model.parameters():
-          p.data.uniform_(-args.init_range, args.init_range)
-      trainable_params = [
-        p for p in model.parameters() if p.requires_grad]
-      optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
-      #optim = torch.optim.Adam(trainable_params)
+    if args.init_type == "uniform":
+      print("initialize uniform with range {}".format(args.init_range))
+      for p in model.parameters():
+        p.data.uniform_(-args.init_range, args.init_range)
+    trainable_params = [
+      p for p in model.parameters() if p.requires_grad]
+    optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
+    #optim = torch.optim.Adam(trainable_params)
 
     step = 0
     best_val_ppl = 1e10
@@ -236,11 +244,11 @@ def train():
     cur_attempt = 0
     lr = hparams.lr
 
-  #crit = get_criterion(hparams)
-  #trainable_params = [
-  #  p for p in model.parameters() if p.requires_grad]
-  #num_params = count_params(trainable_params)
-  #print("Model has {0} params".format(num_params))
+  crit = get_criterion(hparams)
+  trainable_params = [
+    p for p in model.parameters() if p.requires_grad]
+  num_params = count_params(trainable_params)
+  print("Model has {0} params".format(num_params))
 
   print("-" * 80)
   print("start training...")
@@ -257,11 +265,16 @@ def train():
     #print(y_mask)
     #exit(0)
     optim.zero_grad()
-
-    logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1], y_mask[:,:-1], y_len)
-    logits = logits.view(-1, hparams.target_vocab_size)
-    labels = y_train[:,1:].contiguous().view(-1)
-    tr_loss, tr_acc = get_performance(crit, logits, labels, hparams)
+    if args.trdec:
+      logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len)
+      logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
+      labels = y_train[:,1:,0].contiguous().view(-1)
+      tr_loss, tr_acc = get_performance(crit, logits, labels, hparams, offset=hparams.target_word_vocab_size)
+    else:
+      logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1], y_mask[:,:-1], y_len)
+      logits = logits.view(-1, hparams.target_vocab_size)
+      labels = y_train[:,1:].contiguous().view(-1)
+      tr_loss, tr_acc = get_performance(crit, logits, labels, hparams)
     total_loss += tr_loss.data[0]
     total_corrects += tr_acc.data[0]
     target_words += (y_count - batch_size)

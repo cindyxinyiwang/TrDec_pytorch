@@ -138,8 +138,12 @@ class DataLoader(object):
 
     x_test, x_mask, x_len, x_count = self._pad(
       sentences=x_test, pad_id=self.pad_id, volatile=True)
-    y_test, y_mask, y_len, y_count = self._pad(
-      sentences=y_test, pad_id=self.pad_id, volatile=True)
+    if self.hparams.trdec:
+      y_test, y_mask, y_len, y_count = self._pad_tree(
+        sentences=y_test, pad_id=self.pad_id, volatile=True)
+    else:
+      y_test, y_mask, y_len, y_count = self._pad(
+        sentences=y_test, pad_id=self.pad_id, volatile=True)
 
     if end_index >= self.test_size:
       end_of_epoch = True
@@ -174,8 +178,12 @@ class DataLoader(object):
 
     x_valid, x_mask, x_len, x_count = self._pad(
       sentences=x_valid, pad_id=self.pad_id, volatile=True)
-    y_valid, y_mask, y_len, y_count = self._pad(
-      sentences=y_valid, pad_id=self.pad_id, volatile=True)
+    if self.hparams.trdec:
+      y_valid, y_mask, y_len, y_count = self._pad_tree(
+        sentences=y_valid, pad_id=self.pad_id, volatile=True)
+    else:
+      y_valid, y_mask, y_len, y_count = self._pad(
+        sentences=y_valid, pad_id=self.pad_id, volatile=True)
 
     # shuffle if reaches the end of data
     if end_index >= self.valid_size:
@@ -431,6 +439,11 @@ class DataLoader(object):
     word_vocab = Vocab(hparams=self.hparams, vocab_file=word_file_name)
     rule_vocab = RuleVocab(hparams=self.hparams, vocab_file=rule_file_name, offset=len(word_vocab))
 
+    self.unk_id = word_vocab.UNK 
+    self.bos_id = word_vocab.BS 
+    self.eos_id = word_vocab.ES 
+    self.pad_id = word_vocab.PAD
+
     print("Done. rule_vocab_size = {0}".format(len(rule_vocab)))
     print("Done. word_vocab_size = {0}".format(len(word_vocab)))
     return rule_vocab, word_vocab
@@ -490,12 +503,26 @@ class DataLoader(object):
       # Process tree
       tree = Tree(parse_root(tokenize(trg_tree_line)))
       remove_preterminal_POS(tree.root)
+      #print(tree)
       pieces = sent_piece_segs(target_line)
+      #print(pieces)
       split_sent_piece(tree.root, pieces, 0)
+      #print(tree)
       add_preterminal_wordswitch(tree.root, add_eos=True)
+      #print(tree)
       tree.reset_timestep()
       trg_tree_indices = tree.get_data_root(self.target_tree_vocab, self.target_word_vocab)
-
+      
+      #print(trg_tree_line)
+      #print(tree)
+      #print(tree.to_parse_string())
+      #for data in trg_tree_indices:
+      #  idx, paren_t, is_word = data 
+      #  if is_word:
+      #    print(self.target_word_vocab[idx], data)
+      #  else:
+      #    print(self.target_tree_vocab[idx], data)
+      #exit(0)
       source_indices += [self.eos_id]
       target_indices += [self.eos_id]
       #assert source_indices[-1] == self.eos_id

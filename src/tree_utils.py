@@ -14,6 +14,10 @@ class Vocab(object):
     vocab_file (str): file containing one word per line, and not containing <s>, </s>, <unk>
   '''
   ES_STR = "</s>"
+  PAD = 0
+  UNK = 1
+  BS = 2
+  ES = 3
   def __init__(self, hparams, i2w=None, vocab_file=None, frozen=True):
     assert i2w is None or vocab_file is None
     self.hparams = hparams
@@ -42,7 +46,7 @@ class Vocab(object):
   def convert(self, w):
     if w not in self.w2i:
       if self.frozen:
-       return self.hparams.unk_id
+       return self.UNK
       self.w2i[w] = len(self.i2w)
       self.i2w.append(w)
     return self.w2i[w]
@@ -57,6 +61,11 @@ class RuleVocab(object):
   '''
   Converts between strings and integer ids
   '''
+  ES_STR = "</s>"
+  PAD = 0
+  UNK = 1
+  BS = 2
+  ES = 3
   def __init__(self, hparams, vocab_file=None, frozen=True, offset=0):
     """
     :param i2w: list of words, including <s> and </s>
@@ -100,7 +109,7 @@ class RuleVocab(object):
     """ w is a Rule object """
     if w not in self.w2i:
       if self.frozen:
-        return self.hparams.unk_id + self.offset
+        return self.UNK + self.offset
       self.w2i[w] = len(self.i2w)
       self.lhs_to_index[w.lhs].append(len(self.i2w))
       self.i2w.append(w)
@@ -256,7 +265,7 @@ class TreeNode(object):
     for c in self.children:
       if hasattr(c, 'is_preterminal'):
         c.get_leaf_lens(len_dict)
-  def set_timestep(self, t, t2n=None, id2n=None, last_word_t=0, sib_t=0, open_stack=[]):
+  def set_timestep_old(self, t, t2n=None, id2n=None, last_word_t=0, sib_t=0, open_stack=[]):
     """
     initialize timestep for each node
     """
@@ -287,13 +296,45 @@ class TreeNode(object):
     c_t = t
     for c in self.children:
       # c_t = t + 1  # time of current child
-      if hasattr(c, 'set_timestep'):
+      if hasattr(c, 'set_timestep_old'):
         c_t = t + 1
-        t, next_word_t = c.set_timestep(c_t, t2n, id2n, next_word_t, sib_t, open_stack)
+        t, next_word_t = c.set_timestep_old(c_t, t2n, id2n, next_word_t, sib_t, open_stack)
       else:
         next_word_t = t
       sib_t = c_t
     return t, next_word_t
+
+  def set_timestep(self, t, num_node, t2n=None, id2n=None, open_stack=[]):
+    """
+    initialize timestep for each node
+    """
+    self.timestep = t
+    if not t2n is None:
+      assert num_node == len(t2n)
+      assert num_node not in t2n
+      t2n[num_node] = self
+    if not id2n is None:
+      self.id = num_node
+      id2n[num_node] = self
+    assert self.label == open_stack[-1]
+    open_stack.pop()
+    new_open_label = []
+    for c in self.children:
+      if hasattr(c, 'set_timestep'):
+        new_open_label.append(c.label)
+    new_open_label.reverse()
+    open_stack.extend(new_open_label)
+    if open_stack:
+      self.frontir_label = open_stack[-1]
+    else:
+      self.frontir_label = Vocab.ES_STR
+    c_t = t
+    for c in self.children:
+      c_t = t + 1  # time of current child
+      if hasattr(c, 'set_timestep'):
+        num_node += 1
+        t, num_node = c.set_timestep(c_t, num_node, t2n, id2n, open_stack)
+    return t, num_node
 
 class Tree(object):
   """A class that represents a parse tree"""
@@ -310,7 +351,7 @@ class Tree(object):
       self.root = TreeNode('XXX', [], id=0, timestep=0)
       self.id2n[0] = self.root
   def reset_timestep(self):
-    self.root.set_timestep(0, self.t2n, self.id2n, open_stack=['XXX'])
+    self.root.set_timestep(0, 0, self.t2n, self.id2n, open_stack=['XXX'])
   def __str__(self):
     return self.root.to_parse_string()
   def to_parse_string(self):
@@ -407,6 +448,7 @@ class Tree(object):
     convert subtree into the sentence it represents
     """
     return self.root.to_string(piece)
+
   def add_rule(self, id, rule):
     ''' Add one node to the tree based on current rule; only called on root tree '''
     node = self.id2n[id]
@@ -440,6 +482,7 @@ class Tree(object):
       data.append(0)
     data.append(self.id2n[id].last_word_t)
     return data
+
   def get_data_root(self, rule_vocab, word_vocab=None):
     data = []
     for t in range(1, len(self.t2n)):
@@ -459,9 +502,10 @@ class Tree(object):
           data.append(d)
       else:
         r = Rule(node.label, children, open_nonterms)
-        d = [rule_vocab.convert(Rule(node.label, children, open_nonterms)), paren_t, is_terminal]
+        d = [rule_vocab.convert(r), paren_t, is_terminal]
         data.append(d)
     return data
+
   def get_bpe_rule(self, rule_vocab):
     ''' Get the rules for doing bpe. Label left and right child '''
     rule_idx = []

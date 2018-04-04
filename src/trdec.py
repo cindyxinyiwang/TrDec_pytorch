@@ -13,29 +13,37 @@ class TreeDecoder(nn.Module):
   def __init__(self, hparams):
     super(TreeDecoder, self).__init__()
     self.hparams = hparams
-    self.emb = nn.Embedding(self.hparams.target_word_vocab_size+self.hparams.target_rule_vocab_size,
-                                 self.hparams.d_word_vec,
-                                 padding_idx=hparams.pad_id)
+    self.target_vocab_size = self.hparams.target_word_vocab_size+self.hparams.target_rule_vocab_size
+    self.emb = nn.Embedding(self.target_vocab_size,
+                            self.hparams.d_word_vec,
+                            padding_idx=hparams.pad_id)
     #self.attention = DotProdAttn(hparams)
     self.rule_attention = MlpAttn(hparams)
     self.word_attention = MlpAttn(hparams)
-    # transform [ctx, h_t] to readout state vectors before softmax
-    self.rule_ctx_to_readout = nn.Linear(hparams.d_model * 2 + hparams.d_model, hparams.d_model, bias=False)
-    self.rule_readout = nn.Linear(hparams.d_model, hparams.target_vocab_size, bias=False)
-    
-    self.word_ctx_to_readout = nn.Linear(hparams.d_model * 2 + hparams.d_model, hparams.d_model, bias=False)
-    self.word_readout = nn.Linear(hparams.d_model, hparams.target_vocab_size, bias=False)    
-    # input: [y_t-1, input_feed]
-    self.rule_lstm_cell = nn.LSTMCell(hparams.d_word_vec + hparams.d_model * 2, 
+    # transform [word_ctx, word_h_t, rule_ctx, rule_h_t] to readout state vectors before softmax
+    self.rule_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
+   
+    self.word_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
+
+    self.readout = nn.Linear(hparams.d_model, 
+                                  self.target_vocab_size, 
+                                  bias=False)  
+    # input: [y_t-1, parent_state, input_feed, word_state]
+    self.rule_lstm_cell = nn.LSTMCell(hparams.d_word_vec + hparams.d_model * 4, 
                              hparams.d_model)
-    self.word_lstm_cell = nn.LSTMCell(hparams.d_word_vec + hparams.d_model * 2, 
+    # input: [y_t-1, parent_state, input_feed]
+    self.word_lstm_cell = nn.LSTMCell(hparams.d_word_vec + hparams.d_model * 3, 
                              hparams.d_model)
     self.dropout = nn.Dropout(hparams.dropout)
     if self.hparams.cuda:
-      self.ctx_to_readout = self.ctx_to_readout.cuda()
+      self.emb = self.emb.cuda()
+      self.rule_attention = self.rule_attention.cuda()
+      self.word_attention = self.word_attention.cuda()
+      self.rule_ctx_to_readout = self.rule_lstm_cell.cuda()
+      self.word_ctx_to_readout = self.word_ctx_to_readout.cuda()
       self.readout = self.readout.cuda()
-      self.word_emb = self.word_emb.cuda()
-      self.layer = self.layer.cuda()
+      self.rule_lstm_cell = self.rule_lstm_cell.cuda()
+      self.word_lstm_cell = self.word_lstm_cell.cuda()
       self.dropout = self.dropout.cuda()
 
   def forward(self, x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask):
@@ -45,51 +53,88 @@ class TreeDecoder(nn.Module):
 
     """
     batch_size_x = x_enc.size()[0]
-    batch_size, y_max_len = y_train.size()
+    batch_size, y_max_len, data_len = y_train.size()
     assert batch_size_x == batch_size
     #print(y_train)
-    hidden = dec_init 
-    #x_enc_k = self.enc_to_k(x_enc.contiguous().view(-1, self.hparams.d_model * 2)).contiguous().view(batch_size, -1, self.hparams.d_model)
-    input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=False)
+    rule_hidden = dec_init 
+    word_hidden = dec_init
+    rule_input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=False)
+    word_input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=False)
     #input_feed = Variable(dec_init[1][1].data.new(batch_size, self.hparams.d_model).zero_(), requires_grad=False)
     if self.hparams.cuda:
-      input_feed = input_feed.cuda()
+      rule_input_feed = rule_input_feed.cuda()
+      word_input_feed = word_input_feed.cuda()
     # [batch_size, y_len, d_word_vec]
     trg_emb = self.emb(y_train[:, :, 0])
     logits = []
+    states = [Variable(torch.zeros(batch_size, self.hparams.d_model), requires_grad=False)] # (timestep, batch_size, d_model)
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
-      y_input = torch.cat([y_emb_tm1, input_feed], dim=1)
-      
-      h_t, c_t = self.layer(y_input, hidden)
-      #print(y_input.size())
-      #print(h_t.size())
-      #print(c_t.size())
-      ctx = self.attention(h_t, x_enc_k, x_enc, attn_mask=x_mask)
-      pre_readout = F.tanh(self.ctx_to_readout(torch.cat([h_t, ctx], dim=1)))
-      pre_readout = self.dropout(pre_readout)
 
-      score_t = self.readout(pre_readout)
+      all_state = torch.cat(states, dim=1).contiguous().view((t+1)*batch_size, self.hparams.d_model) # [batch_size*t, d_model]
+      parent_t = y_train.data[:, t, 1] + (t+1) * torch.arange(batch_size).long() # [batch_size,]
+      parent_t = Variable(parent_t, requires_grad=False)
+      #print(parent_t)
+      parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
+      
+      word_mask = y_train[:, t, 2].unsqueeze(1).expand(-1, self.hparams.d_model).float() # (1 is word, 0 is rule)
+      word_mask_vocab = y_train[:, t, 2].unsqueeze(1).expand(-1, self.target_vocab_size).float()
+
+      word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
+      word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
+      #print(word_h_t.size())
+      #print(word_mask.size())
+      #print(word_hidden[0].size())
+      word_h_t = word_h_t * word_mask + word_hidden[0] * (1-word_mask)
+      word_c_t = word_c_t * word_mask + word_hidden[1] * (1-word_mask)
+
+      rule_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed, word_h_t], dim=1)
+      rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
+
+      rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc, attn_mask=x_mask)
+      word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
+
+      #print(rule_h_t.size())
+      #print(rule_ctx.size())
+      #print(word_h_t.size())
+      #print(word_ctx.size())
+      inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
+      rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))
+      word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
+      
+      rule_pre_readout = self.dropout(rule_pre_readout)
+      word_pre_readout = self.dropout(word_pre_readout)
+
+      rule_score_t = self.readout(rule_pre_readout)
+      word_score_t = self.readout(word_pre_readout)
+
+      score_t = word_score_t*word_mask_vocab + rule_score_t*(1 - word_mask_vocab)
       logits.append(score_t)
 
-      input_feed = ctx
-      hidden = (h_t, c_t)
+      rule_input_feed = rule_ctx
+      word_input_feed = word_ctx
+
+      rule_hidden = (rule_h_t, rule_c_t)
+      word_hidden = (word_h_t, word_c_t)
+
+      states.append(rule_h_t)
     # [len_y, batch_size, trg_vocab_size]
     logits = torch.stack(logits).transpose(0, 1).contiguous()
     return logits
 
   def step(self, x_enc, x_enc_k, y_tm1, dec_state, ctx_t):
-    y_emb_tm1 = self.word_emb(y_tm1)
-    y_input = torch.cat([y_emb_tm1, ctx_t], dim=1)
+    #y_emb_tm1 = self.word_emb(y_tm1)
+    #y_input = torch.cat([y_emb_tm1, ctx_t], dim=1)
     #print (y_input.size())
     #print (dec_state[0].size())
     #print (dec_state[1].size())
-    h_t, c_t = self.layer(y_input, dec_state)
-    ctx = self.attention(h_t, x_enc_k, x_enc)
-    pre_readout = F.tanh(self.ctx_to_readout(torch.cat([h_t, ctx], dim=1)))
-    logits = self.readout(pre_readout)
+    #h_t, c_t = self.layer(y_input, dec_state)
+    #ctx = self.attention(h_t, x_enc_k, x_enc)
+    #pre_readout = F.tanh(self.ctx_to_readout(torch.cat([h_t, ctx], dim=1)))
+    #logits = self.readout(pre_readout)
 
-    return logits, (h_t, c_t), ctx
+    #return logits, (h_t, c_t), ctx
+    pass 
 
 class TrDec(nn.Module):
   
