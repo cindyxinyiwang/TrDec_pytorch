@@ -39,7 +39,7 @@ class TreeDecoder(nn.Module):
       self.emb = self.emb.cuda()
       self.rule_attention = self.rule_attention.cuda()
       self.word_attention = self.word_attention.cuda()
-      self.rule_ctx_to_readout = self.rule_lstm_cell.cuda()
+      self.rule_ctx_to_readout = self.rule_ctx_to_readout.cuda()
       self.word_ctx_to_readout = self.word_ctx_to_readout.cuda()
       self.readout = self.readout.cuda()
       self.rule_lstm_cell = self.rule_lstm_cell.cuda()
@@ -56,10 +56,16 @@ class TreeDecoder(nn.Module):
     batch_size, y_max_len, data_len = y_train.size()
     assert batch_size_x == batch_size
     #print(y_train)
+    input_feed_zeros = torch.zeros(batch_size, self.hparams.d_model * 2)
+    state_zeros = torch.zeros(batch_size, self.hparams.d_model)
+    if self.hparams.cuda:
+      input_feed_zeros = input_feed_zeros.cuda()
+      state_zeros = state_zeros.cuda()
+
     rule_hidden = dec_init 
     word_hidden = dec_init
-    rule_input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=False)
-    word_input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=False)
+    rule_input_feed = Variable(input_feed_zeros, requires_grad=False)
+    word_input_feed = Variable(input_feed_zeros, requires_grad=False)
     #input_feed = Variable(dec_init[1][1].data.new(batch_size, self.hparams.d_model).zero_(), requires_grad=False)
     if self.hparams.cuda:
       rule_input_feed = rule_input_feed.cuda()
@@ -67,12 +73,17 @@ class TreeDecoder(nn.Module):
     # [batch_size, y_len, d_word_vec]
     trg_emb = self.emb(y_train[:, :, 0])
     logits = []
-    states = [Variable(torch.zeros(batch_size, self.hparams.d_model), requires_grad=False)] # (timestep, batch_size, d_model)
+    states = [Variable(state_zeros, requires_grad=False)] # (timestep, batch_size, d_model)
+    offset = torch.arange(batch_size).long() 
+    if self.hparams.cuda:
+      offset = offset.cuda()
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
 
       all_state = torch.cat(states, dim=1).contiguous().view((t+1)*batch_size, self.hparams.d_model) # [batch_size*t, d_model]
-      parent_t = y_train.data[:, t, 1] + (t+1) * torch.arange(batch_size).long() # [batch_size,]
+      if self.hparams.cuda:
+        all_state = all_state.cuda()
+      parent_t = y_train.data[:, t, 1] + (t+1) * offset # [batch_size,]
       parent_t = Variable(parent_t, requires_grad=False)
       #print(parent_t)
       parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
@@ -226,7 +237,7 @@ class TrDec(nn.Module):
                   y=[self.hparams.bos_id], 
                   rule_ctx_tm1=rule_input_feed, 
                   word_ctx_tm1=word_input_feed,
-                  open_nonterms=[OpenNonterm(label='S', 
+                  open_nonterms=[OpenNonterm(label='ROOT', 
                     parent_state=Variable(torch.zeros(1, self.hparams.d_model), requires_grad=False))],
                   score=0.)]
     while len(completed_hyp) < beam_size and length < max_len:

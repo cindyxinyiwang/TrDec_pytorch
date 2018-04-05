@@ -1,13 +1,16 @@
 #!/bin/bash
 
-python src/main.py \
+export PYTHONPATH="$(pwd)"
+export CUDA_VISIBLE_DEVICES="0"
+
+python3.6 src/main.py \
   --trdec \
-  --output_dir="outputs" \
-  --log_every=50 \
+  --output_dir="outputs_trdec" \
+  --log_every=10 \
   --eval_every=500 \
   --reset_output_dir \
-  --d_word_vec=4 \
-  --d_model=4 \
+  --d_word_vec=512 \
+  --d_model=512 \
   --data_path="data/orm_data/" \
   --target_tree_vocab="vocab.rule.eng" \
   --target_word_vocab="vocab.word.eng" \
@@ -21,9 +24,10 @@ python src/main.py \
   --source_vocab="vocab.orm" \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
-  --batch_size=2 \
+  --batch_size=16 \
   --n_train_sents=200000 \
-  --max_len=200 \
-  --n_train_steps=5000 \
+  --max_len=2000 \
+  --n_train_steps=10000 \
+  --cuda \
   "$@"
 
