@@ -145,8 +145,9 @@ class DataLoader(object):
     x_test, x_mask, x_len, x_count = self._pad(
       sentences=x_test, pad_id=self.pad_id, volatile=True)
     if self.hparams.trdec:
-      y_test, y_mask, y_len, y_count = self._pad_tree(
+      y_test, y_mask, y_len, y_count, y_count_rule, y_count_word, y_count_eos = self._pad_tree(
         sentences=y_test, pad_id=self.pad_id, volatile=True)
+      y_count = (y_count, y_count_rule, y_count_word, y_count_eos)
     else:
       y_test, y_mask, y_len, y_count = self._pad(
         sentences=y_test, pad_id=self.pad_id, volatile=True)
@@ -185,8 +186,9 @@ class DataLoader(object):
     x_valid, x_mask, x_len, x_count = self._pad(
       sentences=x_valid, pad_id=self.pad_id, volatile=True)
     if self.hparams.trdec:
-      y_valid, y_mask, y_len, y_count = self._pad_tree(
+      y_valid, y_mask, y_len, y_count, y_count_rule, y_count_word, y_count_eos = self._pad_tree(
         sentences=y_valid, pad_id=self.pad_id, volatile=True)
+      y_count = (y_count, y_count_rule, y_count_word, y_count_eos)
     else:
       y_valid, y_mask, y_len, y_count = self._pad(
         sentences=y_valid, pad_id=self.pad_id, volatile=True)
@@ -233,8 +235,9 @@ class DataLoader(object):
     x_train, x_mask, x_len, x_count = self._pad(
       sentences=x_train, pad_id=self.pad_id)
     if self.hparams.trdec:
-      y_train, y_mask, y_len, y_count = self._pad_tree(
+      y_train, y_mask, y_len, y_count, y_count_rule, y_count_word, y_count_eos = self._pad_tree(
         sentences=y_train, pad_id=self.pad_id)
+      y_count = (y_count, y_count_rule, y_count_word, y_count_eos)
     else:
       y_train, y_mask, y_len, y_count = self._pad(
         sentences=y_train, pad_id=self.pad_id)
@@ -307,6 +310,12 @@ class DataLoader(object):
 
     padded_sentences = Variable(torch.LongTensor(padded_sentences))
     mask = torch.ByteTensor(mask)
+
+    num_padding = (padded_sentences.data[:,:,0] == pad_id).long().sum()
+    num_rule = (padded_sentences.data[:,:,0] >= self.target_word_vocab_size).long().sum()
+    num_eos = (padded_sentences.data[:,:,0] == self.hparams.eos_id).long().sum()
+    num_word = sum_len - num_rule - num_eos
+    assert num_rule + num_word + num_eos + num_padding == max_len * len(sentences)
     #l = Variable(torch.FloatTensor(lengths))
 
     if self.hparams.cuda:
@@ -314,7 +323,7 @@ class DataLoader(object):
       mask = mask.cuda()
       #l = l.cuda()
 
-    return padded_sentences, mask, lengths, sum_len
+    return padded_sentences, mask, lengths, sum_len, num_rule, num_word, num_eos
 
   def _build_parallel(self, source_file, target_file, is_training, sort=False):
     """Build pair of data."""
@@ -509,26 +518,16 @@ class DataLoader(object):
       # Process tree
       tree = Tree(parse_root(tokenize(trg_tree_line)))
       remove_preterminal_POS(tree.root)
-      #print(tree)
       pieces = sent_piece_segs(target_line)
-      #print(pieces)
       split_sent_piece(tree.root, pieces, 0)
-      #print(tree)
       add_preterminal_wordswitch(tree.root, add_eos=True)
-      #print(tree)
       tree.reset_timestep()
       trg_tree_indices = tree.get_data_root(self.target_tree_vocab, self.target_word_vocab) # (len_y, 3)
-      trg_tree_indices = [[self.bos_id, 0, 0]] + trg_tree_indices
-      trg_tree_indices = np.array(trg_tree_indices)
-      #print(trg_tree_indices)
-      trg_tree_indices[:, 1] = np.append(trg_tree_indices[1:, 1], 0) # parent timestep, last one not used
-      trg_tree_indices[:, 2] = np.append(trg_tree_indices[1:, 2], 0) # is word, last one not used in training
-      trg_tree_indices = trg_tree_indices.tolist()
-      #print(trg_tree_indices)
-      #exit(0)
-      #print(trg_tree_line)
-      #print(tree)
-      #print(tree.to_parse_string())
+      trg_tree_indices = [[self.bos_id, 0, 1]] + trg_tree_indices
+      #trg_tree_indices = np.array(trg_tree_indices)
+      #trg_tree_indices[:, 1] = np.append(trg_tree_indices[1:, 1], 0) # parent timestep, last one not used
+      #trg_tree_indices[:, 2] = np.append(trg_tree_indices[1:, 2], 0) # is word, last one not used in training
+      #trg_tree_indices = trg_tree_indices.tolist()
       #for data in trg_tree_indices:
       #  idx, paren_t, is_word = data 
       #  if is_word:

@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.nn.init as init
 
 def get_criterion(hparams):
-  crit = nn.CrossEntropyLoss(ignore_index=hparams.pad_id, size_average=False, reduce=False)
+  crit = nn.CrossEntropyLoss(ignore_index=hparams.pad_id, size_average=False, reduce=True)
   if hparams.cuda:
     crit = crit.cuda()
   return crit
@@ -18,11 +18,11 @@ def get_criterion(hparams):
 def get_performance(crit, logits, labels, hparams, offset=None):
   mask = (labels == hparams.pad_id)
   loss = crit(logits, labels)
-  if not offset is None:
-    mask_t = (labels == hparams.pad_id + offset)
-    mask_t = mask | mask_t
-    loss.masked_fill_(mask_t, 0)
-  loss = loss.sum()  
+  #if not offset is None:
+  #  mask_t = (labels == hparams.pad_id + offset)
+  #  mask_t = mask | mask_t
+  #  loss.masked_fill_(mask_t, 0)
+  #loss = loss.sum()  
   _, preds = torch.max(logits, dim=1)
   acc = torch.eq(preds, labels).int().masked_fill_(mask, 0).sum()
 

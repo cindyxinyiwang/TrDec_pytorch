@@ -119,17 +119,16 @@ for h in hyps:
     for w in h:
       if w < data.target_word_vocab_size:
         deriv.append([data.target_word_vocab[w], False])
-        #print(data.target_word_vocab[w])
       else:
         deriv.append([data.target_tree_vocab[w], False])
-        #print(data.target_tree_vocab[w])
-    #print()
     tree = Tree.from_rule_deriv(deriv)
-    #print(tree)
-    out_file.write(tree.to_string() + '\n')
-    #out_file.flush()
+    line = tree.to_string()
+    if hparams.merge_bpe:
+      line = line.replace('▁', ' ')
+    out_file.write(line + '\n')
+    out_file.flush()
     out_parse_file.write(tree.to_parse_string() + '\n')
-    #out_parse_file.flush()
+    out_parse_file.flush()
   else:
     h_best_words = map(lambda wi: data.target_index_to_word[wi],
                      filter(lambda wi: wi not in hparams.filtered_tokens, h))
