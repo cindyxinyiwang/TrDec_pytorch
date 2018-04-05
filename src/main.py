@@ -81,6 +81,8 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
   valid_loss = 0
   valid_acc = 0
   n_batches = 0
+
+  valid_total = valid_rule_count = valid_word_count = valid_eos_count = 0
   valid_bleu = None
   if eval_bleu:
     valid_hyp_file = os.path.join(args.output_dir, "dev.trans_{0}".format(step))
@@ -98,15 +100,20 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     #print(y_valid)
     #print(y_mask)
     # do this since you shift y_valid[:, 1:] and y_valid[:, :-1]
-    y_count -= batch_size
-
-    # word count
-    valid_words += y_count
+    if args.trdec:
+      y_total_count, y_rule_count, y_word_count, y_eos_count = y_count
+      valid_total += (y_total_count - batch_size)
+      valid_rule_count += y_rule_count
+      valid_word_count += (y_word_count - batch_size)
+    else:
+      y_count -= batch_size
+      # word count
+      valid_words += y_count
 
     if args.trdec:
       logits = model.forward(
         x_valid, x_mask, x_len,
-        y_valid[:,:-1,:], y_mask[:,:-1], y_len)
+        y_valid[:,:-1,:], y_mask[:,:-1], y_len, y_valid[:,1:,2])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_valid[:,1:,0].contiguous().view(-1)
       val_loss, val_acc = get_performance(crit, logits, labels, hparams, offset=hparams.target_word_vocab_size)
@@ -136,11 +143,18 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
       line = line.replace('▁', ' ').strip()
       out_file.write(line + '\n')
 
-  val_ppl = np.exp(valid_loss / valid_words)
-  log_string = "val_step={0:<6d}".format(step)
-  log_string += " loss={0:<6.2f}".format(valid_loss / valid_words)
-  log_string += " acc={0:<5.4f}".format(valid_acc / valid_words)
-  log_string += " val_ppl={0:<.2f}".format(val_ppl)
+  if args.trdec:
+    val_ppl = np.exp(valid_loss / valid_word_count)
+    log_string = "val_step={0:<6d}".format(step)
+    log_string += " loss={0:<6.2f}".format(valid_loss / valid_word_count)
+    log_string += " acc={0:<5.4f}".format(valid_acc / valid_total)
+    log_string += " val_ppl={0:<.2f}".format(val_ppl)
+  else:
+    val_ppl = np.exp(valid_loss / valid_words)
+    log_string = "val_step={0:<6d}".format(step)
+    log_string += " loss={0:<6.2f}".format(valid_loss / valid_words)
+    log_string += " acc={0:<5.4f}".format(valid_acc / valid_words)
+    log_string += " val_ppl={0:<.2f}".format(val_ppl)
   if eval_bleu:
     out_file.close()
     if args.target_valid_ref:
@@ -254,7 +268,8 @@ def train():
   print("start training...")
   start_time = log_start_time = time.time()
   target_words, total_loss, total_corrects = 0, 0, 0
-  #model.train()
+  target_rules, target_total, target_eos = 0, 0, 0
+  model.train()
   while True:
     ((x_train, x_mask, x_len, x_count),
      (y_train, y_mask, y_len, y_count),
@@ -266,18 +281,25 @@ def train():
     #exit(0)
     optim.zero_grad()
     if args.trdec:
-      logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len)
+      y_total_count, y_rule_count, y_word_count, y_eos_count = y_count
+      target_total += (y_total_count - batch_size)
+      target_rules += y_rule_count
+      target_eos += y_eos_count
+      target_words += (y_word_count - batch_size)
+
+      logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len, y_train[:,1:,2])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_train[:,1:,0].contiguous().view(-1)
       tr_loss, tr_acc = get_performance(crit, logits, labels, hparams, offset=hparams.target_word_vocab_size)
     else:
+      target_words += (y_count - batch_size)
+
       logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1], y_mask[:,:-1], y_len)
       logits = logits.view(-1, hparams.target_vocab_size)
       labels = y_train[:,1:].contiguous().view(-1)
       tr_loss, tr_acc = get_performance(crit, logits, labels, hparams)
     total_loss += tr_loss.data[0]
     total_corrects += tr_acc.data[0]
-    target_words += (y_count - batch_size)
     step += 1
 
     tr_loss.div_(batch_size).backward()
@@ -295,8 +317,14 @@ def train():
       log_string += " lr={0:<9.7f}".format(lr)
       log_string += " loss={0:<7.2f}".format(tr_loss.data[0])
       log_string += " |g|={0:<5.2f}".format(grad_norm)
-      log_string += " ppl={0:<8.2f}".format(np.exp(total_loss / target_words))
-      log_string += " acc={0:<5.4f}".format(total_corrects / target_words)
+      if args.trdec:
+        log_string += " num_word={} num_rule={} num_eos={}".format(target_words, target_rules, target_eos)
+        log_string += " ppl/word={0:<8.2f}".format(np.exp(total_loss / target_words))
+        log_string += " acc={0:<5.4f}".format(total_corrects / target_total)
+      else:
+        log_string += " ppl={0:<8.2f}".format(np.exp(total_loss / target_words))
+        log_string += " acc={0:<5.4f}".format(total_corrects / target_words)
+
       log_string += " wpm(k)={0:<5.2f}".format(target_words / (1000 * elapsed))
       log_string += " time(min)={0:<5.2f}".format(since_start)
       print(log_string)
@@ -328,6 +356,7 @@ def train():
       # reset counter after eval
       log_start_time = time.time()
       target_words = total_corrects = total_loss = 0
+      target_rules = target_total = target_eos = 0
     if args.patience >= 0:
       if cur_attempt > args.patience: break
     else:

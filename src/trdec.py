@@ -46,7 +46,7 @@ class TreeDecoder(nn.Module):
       self.word_lstm_cell = self.word_lstm_cell.cuda()
       self.dropout = self.dropout.cuda()
 
-  def forward(self, x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask):
+  def forward(self, x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask):
     # get decoder init state and cell, use x_ct
     """
     x_enc: [batch_size, max_x_len, d_model * 2]
@@ -85,11 +85,10 @@ class TreeDecoder(nn.Module):
         all_state = all_state.cuda()
       parent_t = y_train.data[:, t, 1] + (t+1) * offset # [batch_size,]
       parent_t = Variable(parent_t, requires_grad=False)
-      #print(parent_t)
       parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
       
       word_mask = y_train[:, t, 2].unsqueeze(1).expand(-1, self.hparams.d_model).float() # (1 is word, 0 is rule)
-      word_mask_vocab = y_train[:, t, 2].unsqueeze(1).expand(-1, self.target_vocab_size).float()
+      word_mask_vocab = score_mask[:, t].unsqueeze(1).expand(-1, self.target_vocab_size).float()
 
       word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
@@ -105,10 +104,6 @@ class TreeDecoder(nn.Module):
       rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc, attn_mask=x_mask)
       word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
 
-      #print(rule_h_t.size())
-      #print(rule_ctx.size())
-      #print(word_h_t.size())
-      #print(word_ctx.size())
       inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))
       word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
@@ -196,7 +191,7 @@ class TrDec(nn.Module):
     if self.hparams.cuda:
       self.enc_to_k = self.enc_to_k.cuda()
 
-  def forward(self, x_train, x_mask, x_len, y_train, y_mask, y_len):
+  def forward(self, x_train, x_mask, x_len, y_train, y_mask, y_len, score_mask):
     # [batch_size, x_len, d_model * 2]
     #print("x_train", x_train)
     #print("x_mask", x_mask)
@@ -204,7 +199,7 @@ class TrDec(nn.Module):
     x_enc, dec_init = self.encoder(x_train, x_len)
     x_enc_k = self.enc_to_k(x_enc)
     # [batch_size, y_len-1, trg_vocab_size]
-    logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask)
+    logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask)
     return logits
 
   def translate(self, x_train, target_rule_vocab, max_len=100, beam_size=5):
