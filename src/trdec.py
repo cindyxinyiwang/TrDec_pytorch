@@ -134,9 +134,10 @@ class TreeDecoder(nn.Module):
     return logits
 
   def step(self, x_enc, x_enc_k, hyp, target_rule_vocab):
-    y_tm1 = Variable(torch.LongTensor([int(hyp.y[-1])] ), volatile=True)
+    y_tm1 = torch.LongTensor([int(hyp.y[-1])])
     if self.hparams.cuda:
       y_tm1 = y_tm1.cuda()
+    y_tm1 = Variable(y_tm1, volatile=True)
     open_nonterms = hyp.open_nonterms
     rule_input_feed = hyp.rule_ctx_tm1
     word_input_feed = hyp.word_ctx_tm1
@@ -227,18 +228,20 @@ class TrDec(nn.Module):
     x_enc_k = self.enc_to_k(x_enc)
     length = 0
     completed_hyp = []
-    rule_input_feed = Variable(torch.zeros(1, self.hparams.d_model * 2), requires_grad=False)
-    word_input_feed = Variable(torch.zeros(1, self.hparams.d_model * 2), requires_grad=False)
+    input_feed_zeros = torch.zeros(1, self.hparams.d_model * 2)
+    state_zeros = torch.zeros(1, self.hparams.d_model)
     if self.hparams.cuda:
-      rule_input_feed = rule_input_feed.cuda()
-      word_input_feed = word_input_feed.cuda()
+      input_feed_zeros = input_feed_zeros.cuda()
+      state_zeros = state_zeros.cuda()
+    rule_input_feed = Variable(input_feed_zeros, requires_grad=False)
+    word_input_feed = Variable(input_feed_zeros, requires_grad=False)
     active_hyp = [TrHyp(rule_hidden=dec_init,
                   word_hidden=dec_init,
                   y=[self.hparams.bos_id], 
                   rule_ctx_tm1=rule_input_feed, 
                   word_ctx_tm1=word_input_feed,
                   open_nonterms=[OpenNonterm(label='ROOT', 
-                    parent_state=Variable(torch.zeros(1, self.hparams.d_model), requires_grad=False))],
+                    parent_state=Variable(state_zeros, requires_grad=False))],
                   score=0.)]
     while len(completed_hyp) < beam_size and length < max_len:
       length += 1

@@ -27,7 +27,7 @@ python3.6 src/main.py \
   --batch_size=16 \
   --n_train_sents=200000 \
   --max_len=2000 \
-  --n_train_steps=10000 \
+  --n_train_steps=5000 \
   --cuda \
   "$@"
 
