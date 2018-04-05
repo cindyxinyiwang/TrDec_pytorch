@@ -53,9 +53,15 @@ class DataLoader(object):
       assert self.source_word_to_index[self.hparams.eos] == self.target_word_to_index[self.hparams.eos]
 
     if self.decode:
-      self.x_test, self.y_test = self._build_parallel(
-        self.hparams.source_test, self.hparams.target_test, is_training=False)
+      if self.hparams.trdec:
+        self.x_test, self.y_word_test, self.y_test = self._build_tree_parallel(
+          self.hparams.source_test, self.hparams.target_test, self.hparams.target_tree_test,
+          is_training=False)
+      else:
+        self.x_test, self.y_test = self._build_parallel(
+          self.hparams.source_test, self.hparams.target_test, is_training=False)
       self.test_size = len(self.x_test)
+      #print(self.test_size)
       self.reset_test()
       return
     else:
@@ -479,7 +485,7 @@ class DataLoader(object):
       if not source_line or not target_line or not trg_tree_line:
         continue
 
-      source_indices, target_indices, trg_tree_indices = [self.bos_id], [self.bos_id], [self.bos_id]
+      source_indices, target_indices = [self.bos_id], [self.bos_id]
       source_tokens = source_line.split()
       target_tokens = target_line.split()
       if is_training and len(target_line) > self.hparams.max_len:
@@ -511,8 +517,15 @@ class DataLoader(object):
       add_preterminal_wordswitch(tree.root, add_eos=True)
       #print(tree)
       tree.reset_timestep()
-      trg_tree_indices = tree.get_data_root(self.target_tree_vocab, self.target_word_vocab)
-      
+      trg_tree_indices = tree.get_data_root(self.target_tree_vocab, self.target_word_vocab) # (len_y, 3)
+      trg_tree_indices = [[self.bos_id, 0, 0]] + trg_tree_indices
+      trg_tree_indices = np.array(trg_tree_indices)
+      #print(trg_tree_indices)
+      trg_tree_indices[:, 1] = np.append(trg_tree_indices[1:, 1], 0) # parent timestep, last one not used
+      trg_tree_indices[:, 2] = np.append(trg_tree_indices[1:, 2], 0) # is word, last one not used in training
+      trg_tree_indices = trg_tree_indices.tolist()
+      #print(trg_tree_indices)
+      #exit(0)
       #print(trg_tree_line)
       #print(tree)
       #print(tree.to_parse_string())

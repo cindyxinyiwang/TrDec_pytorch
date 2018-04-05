@@ -393,16 +393,15 @@ class Tree(object):
     stack_tree = [tree.root]
     for x in derivs:
       r, stop = x
+      #print(r, stop)
       p_tree = stack_tree.pop()
       if type(r) != Rule:
         if p_tree.label != '*':
           for i in derivs:
             if type(i[0]) != Rule:
-              print
-              i[0].encode('utf-8'), i[1]
+              print(i[0].encode('utf-8'), i[1])
             else:
-              print
-              i[0], i[1]
+              print(i[0], i[1])
         assert p_tree.label == '*', p_tree.label
         if wordswitch:
           if r != Vocab.ES_STR:
@@ -420,15 +419,11 @@ class Tree(object):
         if p_tree.label != r.lhs:
           for i in derivs:
             if type(i[0]) != Rule:
-              print
-              i[0].encode('utf-8'), i[1]
+              print(i[0].encode('utf-8'), i[1])
             else:
-              print
-              i[0], i[1]
-          print
-          tree.to_parse_string().encode('utf-8')
-          print
-          p_tree.label.encode('utf-8'), r.lhs.encode('utf-8')
+              print(i[0], i[1])
+          print(tree.to_parse_string().encode('utf-8'))
+          print(p_tree.label.encode('utf-8'), r.lhs.encode('utf-8'))
           exit(1)
         assert p_tree.label == r.lhs, "%s %s" % (p_tree.label, r.lhs)
         new_tree = p_tree
