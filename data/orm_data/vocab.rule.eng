@@ -1,0 +1,2727 @@
+<pad>
+<unk>
+<s>
+</s>
+ROOT|||FRAG|||FRAG
+FRAG|||* INTJ * S *|||* INTJ * S *
+INTJ|||* PP * INTJ|||* PP * INTJ
+PP|||* NP|||* NP
+NP|||*|||*
+INTJ|||* INTJ|||* INTJ
+INTJ|||* PP *|||* PP *
+S|||* SBAR * NP VP|||* SBAR * NP VP
+SBAR|||* S|||* S
+S|||NP VP|||NP VP
+NP|||NP VP|||NP VP
+VP|||* PP|||* PP
+VP|||* VP|||* VP
+VP|||* ADVP * S|||* ADVP * S
+ADVP|||*|||*
+S|||VP|||VP
+VP|||* ADVP ADVP|||* ADVP ADVP
+ADVP|||* PP|||* PP
+ROOT|||S|||S
+S|||ADVP NP VP *|||ADVP NP VP *
+VP|||* S * PP * SBAR|||* S * PP * SBAR
+VP|||VP * VP|||VP * VP
+VP|||* PP PP|||* PP PP
+VP|||* NP|||* NP
+S|||VP *|||VP *
+VP|||* S|||* S
+NP|||NP * NP|||NP * NP
+NP|||NP *|||NP *
+VP|||* PRT PP * PP|||* PRT PP * PP
+PRT|||*|||*
+PP|||* PP|||* PP
+S|||NP VP * NP VP * S *|||NP VP * NP VP * S *
+VP|||* ADVP NP|||* ADVP NP
+NP|||NP SBAR|||NP SBAR
+SBAR|||WHNP S|||WHNP S
+WHNP|||*|||*
+S|||*|||*
+S|||* NP S|||* NP S
+SBAR|||S|||S
+S|||NP ADVP VP|||NP ADVP VP
+NP|||NP PP|||NP PP
+NP|||NP * SBAR|||NP * SBAR
+VP|||* NP PP|||* NP PP
+ROOT|||SBARQ|||SBARQ
+SBARQ|||WHNP SQ *|||WHNP SQ *
+WHNP|||WHADJP *|||WHADJP *
+WHADJP|||*|||*
+SQ|||* NP VP|||* NP VP
+NP|||NP * SBAR *|||NP * SBAR *
+S|||PP VP|||PP VP
+VP|||* NP PP S|||* NP PP S
+S|||SBAR PRN NP VP *|||SBAR PRN NP VP *
+PRN|||*|||*
+S|||S * S *|||S * S *
+S|||SBAR * NP VP|||SBAR * NP VP
+SBAR|||WHADVP S|||WHADVP S
+WHADVP|||*|||*
+VP|||*|||*
+VP|||* NP PP SBAR|||* NP PP SBAR
+S|||* ADVP NP VP *|||* ADVP NP VP *
+VP|||* PP NP|||* PP NP
+S|||* S * S *|||* S * S *
+S|||NP ADJP|||NP ADJP
+NP|||NP * NP *|||NP * NP *
+NP|||NP CONJP NP|||NP CONJP NP
+CONJP|||*|||*
+ADJP|||* PP|||* PP
+S|||* SBAR * NP VP *|||* SBAR * NP VP *
+VP|||VP * NP|||VP * NP
+VP|||* ADVP|||* ADVP
+VP|||* NP PP * SBAR|||* NP PP * SBAR
+S|||SBAR NP VP|||SBAR NP VP
+S|||NP VP *|||NP VP *
+VP|||* PP NP * S|||* PP NP * S
+S|||FRAG * NP VP|||FRAG * NP VP
+FRAG|||NP * S * NP * S *|||NP * S * NP * S *
+S|||SQ * S * S|||SQ * S * S
+VP|||* SBAR|||* SBAR
+VP|||* PP NP * SQ *|||* PP NP * SQ *
+SQ|||* NP VP *|||* NP VP *
+S|||S * S|||S * S
+VP|||* PP * INTJ|||* PP * INTJ
+INTJ|||*|||*
+S|||PP NP VP *|||PP NP VP *
+PP|||* ADVP|||* ADVP
+S|||S S *|||S S *
+VP|||* PP * S|||* PP * S
+S|||PP NP VP * S *|||PP NP VP * S *
+VP|||* NP NP|||* NP NP
+S|||* NP VP|||* NP VP
+VP|||* ADVP PP|||* ADVP PP
+S|||* SBAR * VP *|||* SBAR * VP *
+VP|||* PRT NP|||* PRT NP
+NP|||NP PP SBAR|||NP PP SBAR
+S|||* PP NP VP *|||* PP NP VP *
+SBAR|||WHNP VP|||WHNP VP
+VP|||* ADJP|||* ADJP
+ADJP|||*|||*
+NP|||NP * NP * NP|||NP * NP * NP
+VP|||* PP * PP|||* PP * PP
+PP|||* S|||* S
+VP|||* S PP|||* S PP
+ROOT|||SINV|||SINV
+SINV|||ADVP PP VP NP *|||ADVP PP VP NP *
+VP|||* PRT PP PP|||* PRT PP PP
+S|||SBAR * NP VP *|||SBAR * NP VP *
+VP|||* UCP|||* UCP
+UCP|||ADJP * S|||ADJP * S
+S|||ADVP VP|||ADVP VP
+S|||PP * VP *|||PP * VP *
+VP|||* NP S|||* NP S
+S|||* VP|||* VP
+PP|||PP * PP|||PP * PP
+VP|||ADVP * NP PP|||ADVP * NP PP
+SBAR|||VP|||VP
+FRAG|||SBAR *|||SBAR *
+VP|||* NP * PP|||* NP * PP
+S|||* NP VP * S *|||* NP VP * S *
+S|||NP VP * S *|||NP VP * S *
+NP|||NP NP|||NP NP
+VP|||* NP PP PP * SBAR|||* NP PP PP * SBAR
+S|||PP NP VP|||PP NP VP
+S|||SBAR * S * S *|||SBAR * S * S *
+S|||* SBAR * ADVP * NP VP *|||* SBAR * ADVP * NP VP *
+SINV|||PP VP NP *|||PP VP NP *
+VP|||* ADVP S|||* ADVP S
+VP|||S * VP|||S * VP
+S|||* NP VP *|||* NP VP *
+S|||SBAR * VP|||SBAR * VP
+VP|||* PRT NP ADVP|||* PRT NP ADVP
+SBARQ|||WHPP SQ *|||WHPP SQ *
+WHPP|||* WHNP|||* WHNP
+SQ|||* NP SBAR * S|||* NP SBAR * S
+FRAG|||* NP *|||* NP *
+NP|||NP PP PP|||NP PP PP
+SBAR|||WHPP S|||WHPP S
+VP|||* PRT SBAR|||* PRT SBAR
+S|||* NP VP * S * S * S *|||* NP VP * S * S * S *
+VP|||* PP S|||* PP S
+VP|||* NP ADVP|||* NP ADVP
+S|||* S * NP VP *|||* S * NP VP *
+VP|||* NP PP PP|||* NP PP PP
+FRAG|||NP * S * INTJ * S *|||NP * S * INTJ * S *
+S|||SQ * NP VP|||SQ * NP VP
+S|||S * S * S *|||S * S * S *
+S|||NP * VP|||NP * VP
+VP|||* S * SBAR|||* S * SBAR
+S|||ADVP * NP VP *|||ADVP * NP VP *
+PP|||*|||*
+VP|||* ADVP ADVP PP * NP|||* ADVP ADVP PP * NP
+SBAR|||* SBAR * SBAR|||* SBAR * SBAR
+NP|||* S|||* S
+S|||X X SBAR * NP VP *|||X X SBAR * NP VP *
+X|||* NP * X S *|||* NP * X S *
+X|||SBARQ|||SBARQ
+SBARQ|||WHADVP * SQ *|||WHADVP * SQ *
+VP|||* PRT PP|||* PRT PP
+X|||*|||*
+S|||ADVP S * S|||ADVP S * S
+ROOT|||SBAR|||SBAR
+SBAR|||SBAR * NP *|||SBAR * NP *
+NP|||NP PP PP * SBAR|||NP PP PP * SBAR
+NP|||* ADJP *|||* ADJP *
+VP|||* PRT NP * SBAR|||* PRT NP * SBAR
+SBAR|||SBAR * SBAR|||SBAR * SBAR
+S|||NP VP * NP VP *|||NP VP * NP VP *
+ROOT|||VP|||VP
+VP|||* NP * SBAR|||* NP * SBAR
+VP|||* ADVP PP * SBAR|||* ADVP PP * SBAR
+NP|||NP VP * PP|||NP VP * PP
+VP|||* NP SBAR|||* NP SBAR
+VP|||VP * VP VP * VP|||VP * VP VP * VP
+S|||* NP VP * NP VP *|||* NP VP * NP VP *
+PP|||* PP * PP|||* PP * PP
+VP|||* NP * S|||* NP * S
+S|||ADVP NP VP|||ADVP NP VP
+VP|||* PP * ADJP|||* PP * ADJP
+ADJP|||* S|||* S
+FRAG|||* SBAR *|||* SBAR *
+S|||SBAR * NP VP * S|||SBAR * NP VP * S
+S|||ADVP * SBAR * NP VP|||ADVP * SBAR * NP VP
+S|||CONJP SINV * S *|||CONJP SINV * S *
+SINV|||VP NP|||VP NP
+S|||S * X NP VP *|||S * X NP VP *
+VP|||* NP PP * S|||* NP PP * S
+S|||S * VP *|||S * VP *
+VP|||* FRAG|||* FRAG
+FRAG|||* NP|||* NP
+S|||PP * NP VP * S *|||PP * NP VP * S *
+VP|||* S * PP|||* S * PP
+VP|||* PP NP PP|||* PP NP PP
+S|||NP NP|||NP NP
+NP|||ADJP *|||ADJP *
+PP|||* SBAR|||* SBAR
+S|||* NP VP * S * S *|||* NP VP * S * S *
+VP|||* PRT|||* PRT
+SBAR|||* SINV|||* SINV
+VP|||* PRT S|||* PRT S
+S|||S * NP VP * S|||S * NP VP * S
+S|||* NP NP VP *|||* NP NP VP *
+ADVP|||ADVP PP|||ADVP PP
+S|||NP|||NP
+VP|||* PP * SBAR|||* PP * SBAR
+FRAG|||INTJ * INTJ * NP * INTJ * NP *|||INTJ * INTJ * NP * INTJ * NP *
+NP|||NP * NP * NP * NP * NP * NP|||NP * NP * NP * NP * NP * NP
+VP|||* PRT NP * S|||* PRT NP * S
+S|||* S * S * S *|||* S * S * S *
+S|||ADVP * S * NP VP|||ADVP * S * NP VP
+VP|||VP * VP * VP|||VP * VP * VP
+S|||NP * NP VP * S *|||NP * NP VP * S *
+NP|||NP * S|||NP * S
+FRAG|||INTJ * PP *|||INTJ * PP *
+NP|||NP SBAR * VP * PP|||NP SBAR * VP * PP
+PP|||* ADJP|||* ADJP
+VP|||* ADVP * SBARQ * SBAR|||* ADVP * SBARQ * SBAR
+SBARQ|||WHNP SQ|||WHNP SQ
+SQ|||* NP|||* NP
+S|||* S * PRN * NP VP|||* S * PRN * NP VP
+S|||S * SQ|||S * SQ
+SQ|||VP NP *|||VP NP *
+PRN|||S|||S
+S|||SBAR * S * S|||SBAR * S * S
+VP|||* ADJP PP|||* ADJP PP
+VP|||VP * VP * SBAR|||VP * VP * SBAR
+FRAG|||ADVP SBAR * S * S * S *|||ADVP SBAR * S * S * S *
+S|||* PP NP VP|||* PP NP VP
+VP|||ADVP * NP|||ADVP * NP
+FRAG|||FRAG * S * S * NP *|||FRAG * S * S * NP *
+FRAG|||* S|||* S
+S|||* S * NP VP|||* S * NP VP
+S|||UCP NP ADVP VP|||UCP NP ADVP VP
+UCP|||NP * ADJP *|||NP * ADJP *
+ADJP|||* SBAR|||* SBAR
+S|||ADVP * X NP VP|||ADVP * X NP VP
+SBARQ|||WHADVP SQ *|||WHADVP SQ *
+SQ|||* NP * VP|||* NP * VP
+VP|||* PRT NP PP|||* PRT NP PP
+S|||S * S * S * S * NP NP VP *|||S * S * S * S * NP NP VP *
+VP|||* NP PRT|||* NP PRT
+VP|||* NP PRT ADVP|||* NP PRT ADVP
+VP|||* PRT * S|||* PRT * S
+NP|||NP ADVP|||NP ADVP
+NP|||* X|||* X
+X|||* NP *|||* NP *
+VP|||* ADVP ADJP|||* ADVP ADJP
+S|||* SBAR * S * S *|||* SBAR * S * S *
+S|||* S * S|||* S * S
+S|||PP NP VP * SQ|||PP NP VP * SQ
+SQ|||SBAR * NP VP *|||SBAR * NP VP *
+NP|||NP * ADJP *|||NP * ADJP *
+ADJP|||ADJP PP|||ADJP PP
+S|||ADVP SBAR * NP VP *|||ADVP SBAR * NP VP *
+S|||NP VP * NP VP * NP VP *|||NP VP * NP VP * NP VP *
+S|||NP * NP|||NP * NP
+SBARQ|||* WHNP * WHADVP SQ * PRN WHADVP SQ *|||* WHNP * WHADVP SQ * PRN WHADVP SQ *
+PRN|||S *|||S *
+SQ|||VP|||VP
+S|||ADVP * SBAR * S * S|||ADVP * SBAR * S * S
+SBARQ|||* WHNP PRN SQ *|||* WHNP PRN SQ *
+WHNP|||WHNP PP|||WHNP PP
+PRN|||* S *|||* S *
+SQ|||* VP|||* VP
+ROOT|||X|||X
+X|||* VP *|||* VP *
+PP|||* PP PP PP|||* PP PP PP
+VP|||* ADJP * ADVP|||* ADJP * ADVP
+NP|||NP * NP PP|||NP * NP PP
+S|||* SBAR * NP VP * NP VP *|||* SBAR * NP VP * NP VP *
+FRAG|||PP * PP * S *|||PP * PP * S *
+PP|||PP * INTJ PP|||PP * INTJ PP
+NP|||NP SBAR * SBAR|||NP SBAR * SBAR
+S|||SBARQ * NP VP *|||SBARQ * NP VP *
+SBARQ|||* WHNP SQ|||* WHNP SQ
+S|||NP NP VP *|||NP NP VP *
+VP|||* VP * SBAR|||* VP * SBAR
+S|||UCP * NP VP|||UCP * NP VP
+UCP|||NP * NP|||NP * NP
+VP|||* NP * UCP|||* NP * UCP
+UCP|||* PP * ADVP|||* PP * ADVP
+VP|||* PP * SQ SBAR|||* PP * SQ SBAR
+SQ|||VP *|||VP *
+NP|||NP PP * PP * VP|||NP PP * PP * VP
+S|||* ADVP S * S|||* ADVP S * S
+S|||* SBAR * VP * NP VP *|||* SBAR * VP * NP VP *
+VP|||* NP * VP|||* NP * VP
+X|||X S|||X S
+NP|||NP PP NP|||NP PP NP
+S|||NP VP * NP VP|||NP VP * NP VP
+VP|||* ADVP * VP|||* ADVP * VP
+VP|||* S * NP|||* S * NP
+S|||* PP S * VP *|||* PP S * VP *
+FRAG|||NP * NP * INTJ * NP|||NP * NP * INTJ * NP
+NP|||* NP|||* NP
+NP|||NP * SBARQ|||NP * SBARQ
+SBARQ|||WHADVP SINV *|||WHADVP SINV *
+SINV|||* NP VP|||* NP VP
+S|||S * NP VP *|||S * NP VP *
+SINV|||* S SBARQ|||* S SBARQ
+NP|||NP * NP * NP *|||NP * NP * NP *
+S|||SBAR * S * NP VP *|||SBAR * S * NP VP *
+VP|||* ADVP VP|||* ADVP VP
+S|||S * S * S * NP VP *|||S * S * S * NP VP *
+S|||X X NP VP *|||X X NP VP *
+X|||SBAR * PP PP *|||SBAR * PP PP *
+X|||X NP|||X NP
+X|||ADVP NP|||ADVP NP
+ROOT|||NP|||NP
+NP|||* PP NP|||* PP NP
+NP|||NP PP PP SBAR|||NP PP PP SBAR
+NP|||NP PP * SBAR *|||NP PP * SBAR *
+S|||SBAR * X NP VP * S *|||SBAR * X NP VP * S *
+SBARQ|||* WHADVP SQ *|||* WHADVP SQ *
+SQ|||* NP VP SBAR|||* NP VP SBAR
+VP|||* ADJP PP * SBAR|||* ADJP PP * SBAR
+S|||ADVP NP VP * NP VP * NP VP *|||ADVP NP VP * NP VP * NP VP *
+NP|||NP PP S|||NP PP S
+S|||* NP VP * S|||* NP VP * S
+NP|||NP * PP|||NP * PP
+S|||* NP VP * NP VP|||* NP VP * NP VP
+NP|||NP * NP * SBAR|||NP * NP * SBAR
+S|||* S * NP VP * S * S *|||* S * NP VP * S * S *
+NP|||NP * VP *|||NP * VP *
+S|||S PRN * S *|||S PRN * S *
+S|||* NP VP * NP VP * S * S *|||* NP VP * NP VP * S * S *
+S|||SBAR * NP VP * S *|||SBAR * NP VP * S *
+VP|||* NP PRT PP|||* NP PRT PP
+S|||SBAR * S * S * NP VP *|||SBAR * S * S * NP VP *
+S|||S VP *|||S VP *
+VP|||* PP * FRAG|||* PP * FRAG
+FRAG|||WHPP|||WHPP
+S|||ADVP * PP * NP VP|||ADVP * PP * NP VP
+ADVP|||NP *|||NP *
+VP|||* PP SBAR|||* PP SBAR
+SBAR|||* FRAG|||* FRAG
+FRAG|||*|||*
+S|||ADVP * NP VP|||ADVP * NP VP
+S|||ADVP NP VP * S *|||ADVP NP VP * S *
+VP|||VP * VP * S|||VP * VP * S
+S|||S * NP VP|||S * NP VP
+S|||VP * S *|||VP * S *
+S|||VP * SQ|||VP * SQ
+SQ|||* NP SQ *|||* NP SQ *
+VP|||* PRT UCP * S|||* PRT UCP * S
+UCP|||ADJP * VP|||ADJP * VP
+NP|||NP ADJP|||NP ADJP
+S|||PP * SBAR * NP VP *|||PP * SBAR * NP VP *
+NP|||* ADJP|||* ADJP
+VP|||* ADVP PP PP * SBAR|||* ADVP PP PP * SBAR
+NP|||QP *|||QP *
+QP|||*|||*
+VP|||* ADJP SBAR|||* ADJP SBAR
+S|||* VP *|||* VP *
+NP|||NP PP VP *|||NP PP VP *
+S|||S * NP * S *|||S * NP * S *
+NP|||NP * NP * NP * NP|||NP * NP * NP * NP
+S|||ADJP|||ADJP
+FRAG|||SBAR * PRN * NP *|||SBAR * PRN * NP *
+PRN|||SINV|||SINV
+SINV|||ADVP * NP VP|||ADVP * NP VP
+S|||ADVP * S * S * S *|||ADVP * S * S * S *
+S|||* SBAR VP|||* SBAR VP
+PP|||ADVP * NP|||ADVP * NP
+S|||SBAR * SBAR * PRN NP VP *|||SBAR * SBAR * PRN NP VP *
+SINV|||* S * S * NP|||* S * S * NP
+X|||* VP * S *|||* VP * S *
+S|||SBAR * NP VP * PP VP|||SBAR * NP VP * PP VP
+VP|||* PRT NP * S * SBAR|||* PRT NP * S * SBAR
+S|||NP PP|||NP PP
+VP|||* NP * PP * PP|||* NP * PP * PP
+NP|||NP * PP ADVP|||NP * PP ADVP
+VP|||* ADJP NP|||* ADJP NP
+S|||ADVP * NP * VP *|||ADVP * NP * VP *
+VP|||* PP * S * SBAR|||* PP * S * SBAR
+NP|||NP * VP|||NP * VP
+S|||S VP|||S VP
+VP|||* PRT PP * S|||* PRT PP * S
+VP|||* PP PP * S|||* PP PP * S
+S|||ADVP NP VP * S * S *|||ADVP NP VP * S * S *
+FRAG|||SBAR * VP * NP * S * NP *|||SBAR * VP * NP * S * NP *
+VP|||VP * PRN VP|||VP * PRN VP
+VP|||* PP ADVP|||* PP ADVP
+SBAR|||SBAR * FRAG|||SBAR * FRAG
+FRAG|||PP|||PP
+S|||NP NP PP|||NP NP PP
+S|||PP * NP VP|||PP * NP VP
+VP|||* ADVP * SBAR|||* ADVP * SBAR
+VP|||* NP ADVP * SBAR|||* NP ADVP * SBAR
+S|||* PP NP VP * NP VP|||* PP NP VP * NP VP
+NP|||* SBAR|||* SBAR
+SBAR|||ADVP SBAR CONJP SBAR|||ADVP SBAR CONJP SBAR
+NP|||* NP * NP|||* NP * NP
+S|||PP * PP * VP * NP VP *|||PP * PP * VP * NP VP *
+ADJP|||ADJP * ADJP * ADJP|||ADJP * ADJP * ADJP
+NP|||NP * NP * NP * NP * NP * NP * NP * NP * NP * NP * NP * NP *|||NP * NP * NP * NP * NP * NP * NP * NP * NP * NP * NP * NP *
+S|||NP NP VP|||NP NP VP
+S|||SBAR * NP ADVP VP|||SBAR * NP ADVP VP
+S|||* ADVP NP VP * NP VP|||* ADVP NP VP * NP VP
+S|||NP * ADVP * VP *|||NP * ADVP * VP *
+NP|||NP * NP * NP * NP * NP * NP * NP|||NP * NP * NP * NP * NP * NP * NP
+S|||S * S NP VP *|||S * S NP VP *
+VP|||* PP *|||* PP *
+VP|||* NP * S * SBAR|||* NP * S * SBAR
+SINV|||* S S *|||* S S *
+VP|||* VP * VP|||* VP * VP
+FRAG|||* SBAR * S * S *|||* SBAR * S * S *
+S|||SINV * S *|||SINV * S *
+SINV|||PP VP NP|||PP VP NP
+S|||* ADVP S * S *|||* ADVP S * S *
+FRAG|||NP * S * VP * FRAG|||NP * S * VP * FRAG
+FRAG|||* SBAR|||* SBAR
+VP|||* ADJP * PP|||* ADJP * PP
+PP|||CONJP PP * PP|||CONJP PP * PP
+NP|||NP * PP *|||NP * PP *
+NP|||NP * NP * NP * NP * NP|||NP * NP * NP * NP * NP
+VP|||* NP PP ADVP|||* NP PP ADVP
+S|||SBAR * ADVP NP VP * S *|||SBAR * ADVP NP VP * S *
+S|||* SBAR * VP|||* SBAR * VP
+VP|||* SQ|||* SQ
+SQ|||* NP NP VP|||* NP NP VP
+VP|||* PP PP * ADVP * ADJP|||* PP PP * ADVP * ADJP
+S|||ADVP NP VP * NP VP *|||ADVP NP VP * NP VP *
+NP|||NP * ADJP|||NP * ADJP
+X|||X * VP *|||X * VP *
+X|||* S|||* S
+NP|||NP * NP * NP * NP *|||NP * NP * NP * NP *
+S|||NP VP * S * S *|||NP VP * S * S *
+S|||NP VP * S|||NP VP * S
+ADJP|||ADJP * NP|||ADJP * NP
+FRAG|||* SBAR * S *|||* SBAR * S *
+VP|||VP * NP PP|||VP * NP PP
+VP|||* NP ADVP SBAR|||* NP ADVP SBAR
+VP|||VP * SBAR|||VP * SBAR
+ADVP|||ADVP SBAR|||ADVP SBAR
+UCP|||* NP|||* NP
+SINV|||* SBARQ S * S *|||* SBARQ S * S *
+S|||PP NP VP * NP VP *|||PP NP VP * NP VP *
+S|||* SBAR * SBAR *|||* SBAR * SBAR *
+VP|||* PRT NP PP PP|||* PRT NP PP PP
+VP|||* SBARQ *|||* SBARQ *
+UCP|||PP * SBAR|||PP * SBAR
+FRAG|||PP *|||PP *
+S|||* SBAR * SBAR * NP VP *|||* SBAR * SBAR * NP VP *
+VP|||* S * S|||* S * S
+S|||* SBAR * NP VP * S *|||* SBAR * NP VP * S *
+ADJP|||ADJP SBAR|||ADJP SBAR
+S|||ADVP PP NP VP *|||ADVP PP NP VP *
+NP|||NP NP *|||NP NP *
+FRAG|||* FRAG *|||* FRAG *
+FRAG|||NP|||NP
+FRAG|||FRAG * VP * NP S *|||FRAG * VP * NP S *
+FRAG|||VP|||VP
+S|||ADVP SINV * S|||ADVP SINV * S
+NP|||NP NP SBAR|||NP NP SBAR
+PP|||PP PP|||PP PP
+S|||S * S * VP|||S * S * VP
+S|||* ADVP NP VP|||* ADVP NP VP
+S|||* NP VP * PP *|||* NP VP * PP *
+PP|||PP * ADVP PP|||PP * ADVP PP
+VP|||* NP NP * SBAR|||* NP NP * SBAR
+S|||S * VP * S *|||S * VP * S *
+VP|||* PP * NP|||* PP * NP
+VP|||* SBARQ|||* SBARQ
+SQ|||SQ * NP ADJP|||SQ * NP ADJP
+NP|||NP * VP * VP|||NP * VP * VP
+NP|||* NX|||* NX
+NX|||*|||*
+S|||S * ADVP S *|||S * ADVP S *
+S|||NP * VP *|||NP * VP *
+VP|||* ADJP PRT|||* ADJP PRT
+S|||SBAR * PP NP VP *|||SBAR * PP NP VP *
+SBAR|||X S|||X S
+VP|||NP PP|||NP PP
+S|||NP PRN VP *|||NP PRN VP *
+PRN|||* NP *|||* NP *
+VP|||* NP * NP|||* NP * NP
+S|||S * NP VP * S *|||S * NP VP * S *
+S|||FRAG * NP VP *|||FRAG * NP VP *
+NP|||SBAR|||SBAR
+S|||* NP ADVP VP|||* NP ADVP VP
+NP|||NP VP * VP|||NP VP * VP
+S|||* SBAR NP VP * NP VP *|||* SBAR NP VP * NP VP *
+VP|||* PP ADVP * S|||* PP ADVP * S
+S|||SBAR NP VP *|||SBAR NP VP *
+VP|||* ADVP PP * SBARQ *|||* ADVP PP * SBARQ *
+S|||NP ADVP VP * NP VP *|||NP ADVP VP * NP VP *
+SINV|||ADVP PP S * NP VP *|||ADVP PP S * NP VP *
+S|||S PRN * S * ADVP VP|||S PRN * S * ADVP VP
+S|||* PP * SBAR * NP VP *|||* PP * SBAR * NP VP *
+VP|||* S * NP SBAR|||* S * NP SBAR
+PP|||* NP *|||* NP *
+S|||ADVP ADVP NP VP|||ADVP ADVP NP VP
+VP|||* ADVP PP S|||* ADVP PP S
+SBARQ|||WHNP SQ WHNP SQ * SQ *|||WHNP SQ WHNP SQ * SQ *
+SQ|||* NP * NP|||* NP * NP
+SQ|||S * NP SBAR|||S * NP SBAR
+S|||* PP * NP VP|||* PP * NP VP
+VP|||* PP * SBARQ|||* PP * SBARQ
+SBARQ|||* WHNP * WHNP SQ *|||* WHNP * WHNP SQ *
+S|||ADVP PRN VP * NP VP|||ADVP PRN VP * NP VP
+PRN|||* ADVP *|||* ADVP *
+VP|||* PP * SQ * S|||* PP * SQ * S
+NP|||NP * NP * NP * NP * NP * NP * NP * NP * NP *|||NP * NP * NP * NP * NP * NP * NP * NP * NP *
+S|||PP * SBAR * VP *|||PP * SBAR * VP *
+VP|||* NP INTJ NP PP|||* NP INTJ NP PP
+S|||* NP VP * S * NP VP *|||* NP VP * S * NP VP *
+VP|||* PRT ADVP PP|||* PRT ADVP PP
+SBARQ|||SBAR * WHNP SQ *|||SBAR * WHNP SQ *
+SBAR|||SBAR * S * SBAR|||SBAR * S * SBAR
+S|||* S *|||* S *
+SBAR|||ADVP * S|||ADVP * S
+PP|||* X|||* X
+X|||* ADJP|||* ADJP
+S|||ADVP * NP VP * S *|||ADVP * NP VP * S *
+X|||X PP|||X PP
+X|||SBAR * SBAR *|||SBAR * SBAR *
+ADJP|||* ADJP|||* ADJP
+VP|||* ADVP NP * ADVP|||* ADVP NP * ADVP
+S|||ADVP * NP VP * S|||ADVP * NP VP * S
+VP|||* PP * SBARQ * S|||* PP * SBARQ * S
+SBARQ|||WHNP *|||WHNP *
+S|||* S * S * S * S|||* S * S * S * S
+S|||* SBAR * S * ADVP S *|||* SBAR * S * ADVP S *
+S|||S * FRAG *|||S * FRAG *
+FRAG|||NP * FRAG|||NP * FRAG
+FRAG|||SBARQ|||SBARQ
+SBARQ|||SBAR * WHNP SQ|||SBAR * WHNP SQ
+S|||S * SQ *|||S * SQ *
+S|||SBAR * X NP ADVP VP *|||SBAR * X NP ADVP VP *
+X|||* NP SBAR *|||* NP SBAR *
+S|||SBAR * S * PP SBAR *|||SBAR * S * PP SBAR *
+S|||* ADVP * S * S * S *|||* ADVP * S * S * S *
+S|||INTJ * NP VP|||INTJ * NP VP
+VP|||* ADVP PP PP|||* ADVP PP PP
+S|||SBAR * SBAR *|||SBAR * SBAR *
+VP|||* PP PRN PP|||* PP PRN PP
+PRN|||* SBAR *|||* SBAR *
+S|||* SQ *|||* SQ *
+VP|||* ADJP ADVP|||* ADJP ADVP
+NP|||NP * PP * SBAR *|||NP * PP * SBAR *
+VP|||* ADVP SBAR|||* ADVP SBAR
+VP|||VP * VP SBAR|||VP * VP SBAR
+S|||ADVP PP NP VP * S *|||ADVP PP NP VP * S *
+VP|||* ADVP SBARQ SBAR|||* ADVP SBARQ SBAR
+SQ|||SQ * NP|||SQ * NP
+SQ|||ADVP VP|||ADVP VP
+S|||NP VP * SQ *|||NP VP * SQ *
+FRAG|||ADVP * NP SBAR * PP|||ADVP * NP SBAR * PP
+S|||S * NP VP * VP *|||S * NP VP * VP *
+SBAR|||WHNP SINV|||WHNP SINV
+VP|||NP|||NP
+S|||* ADVP NP VP * S *|||* ADVP NP VP * S *
+SBARQ|||* WHADVP SQ|||* WHADVP SQ
+SQ|||SQ * VP|||SQ * VP
+SQ|||NP VP|||NP VP
+FRAG|||X VP *|||X VP *
+ADJP|||* PP PP|||* PP PP
+FRAG|||PP NP * S * SBAR|||PP NP * S * SBAR
+SBAR|||* WHADVP S *|||* WHADVP S *
+S|||NP ADVP VP *|||NP ADVP VP *
+VP|||* NP PP * ADJP|||* NP PP * ADJP
+S|||* NP VP * S * ADVP VP * S *|||* NP VP * S * ADVP VP * S *
+VP|||* ADJP PP * PP|||* ADJP PP * PP
+S|||ADVP SBAR * NP VP * S *|||ADVP SBAR * NP VP * S *
+VP|||* NP ADVP PP|||* NP ADVP PP
+S|||* NP VP * SBAR * NP VP *|||* NP VP * SBAR * NP VP *
+S|||SBAR VP *|||SBAR VP *
+VP|||* S ADVP|||* S ADVP
+VP|||* PP PP S|||* PP PP S
+ADVP|||* NP|||* NP
+S|||* NP NP VP|||* NP NP VP
+S|||NP VP * SBAR * NP VP *|||NP VP * SBAR * NP VP *
+VP|||VP PRN|||VP PRN
+S|||* NP VP * NP VP * S *|||* NP VP * NP VP * S *
+VP|||ADVP * S|||ADVP * S
+S|||INTJ VP|||INTJ VP
+S|||SBARQ * S *|||SBARQ * S *
+NP|||NP * NP NP *|||NP * NP NP *
+VP|||* NP NP * ADJP|||* NP NP * ADJP
+VP|||* NP PRN SBAR|||* NP PRN SBAR
+PRN|||* FRAG *|||* FRAG *
+FRAG|||INTJ * NP * SBAR|||INTJ * NP * SBAR
+S|||PP * NP VP *|||PP * NP VP *
+PP|||* SBARQ|||* SBARQ
+SBARQ|||WHNP SQ * SQ|||WHNP SQ * SQ
+S|||S * S * S * VP *|||S * S * S * VP *
+FRAG|||SBAR * ADVP * NP * S *|||SBAR * ADVP * NP * S *
+NP|||* NP *|||* NP *
+VP|||* PP * NP * PP * SBAR|||* PP * NP * PP * SBAR
+UCP|||PP * NP|||PP * NP
+VP|||* PP * SQ * SBAR|||* PP * SQ * SBAR
+S|||NP VP * VP *|||NP VP * VP *
+ROOT|||SQ|||SQ
+SQ|||* NP SQ|||* NP SQ
+S|||NP VP * SBARQ|||NP VP * SBARQ
+SBARQ|||* WHNP SQ *|||* WHNP SQ *
+SQ|||* NP S|||* NP S
+S|||PP * VP|||PP * VP
+VP|||VP * ADVP NP|||VP * ADVP NP
+VP|||* ADJP S|||* ADJP S
+S|||SBAR VP|||SBAR VP
+VP|||* X|||* X
+S|||* S S * S * NP VP *|||* S S * S * NP VP *
+VP|||* PP * SQ|||* PP * SQ
+SQ|||* NP ADVP VP *|||* NP ADVP VP *
+S|||* NP * VP|||* NP * VP
+VP|||ADVP * PP * S|||ADVP * PP * S
+S|||S NP VP|||S NP VP
+VP|||* PP PP ADVP|||* PP PP ADVP
+VP|||* ADVP PRN SBAR|||* ADVP PRN SBAR
+PRN|||* SINV *|||* SINV *
+NP|||* NP * S|||* NP * S
+S|||S * SINV PP *|||S * SINV PP *
+S|||SBAR * S * VP|||SBAR * S * VP
+S|||* NP NP VP * NP * S * VP * S *|||* NP NP VP * NP * S * VP * S *
+VP|||ADVP *|||ADVP *
+ADJP|||ADJP * ADJP|||ADJP * ADJP
+ADJP|||ADJP *|||ADJP *
+S|||S * S * NP VP *|||S * S * NP VP *
+S|||S * S * NP VP * S * S *|||S * S * NP VP * S * S *
+ADJP|||ADVP * S|||ADVP * S
+S|||* NP ADVP VP *|||* NP ADVP VP *
+VP|||* PRT PP * PP * SBAR|||* PRT PP * PP * SBAR
+S|||* SBAR * NP VP * VP *|||* SBAR * NP VP * VP *
+S|||* SBAR * ADVP ADVP NP VP *|||* SBAR * ADVP ADVP NP VP *
+VP|||* ADVP PP SBAR|||* ADVP PP SBAR
+FRAG|||SBAR * INTJ * NP|||SBAR * INTJ * NP
+SQ|||* NP ADJP|||* NP ADJP
+NP|||NP PRN|||NP PRN
+S|||SBAR * S * SBAR|||SBAR * S * SBAR
+S|||NP * PP * VP|||NP * PP * VP
+S|||S * S * S|||S * S * S
+S|||NP ADVP VP * S *|||NP ADVP VP * S *
+S|||ADVP * ADVP * NP VP *|||ADVP * ADVP * NP VP *
+S|||SBAR * S * S * S|||SBAR * S * S * S
+S|||NP NP VP * S *|||NP NP VP * S *
+FRAG|||X VP * INTJ * ADVP * SBAR|||X VP * INTJ * ADVP * SBAR
+X|||SBARQ *|||SBARQ *
+SBARQ|||WHNP ADVP|||WHNP ADVP
+SBAR|||* S *|||* S *
+VP|||* ADJP * S|||* ADJP * S
+PP|||PP * PP * PP|||PP * PP * PP
+NP|||NP * ADVP NP|||NP * ADVP NP
+NP|||NP * NP * NP * SBAR *|||NP * NP * NP * SBAR *
+NX|||NX * NX|||NX * NX
+NX|||NX PP|||NX PP
+S|||PRN VP|||PRN VP
+VP|||* NP PP PP PP|||* NP PP PP PP
+S|||ADVP * NP VP * S * S *|||ADVP * NP VP * S * S *
+VP|||* S SBAR|||* S SBAR
+VP|||* PRT ADVP|||* PRT ADVP
+S|||PP * SBAR *|||PP * SBAR *
+S|||ADVP NP ADVP VP|||ADVP NP ADVP VP
+VP|||* PP * SQ *|||* PP * SQ *
+SQ|||INTJ * NP VP *|||INTJ * NP VP *
+VP|||* PP * S PP PP|||* PP * S PP PP
+S|||S * SBARQ * S|||S * SBARQ * S
+VP|||NP SBAR|||NP SBAR
+S|||ADVP NP VP * S * S * SBARQ *|||ADVP NP VP * S * S * SBARQ *
+SBARQ|||WHADVP SQ|||WHADVP SQ
+S|||ADVP * S * NP VP *|||ADVP * S * NP VP *
+S|||* PP NP VP * S *|||* PP NP VP * S *
+NP|||* ADJP * SBAR|||* ADJP * SBAR
+FRAG|||PP * S * S * S *|||PP * S * S * S *
+S|||* SBAR * ADVP NP VP *|||* SBAR * ADVP NP VP *
+S|||* SQ * NP VP *|||* SQ * NP VP *
+VP|||* PP PRN PP PP S * NP PP SBAR|||* PP PRN PP PP S * NP PP SBAR
+VP|||* ADVP PP * S|||* ADVP PP * S
+VP|||VP *|||VP *
+PP|||NP * NP|||NP * NP
+S|||* ADVP * SBAR * NP VP|||* ADVP * SBAR * NP VP
+SINV|||* NP|||* NP
+S|||S S * S *|||S S * S *
+S|||* S * S * NP VP|||* S * S * NP VP
+NP|||NP PP VP|||NP PP VP
+S|||* SBAR * S *|||* SBAR * S *
+S|||* PP VP *|||* PP VP *
+S|||* ADVP PRN NP VP *|||* ADVP PRN NP VP *
+NP|||QP|||QP
+S|||* S * VP *|||* S * VP *
+X|||* VP * PP * SBAR * S *|||* VP * PP * SBAR * S *
+PP|||PP * ADVP|||PP * ADVP
+S|||* PP * NP VP *|||* PP * NP VP *
+S|||SBAR * S * S * NP VP|||SBAR * S * S * NP VP
+VP|||* ADJP * SBAR|||* ADJP * SBAR
+S|||S * SBAR *|||S * SBAR *
+SINV|||* NP * VP|||* NP * VP
+S|||* NP * NP VP *|||* NP * NP VP *
+NP|||NP * S * NP|||NP * S * NP
+S|||PP * PP * VP *|||PP * PP * VP *
+SBARQ|||* WHADVP * WHNP SQ *|||* WHADVP * WHNP SQ *
+SINV|||* SBARQ S * NP VP|||* SBARQ S * NP VP
+S|||ADVP S * VP * VP *|||ADVP S * VP * VP *
+UCP|||PP * PP|||PP * PP
+S|||PP S * S *|||PP S * S *
+S|||ADVP NP VP * S|||ADVP NP VP * S
+VP|||* PRT NP S|||* PRT NP S
+S|||SBAR * VP *|||SBAR * VP *
+NP|||NP PP ADVP PP|||NP PP ADVP PP
+S|||PP S * S * S * S *|||PP S * S * S * S *
+ROOT|||UCP|||UCP
+UCP|||*|||*
+S|||S * PP * NP VP *|||S * PP * NP VP *
+NP|||NP * ADVP NP *|||NP * ADVP NP *
+S|||NP VP * SBARQ * S *|||NP VP * SBARQ * S *
+SQ|||* NP NP|||* NP NP
+S|||PP * S * S|||PP * S * S
+FRAG|||WHNP S|||WHNP S
+VP|||* PRT PP * S * SBAR|||* PRT PP * S * SBAR
+SBARQ|||WHADVP SQ * SQ *|||WHADVP SQ * SQ *
+SQ|||* FRAG SBAR|||* FRAG SBAR
+FRAG|||ADVP * SBARQ *|||ADVP * SBARQ *
+VP|||* SBARQ SBAR|||* SBARQ SBAR
+VP|||CONJP VP * ADVP VP|||CONJP VP * ADVP VP
+S|||* ADVP INTJ * NP VP|||* ADVP INTJ * NP VP
+UCP|||ADVP * ADVP|||ADVP * ADVP
+NP|||NP VP * VP *|||NP VP * VP *
+VP|||* PRT FRAG|||* PRT FRAG
+FRAG|||* NP * S * NP * VP *|||* NP * S * NP * VP *
+VP|||* PP VP * S|||* PP VP * S
+FRAG|||* S *|||* S *
+S|||* ADVP NP VP * S|||* ADVP NP VP * S
+VP|||* PP PP PP|||* PP PP PP
+S|||* SBAR * NP VP * S|||* SBAR * NP VP * S
+S|||S * S * S * S *|||S * S * S * S *
+SINV|||ADVP VP NP|||ADVP VP NP
+NP|||NP PP * PP|||NP PP * PP
+PP|||CONJP PP CONJP PP|||CONJP PP CONJP PP
+S|||PP NP VP * ADVP * ADVP * NP VP *|||PP NP VP * ADVP * ADVP * NP VP *
+VP|||* ADJP * PP * PP|||* ADJP * PP * PP
+S|||SBAR * NP VP * NP VP *|||SBAR * NP VP * NP VP *
+S|||* ADVP SBAR VP *|||* ADVP SBAR VP *
+SQ|||SQ * NP NP *|||SQ * NP NP *
+SQ|||* ADVP SQ * NP * VP|||* ADVP SQ * NP * VP
+FRAG|||* SBAR * VP * S * S *|||* SBAR * VP * S * S *
+VP|||VP * VP * ADVP * SBAR|||VP * VP * ADVP * SBAR
+VP|||* NP ADVP * SBARQ * S|||* NP ADVP * SBARQ * S
+S|||* SBAR PRN NP VP *|||* SBAR PRN NP VP *
+WHNP|||* PP|||* PP
+FRAG|||NP PP * VP * VP *|||NP PP * VP * VP *
+VP|||ADVP * ADJP PP|||ADVP * ADJP PP
+VP|||* NP ADVP PP PP|||* NP ADVP PP PP
+S|||PP PP VP|||PP PP VP
+VP|||* PP VP|||* PP VP
+FRAG|||FRAG * ADVP * INTJ *|||FRAG * ADVP * INTJ *
+VP|||* PP * VP|||* PP * VP
+S|||PP * SBAR * NP VP|||PP * SBAR * NP VP
+NP|||NP * NP * PP|||NP * NP * PP
+S|||* S VP *|||* S VP *
+VP|||VP * VP * ADVP|||VP * VP * ADVP
+SQ|||* NP NP NP * NP * VP|||* NP NP NP * NP * VP
+S|||* PP VP|||* PP VP
+S|||ADVP SBAR * NP VP PRN NP VP * NP VP *|||ADVP SBAR * NP VP PRN NP VP * NP VP *
+S|||ADVP * PP NP VP *|||ADVP * PP NP VP *
+VP|||* CONJP VP|||* CONJP VP
+VP|||VP * ADVP VP|||VP * ADVP VP
+S|||* NP VP * S * S * S * S *|||* NP VP * S * S * S * S *
+S|||LST VP|||LST VP
+LST|||*|||*
+S|||ADVP PP NP VP * NP VP *|||ADVP PP NP VP * NP VP *
+NP|||NP VP SBAR|||NP VP SBAR
+VP|||* NP NP PP|||* NP NP PP
+SBAR|||SINV|||SINV
+S|||VP PRN|||VP PRN
+NP|||NP PRN SBAR|||NP PRN SBAR
+S|||NP * SBAR * VP|||NP * SBAR * VP
+S|||ADVP * S|||ADVP * S
+S|||ADVP S * S * S *|||ADVP S * S * S *
+S|||NP ADVP * VP|||NP ADVP * VP
+S|||ADVP PRN NP VP|||ADVP PRN NP VP
+FRAG|||PP NP|||PP NP
+S|||VP VP|||VP VP
+NP|||NP PP VP * VP|||NP PP VP * VP
+PP|||* PP * PP * PP|||* PP * PP * PP
+S|||SBARQ * NP VP * NP VP *|||SBARQ * NP VP * NP VP *
+SQ|||* NP * NP *|||* NP * NP *
+VP|||* S * PRN|||* S * PRN
+FRAG|||* NP * NP * SBAR *|||* NP * NP * SBAR *
+S|||SBAR VP * S *|||SBAR VP * S *
+S|||* PP S * PP|||* PP S * PP
+VP|||* NP PRN|||* NP PRN
+SBAR|||* PP *|||* PP *
+S|||PP * PP *|||PP * PP *
+PP|||PP * PP * PP * NP|||PP * PP * PP * NP
+SINV|||ADVP VP NP *|||ADVP VP NP *
+S|||NP * ADVP * VP * S *|||NP * ADVP * VP * S *
+S|||ADVP NP VP * NP VP|||ADVP NP VP * NP VP
+ADVP|||* S|||* S
+S|||S * S * ADVP S *|||S * S * ADVP S *
+S|||SBAR * NP VP * NP VP|||SBAR * NP VP * NP VP
+SBAR|||* S * SBAR * SBAR|||* S * SBAR * SBAR
+ROOT|||PP|||PP
+VP|||* NP PP * S * S|||* NP PP * S * S
+S|||* ADVP * NP VP *|||* ADVP * NP VP *
+FRAG|||* ADJP * S * NP * VP *|||* ADJP * S * NP * VP *
+SBAR|||SBAR PRN S *|||SBAR PRN S *
+PRN|||* PP *|||* PP *
+S|||NP * S * VP|||NP * S * VP
+SBARQ|||SBAR * WHADVP SQ *|||SBAR * WHADVP SQ *
+VP|||* PP SBAR * S|||* PP SBAR * S
+S|||VP * VP|||VP * VP
+S|||LST S * S|||LST S * S
+S|||FRAG * ADVP NP VP *|||FRAG * ADVP NP VP *
+FRAG|||* PP|||* PP
+VP|||* NP VP|||* NP VP
+NP|||NP PP * ADJP|||NP PP * ADJP
+SQ|||SQ SQ VP|||SQ SQ VP
+SQ|||VP NP PRN S *|||VP NP PRN S *
+PRN|||* INTJ *|||* INTJ *
+VP|||* PP * SBARQ *|||* PP * SBARQ *
+SINV|||* SBARQ SBARQ|||* SBARQ SBARQ
+SQ|||* NP VP * S|||* NP VP * S
+S|||SINV * NP VP *|||SINV * NP VP *
+SINV|||SBARQ VP NP|||SBARQ VP NP
+X|||X * NP NP *|||X * NP NP *
+S|||S * SBAR * VP *|||S * SBAR * VP *
+VP|||PP|||PP
+SBAR|||SBAR *|||SBAR *
+S|||* NP * S * VP *|||* NP * S * VP *
+S|||NP VP * SBAR|||NP VP * SBAR
+S|||ADVP * S * S|||ADVP * S * S
+S|||S NP VP *|||S NP VP *
+NP|||NP * VP * PP|||NP * VP * PP
+S|||NP ADVP VP * S * S *|||NP ADVP VP * S * S *
+VP|||* NP NP * S|||* NP NP * S
+S|||* SBARQ * PRN * S *|||* SBARQ * PRN * S *
+VP|||* NP PP * PP|||* NP PP * PP
+VP|||* NP PP * VP * VP * SBAR|||* NP PP * VP * VP * SBAR
+VP|||SBAR * VP|||SBAR * VP
+NP|||NP * NP * NP * SBARQ|||NP * NP * NP * SBARQ
+VP|||* ADVP PP ADVP|||* ADVP PP ADVP
+VP|||* INTJ *|||* INTJ *
+VP|||* NP *|||* NP *
+FRAG|||SBAR * SBAR * PP * INTJ *|||SBAR * SBAR * PP * INTJ *
+SBAR|||WHNP FRAG|||WHNP FRAG
+FRAG|||ADVP SBAR|||ADVP SBAR
+VP|||* PRT PP * SBAR|||* PRT PP * SBAR
+S|||SBAR * NP NP VP * S *|||SBAR * NP NP VP * S *
+VP|||PP * ADVP * S|||PP * ADVP * S
+S|||S * SQ * S *|||S * SQ * S *
+VP|||* INTJ|||* INTJ
+S|||* SBARQ * PRN NP VP|||* SBARQ * PRN NP VP
+S|||NP VP * SBAR *|||NP VP * SBAR *
+SQ|||* NP SBAR|||* NP SBAR
+S|||* NP * S *|||* NP * S *
+NP|||* UCP *|||* UCP *
+UCP|||* NP *|||* NP *
+S|||* SBAR * X ADVP NP VP *|||* SBAR * X ADVP NP VP *
+S|||SQ * SBARQ|||SQ * SBARQ
+SBARQ|||* SQ *|||* SQ *
+VP|||* PP * PP * SBAR|||* PP * PP * SBAR
+S|||NP UCP|||NP UCP
+S|||S * PP S *|||S * PP S *
+S|||* NP PRN VP *|||* NP PRN VP *
+S|||* PP * VP|||* PP * VP
+NP|||NP PP * SBAR|||NP PP * SBAR
+S|||ADVP * PP * SBAR VP *|||ADVP * PP * SBAR VP *
+VP|||* NP ADVP * PP|||* NP ADVP * PP
+VP|||* ADVP NP PP ADVP|||* ADVP NP PP ADVP
+S|||ADVP NP ADVP VP *|||ADVP NP ADVP VP *
+SINV|||* NP * NP NP * NP * NP NP *|||* NP * NP NP * NP * NP NP *
+S|||* SQ S *|||* SQ S *
+SQ|||* VP *|||* VP *
+S|||* ADVP * NP VP * VP *|||* ADVP * NP VP * VP *
+S|||SBAR * ADVP NP VP *|||SBAR * ADVP NP VP *
+S|||ADVP NP VP * SBAR * S * S *|||ADVP NP VP * SBAR * S * S *
+S|||S * NP VP * NP VP *|||S * NP VP * NP VP *
+SQ|||* NP VP * PRN NP NP VP *|||* NP VP * PRN NP NP VP *
+PRN|||* S|||* S
+SQ|||SBAR * NP SQ *|||SBAR * NP SQ *
+S|||SBAR PRN NP VP * SBAR * NP VP *|||SBAR PRN NP VP * SBAR * NP VP *
+SBAR|||SBAR * SBAR *|||SBAR * SBAR *
+VP|||* PP PP * SBAR|||* PP PP * SBAR
+S|||SBAR * S * NP VP|||SBAR * S * NP VP
+S|||SBARQ * NP VP * NP VP|||SBARQ * NP VP * NP VP
+S|||NP ADJP NP VP *|||NP ADJP NP VP *
+VP|||ADVP * NP ADVP * SBAR|||ADVP * NP ADVP * SBAR
+VP|||* PP ADVP PP|||* PP ADVP PP
+FRAG|||ADVP * S * INTJ * VP * S * VP *|||ADVP * S * INTJ * VP * S * VP *
+S|||ADVP * VP *|||ADVP * VP *
+SBAR|||WHNP S * S *|||WHNP S * S *
+VP|||* PRT ADVP * S|||* PRT ADVP * S
+S|||SBAR * ADVP * NP VP|||SBAR * ADVP * NP VP
+FRAG|||FRAG * NP *|||FRAG * NP *
+VP|||* PRN SBAR|||* PRN SBAR
+FRAG|||* NP * S * NP|||* NP * S * NP
+S|||ADVP NP VP * SBAR NP VP *|||ADVP NP VP * SBAR NP VP *
+S|||NP VP PRN * SINV *|||NP VP PRN * SINV *
+S|||SINV * S * NP VP *|||SINV * S * NP VP *
+VP|||* NP * PP * SBAR|||* NP * PP * SBAR
+S|||* VP * NP VP *|||* VP * NP VP *
+S|||S * S * SBAR * NP VP * S *|||S * S * SBAR * NP VP * S *
+PRN|||* NP NP|||* NP NP
+VP|||ADVP VP * VP|||ADVP VP * VP
+FRAG|||SBAR * NP * SBAR *|||SBAR * NP * SBAR *
+NP|||NP * PP SBAR|||NP * PP SBAR
+VP|||ADVP * PP|||ADVP * PP
+FRAG|||PP * VP * INTJ *|||PP * VP * INTJ *
+VP|||* ADJP *|||* ADJP *
+S|||SBAR * S * S * S * SBAR * NP VP *|||SBAR * S * S * S * SBAR * NP VP *
+NP|||NP ADJP *|||NP ADJP *
+S|||ADVP * NP * SBAR * VP *|||ADVP * NP * SBAR * VP *
+VP|||* ADVP * ADVP|||* ADVP * ADVP
+VP|||ADVP PP|||ADVP PP
+VP|||* NP PP *|||* NP PP *
+ADVP|||ADVP *|||ADVP *
+S|||NP ADJP PRN S|||NP ADJP PRN S
+FRAG|||VP * S * SBAR * SBARQ *|||VP * S * SBAR * SBARQ *
+SQ|||* NP ADVP VP|||* NP ADVP VP
+S|||NP * PP VP|||NP * PP VP
+VP|||* PP ADVP * SBAR|||* PP ADVP * SBAR
+FRAG|||* ADVP VP * S *|||* ADVP VP * S *
+S|||* INTJ * NP VP * S * S|||* INTJ * NP VP * S * S
+S|||* SBAR * X S * S *|||* SBAR * X S * S *
+FRAG|||NP * NP * S|||NP * NP * S
+S|||S * PP|||S * PP
+NP|||NP PP PRN|||NP PP PRN
+VP|||* PP * SBARQ SBAR|||* PP * SBARQ SBAR
+S|||SQ * SQ|||SQ * SQ
+SQ|||* NP PP SBAR|||* NP PP SBAR
+SQ|||* NP NP NP VP *|||* NP NP NP VP *
+FRAG|||* VP * S *|||* VP * S *
+VP|||* PRT * SBAR|||* PRT * SBAR
+VP|||* PP * SQ * SBAR * SBAR|||* PP * SQ * SBAR * SBAR
+SQ|||NP VP *|||NP VP *
+S|||* NP * S * VP|||* NP * S * VP
+ADJP|||ADVP * PP|||ADVP * PP
+S|||* PP * NP * VP * VP *|||* PP * NP * VP * VP *
+FRAG|||FRAG * S *|||FRAG * S *
+FRAG|||WHNP ADVP SINV * SBAR * PP * S * SBAR *|||WHNP ADVP SINV * SBAR * PP * S * SBAR *
+S|||PP NP NP VP *|||PP NP NP VP *
+NP|||NP PP *|||NP PP *
+S|||* NP * NP VP * NP VP *|||* NP * NP VP * NP VP *
+SBAR|||SBAR * S|||SBAR * S
+ROOT|||PRN|||PRN
+PRN|||* PP|||* PP
+S|||* S * NP VP * S *|||* S * NP VP * S *
+VP|||* PRT NP SBAR|||* PRT NP SBAR
+S|||* NP VP * ADVP NP VP *|||* NP VP * ADVP NP VP *
+NP|||SBAR * NP|||SBAR * NP
+FRAG|||NP * VP * NP *|||NP * VP * NP *
+S|||* NP VP * PP VP *|||* NP VP * PP VP *
+VP|||* ADJP PRN|||* ADJP PRN
+ADJP|||NP *|||NP *
+S|||* SBAR * SBAR * NP VP * NP VP *|||* SBAR * SBAR * NP VP * NP VP *
+VP|||* ADVP PP * NP|||* ADVP PP * NP
+S|||* NP * SBAR * VP|||* NP * SBAR * VP
+S|||S * PP *|||S * PP *
+VP|||* ADVP NP ADVP|||* ADVP NP ADVP
+VP|||* NP S * S|||* NP S * S
+FRAG|||S * FRAG * PP * VP * INTJ *|||S * FRAG * PP * VP * INTJ *
+VP|||* NP ADVP * S|||* NP ADVP * S
+FRAG|||NP S * INTJ *|||NP S * INTJ *
+S|||* NP VP * SBAR PRN NP VP *|||* NP VP * SBAR PRN NP VP *
+PP|||PP ADVP *|||PP ADVP *
+VP|||VP * VP PRN|||VP * VP PRN
+S|||NP * NP VP * S|||NP * NP VP * S
+S|||ADVP S * S *|||ADVP S * S *
+VP|||* PRT NP ADVP S|||* PRT NP ADVP S
+S|||* SBAR * NP ADVP VP *|||* SBAR * NP ADVP VP *
+S|||PP PRN VP *|||PP PRN VP *
+S|||* S S *|||* S S *
+S|||* NP * S * S *|||* NP * S * S *
+VP|||ADVP NP|||ADVP NP
+NP|||NP VP *|||NP VP *
+VP|||ADJP PP|||ADJP PP
+VP|||PP NP|||PP NP
+NP|||NP ADJP * SBAR|||NP ADJP * SBAR
+S|||S * SBAR * NP VP *|||S * SBAR * NP VP *
+S|||* NP VP * S * VP|||* NP VP * S * VP
+S|||ADVP NP VP * PP NP VP *|||ADVP NP VP * PP NP VP *
+VP|||* PP * SQ S|||* PP * SQ S
+VP|||* PRT PP NP|||* PRT PP NP
+VP|||* NP * SBARQ * SBAR|||* NP * SBARQ * SBAR
+SBARQ|||WHNP S * SQ *|||WHNP S * SQ *
+S|||* SQ * S|||* SQ * S
+SQ|||* NP NP *|||* NP NP *
+FRAG|||S * PP * FRAG *|||S * PP * FRAG *
+S|||SBAR * NP VP * PP *|||SBAR * NP VP * PP *
+S|||SBAR * NP VP * SBARQ|||SBAR * NP VP * SBARQ
+VP|||* NP NP *|||* NP NP *
+S|||* SBAR * ADVP VP *|||* SBAR * ADVP VP *
+S|||* NP VP * NP NP VP *|||* NP VP * NP NP VP *
+VP|||* PP * SBARQ S|||* PP * SBARQ S
+NP|||NP NX|||NP NX
+S|||* SBAR * S * VP *|||* SBAR * S * VP *
+NP|||NP * CONJP NP *|||NP * CONJP NP *
+NP|||NP * CONJP NP|||NP * CONJP NP
+VP|||* ADVP * NP|||* ADVP * NP
+FRAG|||SBAR * ADVP NP * S *|||SBAR * ADVP NP * S *
+ADJP|||* ADVP|||* ADVP
+S|||* SBAR NP VP|||* SBAR NP VP
+S|||ADVP * NP S|||ADVP * NP S
+VP|||* NP S * SBAR|||* NP S * SBAR
+S|||* S * SINV *|||* S * SINV *
+SINV|||PP * NP VP|||PP * NP VP
+VP|||* SBARQ * SBAR|||* SBARQ * SBAR
+S|||S * S * S * S|||S * S * S * S
+NP|||NP VP * PP *|||NP VP * PP *
+VP|||* ADVP ADVP PP PP|||* ADVP ADVP PP PP
+VP|||* PRT PP PP S|||* PRT PP PP S
+S|||ADVP NP|||ADVP NP
+VP|||ADVP * PP * SBAR|||ADVP * PP * SBAR
+SQ|||* NP NP * WHNP SQ *|||* NP NP * WHNP SQ *
+VP|||* NP PP NP|||* NP PP NP
+FRAG|||FRAG * PP * S *|||FRAG * PP * S *
+S|||* PP * PP * VP|||* PP * PP * VP
+NP|||NP * UCP|||NP * UCP
+UCP|||ADJP * ADVP|||ADJP * ADVP
+VP|||VP * VP * PP|||VP * VP * PP
+NP|||ADVP QP|||ADVP QP
+ADVP|||* PP *|||* PP *
+NP|||* NP NP * NP|||* NP NP * NP
+S|||SBAR * S *|||SBAR * S *
+S|||S * ADVP SINV *|||S * ADVP SINV *
+NP|||NP NP PP *|||NP NP PP *
+S|||NP VP * NP VP * SBARQ|||NP VP * NP VP * SBARQ
+SQ|||VP NP SBAR|||VP NP SBAR
+FRAG|||* ADVP SBAR * SBAR *|||* ADVP SBAR * SBAR *
+S|||* NP NP VP * S *|||* NP NP VP * S *
+S|||* S PRN * S *|||* S PRN * S *
+S|||* ADVP SBAR * VP *|||* ADVP SBAR * VP *
+VP|||* PP PRN|||* PP PRN
+PRN|||* VP *|||* VP *
+S|||NP PP VP|||NP PP VP
+S|||S * ADVP SINV * S|||S * ADVP SINV * S
+VP|||* PRT * NP PP|||* PRT * NP PP
+S|||* SBAR PRN * NP VP *|||* SBAR PRN * NP VP *
+VP|||* SQ *|||* SQ *
+SQ|||* NP NP * SQ *|||* NP NP * SQ *
+S|||ADVP * SBAR * NP VP *|||ADVP * SBAR * NP VP *
+VP|||* PRN PP|||* PRN PP
+NP|||NP * NP * VP *|||NP * NP * VP *
+S|||INTJ * NP VP *|||INTJ * NP VP *
+VP|||* NP S * VP|||* NP S * VP
+VP|||* ADVP PP PP ADVP PP|||* ADVP PP PP ADVP PP
+S|||ADVP SBAR * PP * NP VP|||ADVP SBAR * PP * NP VP
+S|||* SBAR VP *|||* SBAR VP *
+S|||S PRN|||S PRN
+S|||* PP *|||* PP *
+WHNP|||NP PP|||NP PP
+FRAG|||SBAR * PP * S PRN * PP * INTJ PRN * PP * SINV * SBAR *|||SBAR * PP * S PRN * PP * INTJ PRN * PP * SINV * SBAR *
+VP|||* ADJP * SBAR * VP|||* ADJP * SBAR * VP
+VP|||* PP PP * PP|||* PP PP * PP
+PP|||* PP * PP * ADVP PP|||* PP * PP * ADVP PP
+S|||* NP * PP * VP|||* NP * PP * VP
+NP|||NP * S *|||NP * S *
+VP|||* S * VP|||* S * VP
+FRAG|||NP ADJP ADVP * INTJ *|||NP ADJP ADVP * INTJ *
+SINV|||NP * NP *|||NP * NP *
+NP|||NP PP * VP * PP|||NP PP * VP * PP
+S|||ADVP S * VP *|||ADVP S * VP *
+S|||SBAR * ADVP NP ADVP VP *|||SBAR * ADVP NP ADVP VP *
+FRAG|||* NP * SBARQ X NP *|||* NP * SBARQ X NP *
+SBARQ|||WHNP SQ * SQ * SQ *|||WHNP SQ * SQ * SQ *
+WHPP|||* SBAR|||* SBAR
+S|||FRAG * S *|||FRAG * S *
+SBAR|||SBARQ|||SBARQ
+SBARQ|||WHNP SQ * SQ *|||WHNP SQ * SQ *
+SQ|||*|||*
+PP|||ADVP * PP|||ADVP * PP
+FRAG|||FRAG * SBAR *|||FRAG * SBAR *
+S|||NP * NP VP *|||NP * NP VP *
+S|||* ADVP * NP VP|||* ADVP * NP VP
+VP|||* SQ NP|||* SQ NP
+VP|||* NP * PRN|||* NP * PRN
+S|||NP VP * SQ|||NP VP * SQ
+SQ|||* NP * VP *|||* NP * VP *
+S|||NP VP PRN S * S *|||NP VP PRN S * S *
+WHNP|||WHNP WHPP|||WHNP WHPP
+SQ|||ADVP * NP * VP *|||ADVP * NP * VP *
+FRAG|||FRAG * SBAR * S *|||FRAG * SBAR * S *
+S|||* S * S * S|||* S * S * S
+S|||* PP S * ADVP VP * VP *|||* PP S * ADVP VP * VP *
+VP|||VP * S|||VP * S
+NP|||NP ADVP SBAR *|||NP ADVP SBAR *
+S|||ADVP S PRN * NP VP *|||ADVP S PRN * NP VP *
+VP|||* NP * SQ *|||* NP * SQ *
+SBAR|||*|||*
+NP|||* PP NP *|||* PP NP *
+VP|||* NP PP * PP * SBAR|||* NP PP * PP * SBAR
+S|||SBAR * X NP VP *|||SBAR * X NP VP *
+X|||NP * SBAR *|||NP * SBAR *
+S|||* NP VP * VP *|||* NP VP * VP *
+UCP|||NP * S|||NP * S
+VP|||* ADJP SBAR * SBAR|||* ADJP SBAR * SBAR
+VP|||VP * VP * VP * SBAR|||VP * VP * VP * SBAR
+VP|||* PP ADJP|||* PP ADJP
+VP|||* SBAR * SBAR|||* SBAR * SBAR
+FRAG|||INTJ * FRAG * FRAG|||INTJ * FRAG * FRAG
+FRAG|||X NP|||X NP
+SINV|||PP VP S * NP ADJP|||PP VP S * NP ADJP
+ROOT|||ADVP|||ADVP
+ADVP|||ADVP SBAR *|||ADVP SBAR *
+VP|||* NP PRT PP S * SBAR|||* NP PRT PP S * SBAR
+S|||NP * VP * VP *|||NP * VP * VP *
+S|||* NP|||* NP
+S|||ADVP PP NP VP * VP *|||ADVP PP NP VP * VP *
+NP|||NP * NP NP * NP|||NP * NP NP * NP
+SBAR|||WHADJP S|||WHADJP S
+VP|||VP * VP * S * SBAR|||VP * VP * S * SBAR
+FRAG|||* ADVP X S * S * S *|||* ADVP X S * S * S *
+X|||* PP *|||* PP *
+VP|||VP * VP NP|||VP * VP NP
+X|||* VP S *|||* VP S *
+SINV|||* SBARQ S *|||* SBARQ S *
+SBAR|||SBAR * NP|||SBAR * NP
+PP|||PP * PP *|||PP * PP *
+S|||* S * FRAG *|||* S * FRAG *
+S|||X NP VP|||X NP VP
+FRAG|||ADVP NP|||ADVP NP
+ADJP|||* PRN SBAR|||* PRN SBAR
+NP|||NP PRN NP|||NP PRN NP
+VP|||VP * PP|||VP * PP
+VP|||* ADJP PP S|||* ADJP PP S
+PP|||PP CONJP PP|||PP CONJP PP
+ADJP|||ADJP * ADJP * ADJP * ADJP * ADJP|||ADJP * ADJP * ADJP * ADJP * ADJP
+S|||S * SBAR|||S * SBAR
+S|||* ADVP SBAR * NP VP *|||* ADVP SBAR * NP VP *
+SQ|||* NP SBAR *|||* NP SBAR *
+FRAG|||NP PP S *|||NP PP S *
+VP|||ADVP * NP * SBAR|||ADVP * NP * SBAR
+S|||ADVP S * NP * NP VP *|||ADVP S * NP * NP VP *
+VP|||* ADVP PP * PP|||* ADVP PP * PP
+SQ|||* NP PP|||* NP PP
+NP|||NP PP PP PP|||NP PP PP PP
+S|||SBAR * NP * S * VP *|||SBAR * NP * S * VP *
+S|||* ADVP X VP *|||* ADVP X VP *
+S|||PP NP VP * PP VP *|||PP NP VP * PP VP *
+VP|||* ADVP ADVP PP|||* ADVP ADVP PP
+S|||PP * SBAR * VP|||PP * SBAR * VP
+S|||ADJP NP|||ADJP NP
+VP|||* NP PP * NP S|||* NP PP * NP S
+S|||S * S * NP VP|||S * S * NP VP
+SINV|||* ADVP VP NP * S *|||* ADVP VP NP * S *
+ADJP|||* ADJP *|||* ADJP *
+NP|||NP * NP NP|||NP * NP NP
+NP|||NP PP SBAR *|||NP PP SBAR *
+S|||ADVP ADVP NP VP *|||ADVP ADVP NP VP *
+S|||INTJ NP VP|||INTJ NP VP
+VP|||* PRN VP|||* PRN VP
+S|||ADVP SBAR * NP VP|||ADVP SBAR * NP VP
+S|||NP * VP * NP VP *|||NP * VP * NP VP *
+VP|||* PP SBAR * SBAR|||* PP SBAR * SBAR
+VP|||ADVP * NP * S|||ADVP * NP * S
+S|||NP ADJP SBAR|||NP ADJP SBAR
+S|||* PP * VP *|||* PP * VP *
+S|||ADVP * NP VP * NP VP *|||ADVP * NP VP * NP VP *
+S|||SBAR * ADVP NP VP|||SBAR * ADVP NP VP
+VP|||* ADVP PP PP PP S|||* ADVP PP PP PP S
+VP|||* PRT PP * VP|||* PRT PP * VP
+S|||* NP VP * SQ|||* NP VP * SQ
+VP|||* PP ADVP PP * PP|||* PP ADVP PP * PP
+NP|||NP * NP * NP * NP * NP * NP *|||NP * NP * NP * NP * NP * NP *
+VP|||* S S|||* S S
+VP|||* NP * SQ|||* NP * SQ
+S|||NP VP * S * VP *|||NP VP * S * VP *
+NP|||* QP|||* QP
+VP|||* PP * NP * S|||* PP * NP * S
+WHADVP|||* NP|||* NP
+S|||ADVP SBAR * S * S *|||ADVP SBAR * S * S *
+ADVP|||* ADJP|||* ADJP
+FRAG|||INTJ * VP * VP * S *|||INTJ * VP * VP * S *
+S|||* SBAR * S * SQ *|||* SBAR * S * SQ *
+PP|||PP * PP * PP * PP|||PP * PP * PP * PP
+FRAG|||* PP * S *|||* PP * S *
+FRAG|||CONJP NP *|||CONJP NP *
+S|||NP * S * PP * SBAR * VP|||NP * S * PP * SBAR * VP
+VP|||* PP ADVP ADVP|||* PP ADVP ADVP
+VP|||* S ADVP * SBAR|||* S ADVP * SBAR
+S|||S * S * NP ADVP VP *|||S * S * NP ADVP VP *
+S|||SBAR * SBAR * S NP VP *|||SBAR * SBAR * S NP VP *
+NP|||* NP * SBAR|||* NP * SBAR
+VP|||* PP * UCP|||* PP * UCP
+UCP|||* VP|||* VP
+S|||NP * SQ * S *|||NP * SQ * S *
+SQ|||* NP VP * SBAR|||* NP VP * SBAR
+S|||S * S * SQ *|||S * S * SQ *
+S|||SBAR * SBAR * NP VP *|||SBAR * SBAR * NP VP *
+VP|||VP * VP * NP|||VP * VP * NP
+UCP|||VP * ADVP SBAR|||VP * ADVP SBAR
+S|||SBAR * PRN VP *|||SBAR * PRN VP *
+S|||PP PRN NP VP *|||PP PRN NP VP *
+S|||NP VP * NP|||NP VP * NP
+S|||ADVP * ADVP VP|||ADVP * ADVP VP
+FRAG|||PP NP *|||PP NP *
+S|||* S * SBARQ|||* S * SBARQ
+X|||ADVP * SBAR *|||ADVP * SBAR *
+VP|||* PP NP PRN SBAR|||* PP NP PRN SBAR
+VP|||* NP ADVP S|||* NP ADVP S
+FRAG|||S * SBAR * S *|||S * SBAR * S *
+ADVP|||* SBAR|||* SBAR
+VP|||* ADJP PP * S|||* ADJP PP * S
+X|||* VP * X *|||* VP * X *
+X|||* NP VP *|||* NP VP *
+VP|||* PP NP * ADVP|||* PP NP * ADVP
+VP|||* NP * NP PP * S|||* NP * NP PP * S
+FRAG|||ADVP NP * NP|||ADVP NP * NP
+S|||PP * S * S * SQ|||PP * S * S * SQ
+SQ|||* NP * NP VP *|||* NP * NP VP *
+VP|||* ADVP PRN NP|||* ADVP PRN NP
+NP|||NP * ADVP *|||NP * ADVP *
+S|||* PP NP VP * S * S *|||* PP NP VP * S * S *
+VP|||* ADVP * PP|||* ADVP * PP
+S|||SBAR * S * SQ|||SBAR * S * SQ
+S|||PP NP VP * NP VP|||PP NP VP * NP VP
+FRAG|||* SBAR * PP * S *|||* SBAR * PP * S *
+VP|||* NP ADVP * SBARQ|||* NP ADVP * SBARQ
+SQ|||* NP NP NP VP|||* NP NP NP VP
+NP|||NP * SBAR * SBAR * SBAR|||NP * SBAR * SBAR * SBAR
+WHPP|||* NP|||* NP
+VP|||* ADJP PP * VP|||* ADJP PP * VP
+VP|||* S ADVP PP * PP|||* S ADVP PP * PP
+VP|||* NP ADVP PP SBAR|||* NP ADVP PP SBAR
+SBAR|||SBAR * PP * PP * S|||SBAR * PP * PP * S
+VP|||* PP PP SBAR|||* PP PP SBAR
+SINV|||* NP VP *|||* NP VP *
+S|||PP NP ADVP VP *|||PP NP ADVP VP *
+PP|||* WHNP|||* WHNP
+ADJP|||ADJP PP S|||ADJP PP S
+S|||S * S * ADVP VP *|||S * S * ADVP VP *
+S|||SBAR * PP NP VP|||SBAR * PP NP VP
+FRAG|||PP * NP * ADVP SINV *|||PP * NP * ADVP SINV *
+S|||S PRN VP|||S PRN VP
+SBAR|||* SBAR|||* SBAR
+S|||ADVP ADVP NP PRN VP * S *|||ADVP ADVP NP PRN VP * S *
+VP|||* NP PP S * SBAR|||* NP PP S * SBAR
+S|||* SBAR ADVP NP VP *|||* SBAR ADVP NP VP *
+VP|||* PRT NP * PP|||* PRT NP * PP
+VP|||* VP * S|||* VP * S
+WHNP|||* WHPP|||* WHPP
+FRAG|||X VP|||X VP
+VP|||* NP PP PP *|||* NP PP PP *
+FRAG|||FRAG * NP * S *|||FRAG * NP * S *
+S|||VP * S * VP *|||VP * S * VP *
+S|||S * S * VP *|||S * S * VP *
+S|||PP * X NP VP|||PP * X NP VP
+FRAG|||* ADVP S * S *|||* ADVP S * S *
+S|||ADVP PP NP VP|||ADVP PP NP VP
+S|||* SBAR * S * S * VP *|||* SBAR * S * S * VP *
+S|||ADVP VP *|||ADVP VP *
+S|||* PRN * SBAR * S * S *|||* PRN * SBAR * S * S *
+S|||* SBAR * S * S * S *|||* SBAR * S * S * S *
+S|||PP * NP * PP * VP|||PP * NP * PP * VP
+VP|||* PP ADJP PP|||* PP ADJP PP
+S|||NP PP VP *|||NP PP VP *
+FRAG|||S * WHADVP * VP * WHADVP * VP *|||S * WHADVP * VP * WHADVP * VP *
+S|||SBARQ * PRN * NP VP *|||SBARQ * PRN * NP VP *
+SBARQ|||* WHNP SQ * SQ *|||* WHNP SQ * SQ *
+S|||* S * ADVP VP|||* S * ADVP VP
+VP|||* SQ * SBAR|||* SQ * SBAR
+S|||* SBAR * PP S * NP VP *|||* SBAR * PP S * NP VP *
+S|||* INTJ * S * S *|||* INTJ * S * S *
+NP|||NP NP NP *|||NP NP NP *
+NP|||* NP * NP *|||* NP * NP *
+NP|||NP SBAR * PP *|||NP SBAR * PP *
+ADVP|||PP *|||PP *
+SBAR|||ADVP WHADVP S|||ADVP WHADVP S
+NP|||ADVP *|||ADVP *
+VP|||* PP PP INTJ|||* PP PP INTJ
+S|||NP VP * SBAR * NP VP|||NP VP * SBAR * NP VP
+VP|||* NP NP S|||* NP NP S
+VP|||* ADJP PP PP|||* ADJP PP PP
+S|||PP * X * NP VP|||PP * X * NP VP
+VP|||* PP PP * INTJ * PRN|||* PP PP * INTJ * PRN
+VP|||* ADVP ADVP * SBAR|||* ADVP ADVP * SBAR
+VP|||* PRT * SQ * S * SBAR|||* PRT * SQ * S * SBAR
+SQ|||S * VP *|||S * VP *
+FRAG|||* ADVP S * NP * S *|||* ADVP S * NP * S *
+FRAG|||ADJP SBAR * S * INTJ * S|||ADJP SBAR * S * INTJ * S
+S|||SBAR * SBAR * VP *|||SBAR * SBAR * VP *
+NP|||NP PRN * NP|||NP PRN * NP
+S|||SQ * SBARQ SBAR|||SQ * SBARQ SBAR
+FRAG|||* S * SBAR|||* S * SBAR
+S|||ADVP NP VP * VP *|||ADVP NP VP * VP *
+FRAG|||* SBAR * VP *|||* SBAR * VP *
+S|||NP ADVP NP ADJP|||NP ADVP NP ADJP
+NP|||ADVP NP * NP|||ADVP NP * NP
+UCP|||* FRAG * ADJP PP|||* FRAG * ADJP PP
+VP|||* SQ * S|||* SQ * S
+S|||ADVP PP S * S *|||ADVP PP S * S *
+NP|||NP WHPP|||NP WHPP
+FRAG|||FRAG * S * NP * S *|||FRAG * S * NP * S *
+S|||PP * NP VP * S * NP VP *|||PP * NP VP * S * NP VP *
+S|||NP NP VP * VP *|||NP NP VP * VP *
+S|||* SBAR * VP * S * NP VP *|||* SBAR * VP * S * NP VP *
+S|||* PP SINV|||* PP SINV
+VP|||* NP PP * SBAR * SBAR|||* NP PP * SBAR * SBAR
+S|||* SBAR S * S *|||* SBAR S * S *
+S|||S * S * SBAR|||S * S * SBAR
+S|||NP VP * VP|||NP VP * VP
+SBARQ|||*|||*
+PP|||PP * PP CONJP PP|||PP * PP CONJP PP
+PP|||PP * CONJP PP|||PP * CONJP PP
+SQ|||* NP NP * NP VP * WHNP VP *|||* NP NP * NP VP * WHNP VP *
+S|||ADVP PRN NP VP *|||ADVP PRN NP VP *
+S|||PP * S * S *|||PP * S * S *
+S|||S * VP * PP * NP VP *|||S * VP * PP * NP VP *
+VP|||* PRT * SBAR * SBAR|||* PRT * SBAR * SBAR
+VP|||ADVP * PP PP|||ADVP * PP PP
+S|||* SBARQ *|||* SBARQ *
+SBARQ|||* WHNP PRN SQ|||* WHNP PRN SQ
+NP|||NP PP PP * PP|||NP PP PP * PP
+SBARQ|||WHADVP SQ * SBARQ SBARQ SQ SQ SQ *|||WHADVP SQ * SBARQ SBARQ SQ SQ SQ *
+S|||* NP VP * SBAR * S *|||* NP VP * SBAR * S *
+S|||NP VP * S * NP VP * VP *|||NP VP * S * NP VP * VP *
+NP|||NP ADJP * ADJP|||NP ADJP * ADJP
+S|||NP * S * VP *|||NP * S * VP *
+FRAG|||NP * S *|||NP * S *
+S|||ADVP SBAR * VP *|||ADVP SBAR * VP *
+FRAG|||FRAG * SBAR * VP * SBAR *|||FRAG * SBAR * VP * SBAR *
+S|||S PRN VP *|||S PRN VP *
+UCP|||ADVP * PP * ADJP *|||ADVP * PP * ADJP *
+SBARQ|||* SQ WHADVP SQ *|||* SQ WHADVP SQ *
+VP|||* NP NP PP * NP|||* NP NP PP * NP
+VP|||VP * VP * VP * VP * VP * VP|||VP * VP * VP * VP * VP * VP
+NP|||NP * NP * NP * NP * NP * SBAR *|||NP * NP * NP * NP * NP * SBAR *
+S|||* NP * PP * NP VP *|||* NP * PP * NP VP *
+FRAG|||X PP|||X PP
+X|||* VP PP|||* VP PP
+SQ|||SQ * ADJP *|||SQ * ADJP *
+SQ|||* NP VP * NP VP|||* NP VP * NP VP
+VP|||* INTJ PP|||* INTJ PP
+INTJ|||INTJ * INTJ|||INTJ * INTJ
+NP|||NP VP * SBAR|||NP VP * SBAR
+SBARQ|||WHPP SQ * SQ *|||WHPP SQ * SQ *
+SBARQ|||SBARQ * WHNP SQ *|||SBARQ * WHNP SQ *
+SQ|||* NP * WHNP NP|||* NP * WHNP NP
+FRAG|||SBAR * VP * ADVP *|||SBAR * VP * ADVP *
+S|||NP VP * ADVP VP *|||NP VP * ADVP VP *
+VP|||* PRT SBAR * S|||* PRT SBAR * S
+S|||SINV * NP VP|||SINV * NP VP
+VP|||ADVP * SBAR|||ADVP * SBAR
+NP|||NP * VP * ADJP *|||NP * VP * ADJP *
+S|||* ADVP * NP VP * S *|||* ADVP * NP VP * S *
+S|||S * S * INTJ * S *|||S * S * INTJ * S *
+S|||PP * PP * NP VP|||PP * PP * NP VP
+SINV|||ADVP VP * S *|||ADVP VP * S *
+S|||PP * S VP *|||PP * S VP *
+NP|||NP * NP * VP|||NP * NP * VP
+VP|||* PRT NP * ADJP|||* PRT NP * ADJP
+VP|||* ADJP PRN SBAR|||* ADJP PRN SBAR
+VP|||* PRT NP PP * S|||* PRT NP PP * S
+S|||* NP * S * PP *|||* NP * S * PP *
+NX|||* NP|||* NP
+VP|||* PRT PP S|||* PRT PP S
+VP|||* NP PRN * SBAR|||* NP PRN * SBAR
+S|||PP NP ADVP VP|||PP NP ADVP VP
+SBARQ|||SBAR * WHADVP SQ WHNP SQ *|||SBAR * WHADVP SQ WHNP SQ *
+VP|||* NP * NP NP * SBAR|||* NP * NP NP * SBAR
+NP|||NP NP S *|||NP NP S *
+VP|||* ADJP * NP|||* ADJP * NP
+VP|||* SBAR PP|||* SBAR PP
+SBAR|||WHNP S *|||WHNP S *
+S|||NP * S|||NP * S
+NP|||* NP * NP * NP|||* NP * NP * NP
+S|||* PP PRN * S * S *|||* PP PRN * S * S *
+VP|||* PP * S SBAR|||* PP * S SBAR
+S|||ADVP PP * NP VP *|||ADVP PP * NP VP *
+S|||* NP VP * SBARQ|||* NP VP * SBARQ
+FRAG|||INTJ * PP S * NP NP ADVP|||INTJ * PP S * NP NP ADVP
+VP|||* PRN NP|||* PRN NP
+S|||* SBAR * PP NP VP *|||* SBAR * PP NP VP *
+S|||* SBAR NP VP *|||* SBAR NP VP *
+NP|||NP * NP ADVP|||NP * NP ADVP
+S|||SBAR * S * S * S *|||SBAR * S * S * S *
+NP|||* PRN *|||* PRN *
+S|||* NP VP * SBAR|||* NP VP * SBAR
+VP|||* NP SBAR * SBAR * PP * SBAR|||* NP SBAR * SBAR * PP * SBAR
+VP|||* NP ADVP PP ADVP|||* NP ADVP PP ADVP
+S|||* NP VP * PP|||* NP VP * PP
+S|||NP SBAR|||NP SBAR
+SBAR|||S * S * SBAR|||S * S * SBAR
+S|||* ADVP * NP NP VP|||* ADVP * NP NP VP
+SBARQ|||WHNP SQ WHADVP SQ *|||WHNP SQ WHADVP SQ *
+FRAG|||S * FRAG * SINV * PP * SBAR *|||S * FRAG * SINV * PP * SBAR *
+VP|||ADVP * PP NP|||ADVP * PP NP
+FRAG|||S * PP * INTJ *|||S * PP * INTJ *
+VP|||* NP INTJ * ADVP|||* NP INTJ * ADVP
+INTJ|||INTJ *|||INTJ *
+UCP|||NP * ADVP|||NP * ADVP
+S|||ADVP S * NP VP|||ADVP S * NP VP
+VP|||* PP NP SBAR|||* PP NP SBAR
+VP|||* PP * NP * SBAR|||* PP * NP * SBAR
+S|||NP ADJP S|||NP ADJP S
+VP|||ADVP|||ADVP
+S|||SBAR * X NP VP|||SBAR * X NP VP
+VP|||* ADVP ADJP SBAR|||* ADVP ADJP SBAR
+S|||S * NP VP * S * S|||S * NP VP * S * S
+S|||NP * ADVP * VP|||NP * ADVP * VP
+SINV|||ADVP VP NP PP * S *|||ADVP VP NP PP * S *
+VP|||* FRAG * SBAR|||* FRAG * SBAR
+S|||ADVP NP * NP VP *|||ADVP NP * NP VP *
+VP|||* NP PP * PP * S|||* NP PP * PP * S
+S|||SBAR PRN X NP VP *|||SBAR PRN X NP VP *
+S|||PP * S * FRAG|||PP * S * FRAG
+S|||* INTJ * X NP VP|||* INTJ * X NP VP
+S|||S * SBARQ|||S * SBARQ
+SQ|||* NP * ADVP PP NP VP|||* NP * ADVP PP NP VP
+VP|||* NP NP SBAR|||* NP NP SBAR
+S|||* SBAR * NP ADJP PP|||* SBAR * NP ADJP PP
+S|||* NP PRN VP * NP VP *|||* NP PRN VP * NP VP *
+VP|||VP CONJP VP|||VP CONJP VP
+UCP|||ADJP * FRAG|||ADJP * FRAG
+FRAG|||* PP * PP|||* PP * PP
+NP|||NP * RRC|||NP * RRC
+RRC|||PP NP * PP|||PP NP * PP
+UCP|||SBAR * ADJP *|||SBAR * ADJP *
+VP|||* ADVP * SBAR * PP|||* ADVP * SBAR * PP
+SBARQ|||* WHNP SQ * VP *|||* WHNP SQ * VP *
+S|||X * NP VP *|||X * NP VP *
+FRAG|||NP PP PP *|||NP PP PP *
+NP|||NP SBAR * ADJP|||NP SBAR * ADJP
+S|||SBAR * NP * VP|||SBAR * NP * VP
+S|||* NP VP * NP VP * NP VP|||* NP VP * NP VP * NP VP
+S|||* S * NP ADVP VP|||* S * NP ADVP VP
+ADJP|||* ADVP * PP|||* ADVP * PP
+S|||* PRN VP *|||* PRN VP *
+SINV|||VP NP SBAR|||VP NP SBAR
+S|||VP * ADVP VP *|||VP * ADVP VP *
+S|||S * VP * ADVP VP *|||S * VP * ADVP VP *
+S|||SBAR * S * VP *|||SBAR * S * VP *
+SBAR|||PP * SBAR|||PP * SBAR
+FRAG|||* NP * S *|||* NP * S *
+NP|||NAC *|||NAC *
+NAC|||*|||*
+S|||NP * S * VP * NP VP|||NP * S * VP * NP VP
+SBAR|||* S * ADVP PRN|||* S * ADVP PRN
+VP|||* NP * SQ S|||* NP * SQ S
+FRAG|||NP PP VP * INTJ * VP * NP *|||NP PP VP * INTJ * VP * NP *
+VP|||VP PRN NP|||VP PRN NP
+S|||SBAR * NP NP VP *|||SBAR * NP NP VP *
+FRAG|||FRAG * ADVP PRN NP * S * S *|||FRAG * ADVP PRN NP * S * S *
+NP|||NP PRN S|||NP PRN S
+PP|||ADVP PP * PP|||ADVP PP * PP
+S|||X X NP VP|||X X NP VP
+S|||PP S * S * S|||PP S * S * S
+VP|||* NP * SBAR SBAR|||* NP * SBAR SBAR
+NP|||NP * ADJP * NP *|||NP * ADJP * NP *
+S|||S * S * NP VP * NP VP *|||S * S * NP VP * NP VP *
+FRAG|||ADVP * S *|||ADVP * S *
+S|||* NP * S|||* NP * S
+NP|||NP PP * PP * PP|||NP PP * PP * PP
+NP|||NP PRN PP|||NP PRN PP
+FRAG|||SBAR * VP * PP *|||SBAR * VP * PP *
+S|||SBAR * ADVP VP|||SBAR * ADVP VP
+S|||* ADVP NP VP * VP * VP *|||* ADVP NP VP * VP * VP *
+NP|||NP * ADVP|||NP * ADVP
+S|||* ADVP * NP * NP VP *|||* ADVP * NP * NP VP *
+S|||VP * SBAR * VP *|||VP * SBAR * VP *
+S|||PP ADVP NP VP|||PP ADVP NP VP
+FRAG|||SBAR * PRN * SBAR * SBAR * SBAR *|||SBAR * PRN * SBAR * SBAR * SBAR *
+FRAG|||FRAG * VP * SBAR *|||FRAG * VP * SBAR *
+S|||* SBAR * ADVP NP ADVP VP *|||* SBAR * ADVP NP ADVP VP *
+VP|||* PRT * ADVP|||* PRT * ADVP
+VP|||* NP NP * ADVP * PP|||* NP NP * ADVP * PP
+FRAG|||X * SBAR * S *|||X * SBAR * S *
+S|||PP NP VP * VP *|||PP NP VP * VP *
+SBAR|||WHNP S * SBAR|||WHNP S * SBAR
+S|||ADVP * PP * S *|||ADVP * PP * S *
+S|||ADVP * PP VP *|||ADVP * PP VP *
+VP|||* NP ADVP ADVP|||* NP ADVP ADVP
+FRAG|||INTJ * PP|||INTJ * PP
+VP|||* NP ADVP * VP|||* NP ADVP * VP
+VP|||* NP ADVP NP|||* NP ADVP NP
+UCP|||S * PRN|||S * PRN
+S|||* ADVP * S * S *|||* ADVP * S * S *
+S|||SBAR * NP * SBAR *|||SBAR * NP * SBAR *
+S|||* NP VP * VP * NP VP *|||* NP VP * VP * NP VP *
+SBAR|||* WHADVP NP *|||* WHADVP NP *
+SQ|||* NP NP VP *|||* NP NP VP *
+VP|||* NP NP NP *|||* NP NP NP *
+FRAG|||NP SBAR * NP * NP *|||NP SBAR * NP * NP *
+S|||NP PP NP VP *|||NP PP NP VP *
+S|||ADVP SINV * S *|||ADVP SINV * S *
+FRAG|||* SBAR * SBAR *|||* SBAR * SBAR *
+S|||NP ADVP * SBAR * VP|||NP ADVP * SBAR * VP
+FRAG|||SBAR * ADVP NP|||SBAR * ADVP NP
+FRAG|||S * FRAG * PP *|||S * FRAG * PP *
+VP|||* SBAR SBAR|||* SBAR SBAR
+PP|||ADVP PP *|||ADVP PP *
+FRAG|||NP PP NP *|||NP PP NP *
+S|||SQ * S *|||SQ * S *
+SQ|||* NP ADVP VP * PP|||* NP ADVP VP * PP
+S|||FRAG * S VP *|||FRAG * S VP *
+S|||ADVP * SBAR * VP *|||ADVP * SBAR * VP *
+S|||ADVP * ADVP * NP VP|||ADVP * ADVP * NP VP
+VP|||* PP NP * PP|||* PP NP * PP
+NP|||NP * NP VP * SBAR|||NP * NP VP * SBAR
+FRAG|||* PP * SBAR|||* PP * SBAR
+S|||* PP NP ADVP * S * VP *|||* PP NP ADVP * S * VP *
+S|||* ADVP NP * SBAR * VP *|||* ADVP NP * SBAR * VP *
+S|||S * ADVP S|||S * ADVP S
+S|||* NP VP * NP ADVP VP *|||* NP VP * NP ADVP VP *
+VP|||* NP * ADJP|||* NP * ADJP
+S|||SBAR * SINV *|||SBAR * SINV *
+SBAR|||WHNP PRN S|||WHNP PRN S
+VP|||* SBAR * VP|||* SBAR * VP
+S|||SBAR * SBAR * SBAR *|||SBAR * SBAR * SBAR *
+NP|||* PRN|||* PRN
+PRN|||* ADVP SQ|||* ADVP SQ
+S|||ADVP SBAR PRN NP VP *|||ADVP SBAR PRN NP VP *
+S|||NP ADVP NP VP *|||NP ADVP NP VP *
+S|||PP|||PP
+S|||NP * SINV|||NP * SINV
+S|||PP NP * VP *|||PP NP * VP *
+VP|||* ADVP SBAR * SBAR|||* ADVP SBAR * SBAR
+S|||NP VP * VP * S *|||NP VP * VP * S *
+NP|||NP * SBAR * SBAR|||NP * SBAR * SBAR
+VP|||* SQ S|||* SQ S
+SQ|||* NP NP * ADVP NP * VP *|||* NP NP * ADVP NP * VP *
+S|||* NP PRN NP VP *|||* NP PRN NP VP *
+VP|||* ADVP ADVP PP * S|||* ADVP ADVP PP * S
+S|||* SBAR * SBAR * NP VP|||* SBAR * SBAR * NP VP
+S|||* ADVP PP * NP VP *|||* ADVP PP * NP VP *
+VP|||* NP PP * VP|||* NP PP * VP
+ADJP|||ADVP *|||ADVP *
+S|||* NP VP * VP|||* NP VP * VP
+VP|||* SBARQ S|||* SBARQ S
+SQ|||VP NP * NP PP|||VP NP * NP PP
+S|||* S VP|||* S VP
+VP|||* NP PRT S|||* NP PRT S
+VP|||VP * NP S|||VP * NP S
+S|||VP * NP VP *|||VP * NP VP *
+NP|||NP NP * NP|||NP NP * NP
+UCP|||* ADJP *|||* ADJP *
+NP|||NP * NP CONJP NP|||NP * NP CONJP NP
+FRAG|||WHNP PP * INTJ * S *|||WHNP PP * INTJ * S *
+WHNP|||WHNP S|||WHNP S
+VP|||* NP NP ADVP|||* NP NP ADVP
+FRAG|||ADJP * NP *|||ADJP * NP *
+NP|||ADJP|||ADJP
+VP|||* PRT S * SBAR|||* PRT S * SBAR
+S|||* NP VP * SBARQ SBAR *|||* NP VP * SBARQ SBAR *
+VP|||ADVP * S * SBAR|||ADVP * S * SBAR
+VP|||* ADJP * VP|||* ADJP * VP
+NP|||NP * PP * PP|||NP * PP * PP
+SBARQ|||WHADVP SQ WHNP SQ *|||WHADVP SQ WHNP SQ *
+S|||* SBAR * VP * S|||* SBAR * VP * S
+NP|||NP * SBAR * SBAR * SBAR * SBAR * SBAR * SBAR *|||NP * SBAR * SBAR * SBAR * SBAR * SBAR * SBAR *
+SBAR|||WHADVP * S|||WHADVP * S
+S|||* SBAR * PP *|||* SBAR * PP *
+S|||ADVP * NP * NP VP *|||ADVP * NP * NP VP *
+VP|||* NP * SBARQ|||* NP * SBARQ
+S|||X NP VP *|||X NP VP *
+X|||* VP * NP|||* VP * NP
+VP|||* ADJP PP SBAR|||* ADJP PP SBAR
+S|||ADVP PP VP|||ADVP PP VP
+S|||* PP * SBAR * NP ADVP VP|||* PP * SBAR * NP ADVP VP
+UCP|||S * S *|||S * S *
+FRAG|||SBAR * SBAR * S *|||SBAR * SBAR * S *
+FRAG|||PP NP * SBARQ *|||PP NP * SBARQ *
+S|||NP PRN * VP *|||NP PRN * VP *
+PRN|||* NP NP *|||* NP NP *
+S|||S * VP * VP|||S * VP * VP
+VP|||* PP * SBAR * PP|||* PP * SBAR * PP
+S|||PP * SBAR VP|||PP * SBAR VP
+NP|||NP * NP * UCP|||NP * NP * UCP
+UCP|||* PP|||* PP
+S|||S PRN * SQ *|||S PRN * SQ *
+VP|||* NP ADVP PP * SBAR|||* NP ADVP PP * SBAR
+S|||* ADVP * VP *|||* ADVP * VP *
+VP|||VP * VP * VP * VP|||VP * VP * VP * VP
+S|||* SBAR * S VP *|||* SBAR * S VP *
+FRAG|||* S * PP *|||* S * PP *
+VP|||* NP ADVP PRT|||* NP ADVP PRT
+SBAR|||SBAR * SBAR * ADVP * S|||SBAR * SBAR * ADVP * S
+FRAG|||* VP *|||* VP *
+VP|||* ADVP * S * SBAR|||* ADVP * S * SBAR
+VP|||* ADVP NP PP|||* ADVP NP PP
+S|||SBAR ADVP PP * NP VP *|||SBAR ADVP PP * NP VP *
+S|||* PP * PP * NP VP *|||* PP * PP * NP VP *
+NP|||PRN|||PRN
+NP|||NP UCP|||NP UCP
+S|||* S * S * S * S *|||* S * S * S * S *
+S|||* PP ADVP PRN VP *|||* PP ADVP PRN VP *
+S|||NP VP PP|||NP VP PP
+FRAG|||FRAG * NP FRAG *|||FRAG * NP FRAG *
+VP|||* PRT PP SBAR|||* PRT PP SBAR
+VP|||* ADVP NP * SBAR|||* ADVP NP * SBAR
+FRAG|||SBAR * SBAR * SBAR * VP *|||SBAR * SBAR * SBAR * VP *
+NP|||NP NP * VP|||NP NP * VP
+S|||S * ADVP S * S *|||S * ADVP S * S *
+VP|||* SBAR * NP|||* SBAR * NP
+VP|||* PP * PP SBAR|||* PP * PP SBAR
+S|||PP * NP ADVP VP *|||PP * NP ADVP VP *
+VP|||VP * VP * VP * S|||VP * VP * VP * S
+FRAG|||NP * PP * PP *|||NP * PP * PP *
+NP|||NP * NP PRN * NP|||NP * NP PRN * NP
+NP|||NP ADVP PP|||NP ADVP PP
+VP|||* VP SBAR|||* VP SBAR
+VP|||* PP NP * SBAR|||* PP NP * SBAR
+NP|||NP SBAR S|||NP SBAR S
+S|||ADVP * NP * ADVP VP *|||ADVP * NP * ADVP VP *
+SQ|||VP NP VP *|||VP NP VP *
+PP|||* VP|||* VP
+SBAR|||SBAR * CONJP SBAR|||SBAR * CONJP SBAR
+S|||* S * VP|||* S * VP
+FRAG|||SBAR * NP SBAR|||SBAR * NP SBAR
+NP|||* NAC *|||* NAC *
+VP|||* NP PRT PP S|||* NP PRT PP S
+NP|||NP SBAR * PP|||NP SBAR * PP
+VP|||* ADVP NP SBAR|||* ADVP NP SBAR
+S|||SBAR * PP *|||SBAR * PP *
+S|||PP S * S|||PP S * S
+VP|||* NP PP * PRT PP|||* NP PP * PRT PP
+VP|||* NP PRT * S * SBAR|||* NP PRT * S * SBAR
+UCP|||NP * FRAG|||NP * FRAG
+FRAG|||* PP * SBAR * VP *|||* PP * SBAR * VP *
+X|||* VP X * VP * PP *|||* VP X * VP * PP *
+PP|||PP * NP|||PP * NP
+NP|||NP VP * VP * PP|||NP VP * VP * PP
+FRAG|||* S * SBAR * SBAR *|||* S * SBAR * SBAR *
+ADJP|||ADJP * ADVP PP|||ADJP * ADVP PP
+VP|||VP * NP ADVP|||VP * NP ADVP
+S|||* NP VP PRN * S|||* NP VP PRN * S
+S|||SBAR S *|||SBAR S *
+NP|||NP ADVP SBAR|||NP ADVP SBAR
+S|||* PP * SBAR * NP VP * S|||* PP * SBAR * NP VP * S
+NP|||* NP ADVP NP *|||* NP ADVP NP *
+S|||NP * PP * VP *|||NP * PP * VP *
+S|||* S NP VP *|||* S NP VP *
+VP|||* SQ S * SBAR|||* SQ S * SBAR
+NP|||NP PP * VP * ADJP|||NP PP * VP * ADJP
+NP|||NP RRC *|||NP RRC *
+RRC|||ADVP NP|||ADVP NP
+S|||* SBAR PRN X NP VP *|||* SBAR PRN X NP VP *
+FRAG|||NP * NP|||NP * NP
+S|||NP PRN * S|||NP PRN * S
+VP|||* PRT PP PP PP|||* PRT PP PP PP
+NP|||NP NP * SBAR|||NP NP * SBAR
+VP|||* PP * SQ ADVP|||* PP * SQ ADVP
+VP|||* ADVP * UCP|||* ADVP * UCP
+UCP|||ADJP * ADJP|||ADJP * ADJP
+SQ|||* NP * PP|||* NP * PP
+S|||ADVP NP * PP *|||ADVP NP * PP *
+FRAG|||* ADJP * S *|||* ADJP * S *
+NP|||* NP * PP|||* NP * PP
+VP|||VP * NP * S|||VP * NP * S
+VP|||PP * S|||PP * S
+NP|||NP SBAR PRN|||NP SBAR PRN
+FRAG|||* WHADVP * SBAR * S *|||* WHADVP * SBAR * S *
+S|||* SBAR PRN NP VP|||* SBAR PRN NP VP
+S|||S * VP|||S * VP
+VP|||* ADVP PRN S|||* ADVP PRN S
+S|||SBAR * ADVP * VP *|||SBAR * ADVP * VP *
+NP|||* NP SBAR *|||* NP SBAR *
+NP|||NP SBAR *|||NP SBAR *
+S|||* S * S * SINV *|||* S * S * SINV *
+S|||ADVP * SBAR * VP|||ADVP * SBAR * VP
+FRAG|||WHADVP NP * S *|||WHADVP NP * S *
+VP|||* PRT NP PP SBAR|||* PRT NP PP SBAR
+VP|||ADVP * NP NP|||ADVP * NP NP
+FRAG|||PP * NP * SBAR * SINV *|||PP * NP * SBAR * SINV *
+S|||NP ADVP VP * VP *|||NP ADVP VP * VP *
+S|||SBAR PRN NP VP|||SBAR PRN NP VP
+PRN|||* S ADVP *|||* S ADVP *
+SBAR|||WHNP * S|||WHNP * S
+S|||SINV * VP *|||SINV * VP *
+SINV|||PP * VP * NP VP|||PP * VP * NP VP
+S|||NP SBAR NP VP|||NP SBAR NP VP
+S|||* SBAR * SQ *|||* SBAR * SQ *
+VP|||* NP * ADJP * SBAR|||* NP * ADJP * SBAR
+VP|||* NP * S *|||* NP * S *
+S|||NP * SBARQ|||NP * SBARQ
+S|||* PRN NP ADVP VP * S *|||* PRN NP ADVP VP * S *
+S|||ADVP * NP NP VP *|||ADVP * NP NP VP *
+NP|||NP * NP * NP * NP * NP * NP * NP * NP|||NP * NP * NP * NP * NP * NP * NP * NP
+VP|||* PP PRN NP|||* PP PRN NP
+S|||* SBAR * S * VP|||* SBAR * S * VP
+FRAG|||SBAR * SBAR * SBAR *|||SBAR * SBAR * SBAR *
+S|||SQ * VP *|||SQ * VP *
+VP|||* NP FRAG|||* NP FRAG
+SQ|||* NP VP S *|||* NP VP S *
+SBAR|||NP * S|||NP * S
+FRAG|||NP PP *|||NP PP *
+NP|||NP * NP * S|||NP * NP * S
+S|||* ADVP * NP * VP *|||* ADVP * NP * VP *
+PP|||ADVP * S|||ADVP * S
+FRAG|||PP * SBAR * INTJ * NP VP * S *|||PP * SBAR * INTJ * NP VP * S *
+S|||ADVP * ADVP * S * NP VP|||ADVP * ADVP * S * NP VP
+S|||S * X INTJ * NP ADVP VP *|||S * X INTJ * NP ADVP VP *
+SINV|||ADVP * NP *|||ADVP * NP *
+FRAG|||SBAR * FRAG *|||SBAR * FRAG *
+S|||* SBAR PRN X NP VP|||* SBAR PRN X NP VP
+NP|||NP * SBAR * S|||NP * SBAR * S
+SQ|||* NP FRAG|||* NP FRAG
+S|||* X X NP VP *|||* X X NP VP *
+ADJP|||ADJP * ADJP ADVP|||ADJP * ADJP ADVP
+NP|||NP * NP * NP * NP * NP * NP * NP * NP *|||NP * NP * NP * NP * NP * NP * NP * NP *
+FRAG|||S *|||S *
+SQ|||* SBARQ NP *|||* SBARQ NP *
+S|||SBAR * NP ADVP VP *|||SBAR * NP ADVP VP *
+SBARQ|||WHADVP SQ WHADVP SQ *|||WHADVP SQ WHADVP SQ *
+SQ|||* NP VP * WHNP SQ|||* NP VP * WHNP SQ
+WHNP|||* NP|||* NP
+PRN|||* SBAR|||* SBAR
+ADVP|||* ADVP|||* ADVP
+S|||NP * NP VP|||NP * NP VP
+VP|||VP * S * SBAR|||VP * S * SBAR
+S|||* NP VP * ADVP PP VP *|||* NP VP * ADVP PP VP *
+VP|||* SQ PP|||* SQ PP
+NP|||CONJP NP CONJP NP|||CONJP NP CONJP NP
+VP|||* ADVP ADJP * S|||* ADVP ADJP * S
+NP|||NP * ADJP * NP|||NP * ADJP * NP
+S|||* S PRN SBARQ *|||* S PRN SBARQ *
+VP|||* NP UCP|||* NP UCP
+UCP|||ADVP * VP|||ADVP * VP
+FRAG|||ADVP ADJP * FRAG|||ADVP ADJP * FRAG
+SBAR|||ADVP WHNP S|||ADVP WHNP S
+PP|||* PP CONJP PP|||* PP CONJP PP
+VP|||VP * NP PP * S|||VP * NP PP * S
+VP|||* PP NP S|||* PP NP S
+NP|||NP PP * NP|||NP PP * NP
+S|||SBARQ NP * NP VP *|||SBARQ NP * NP VP *
+S|||SBAR * PP * S|||SBAR * PP * S
+VP|||VP * VP PRN SBAR|||VP * VP PRN SBAR
+S|||* S * NP * NP VP *|||* S * NP * NP VP *
+UCP|||SBAR * NP|||SBAR * NP
+VP|||* VP * PP|||* VP * PP
+SINV|||ADVP VP * SBAR|||ADVP VP * SBAR
+VP|||* PRT ADVP * NP|||* PRT ADVP * NP
+S|||INTJ INTJ S|||INTJ INTJ S
+VP|||* PP PRN SBAR|||* PP PRN SBAR
+PRN|||* NP PP *|||* NP PP *
+ADJP|||ADJP PP PP|||ADJP PP PP
+S|||S * S * SBAR NP VP *|||S * S * SBAR NP VP *
+S|||SQ * INTJ * S *|||SQ * INTJ * S *
+FRAG|||SBAR * NP * S *|||SBAR * NP * S *
+SINV|||ADVP VP ADVP * SBARQ|||ADVP VP ADVP * SBARQ
+SBARQ|||WHNP SQ * SQ SBARQ *|||WHNP SQ * SQ SBARQ *
+S|||ADVP * S * S *|||ADVP * S * S *
+VP|||* PRT PP ADVP|||* PRT PP ADVP
+S|||S * SBAR VP *|||S * SBAR VP *
+S|||ADVP S * S * S|||ADVP S * S * S
+S|||* PP SBAR *|||* PP SBAR *
+FRAG|||PP NP * PP * INTJ *|||PP NP * PP * INTJ *
+VP|||* NP PRT * S|||* NP PRT * S
+VP|||* PRT * NP|||* PRT * NP
+SBAR|||* X|||* X
+S|||ADVP * SBAR * ADVP VP *|||ADVP * SBAR * ADVP VP *
+SBARQ|||WHNP S *|||WHNP S *
+VP|||* PP PP SBAR *|||* PP PP SBAR *
+SBARQ|||INTJ WHADVP SQ *|||INTJ WHADVP SQ *
+VP|||* PP NP * NP|||* PP NP * NP
+SBARQ|||WHADVP PRN SQ *|||WHADVP PRN SQ *
+S|||* NP VP * NP ADVP VP|||* NP VP * NP ADVP VP
+S|||* NP * NP ADVP VP *|||* NP * NP ADVP VP *
+S|||SBARQ NP VP *|||SBARQ NP VP *
+S|||PP * NP * VP *|||PP * NP * VP *
+S|||* ADVP VP * VP|||* ADVP VP * VP
+VP|||* VP VP * VP|||* VP VP * VP
+VP|||* VP CONJP VP|||* VP CONJP VP
+VP|||* PP ADVP PP * SBAR|||* PP ADVP PP * SBAR
+VP|||* ADJP * S * SBAR|||* ADJP * S * SBAR
+VP|||* PRT PP PP NP|||* PRT PP PP NP
+S|||* NP * VP *|||* NP * VP *
+FRAG|||ADVP SBAR * S * ADVP S * VP *|||ADVP SBAR * S * ADVP S * VP *
+VP|||* PP NP ADVP|||* PP NP ADVP
+VP|||* ADJP NP PP|||* ADJP NP PP
+VP|||* PP ADVP SBAR|||* PP ADVP SBAR
+S|||ADVP PP NP VP * NP VP|||ADVP PP NP VP * NP VP
+VP|||VP * VP S|||VP * VP S
+ADJP|||ADJP PRN|||ADJP PRN
+S|||ADVP * NP VP * VP *|||ADVP * NP VP * VP *
+SINV|||PP * ADJP * S *|||PP * ADJP * S *
+UCP|||* SBAR|||* SBAR
+VP|||VP * PP PP|||VP * PP PP
+S|||S * SBARQ PP|||S * SBARQ PP
+SBARQ|||ADVP WHNP * WHNP * WHNP * WHNP * WHNP SQ *|||ADVP WHNP * WHNP * WHNP * WHNP * WHNP SQ *
+SQ|||INTJ * WHNP VP|||INTJ * WHNP VP
+VP|||PP * SBAR * S|||PP * SBAR * S
+VP|||* PP PP PRN PP|||* PP PP PRN PP
+S|||ADVP * SBAR * ADVP NP VP|||ADVP * SBAR * ADVP NP VP
+UCP|||NP * PP|||NP * PP
+SBARQ|||ADVP WHNP SQ *|||ADVP WHNP SQ *
+VP|||* S PP PP * SBAR|||* S PP PP * SBAR
+S|||SBAR * NP VP * VP *|||SBAR * NP VP * VP *
+VP|||* S S S|||* S S S
+VP|||* PP PP * INTJ|||* PP PP * INTJ
+VP|||* S * PP * S|||* S * PP * S
+S|||SBAR NP VP * S *|||SBAR NP VP * S *
+S|||ADVP PP ADVP NP VP|||ADVP PP ADVP NP VP
+FRAG|||* NP SBAR|||* NP SBAR
+SBAR|||SBAR * S *|||SBAR * S *
+PRN|||* INTJ * NP *|||* INTJ * NP *
+S|||SBAR * ADVP * NP VP *|||SBAR * ADVP * NP VP *
+S|||PP * PP * SBAR *|||PP * PP * SBAR *
+S|||SBAR * SBAR VP *|||SBAR * SBAR VP *
+SQ|||SQ SQ * NP|||SQ SQ * NP
+SQ|||SQ SQ * NP *|||SQ SQ * NP *
+FRAG|||NP * NP * NP NP * NP * NP * SBAR|||NP * NP * NP NP * NP * NP * SBAR
+S|||* S * S * SBAR|||* S * S * SBAR
+FRAG|||NP NP VP * INTJ *|||NP NP VP * INTJ *
+NP|||NP SBAR NP SBAR *|||NP SBAR NP SBAR *
+S|||* NP VP PP NP *|||* NP VP PP NP *
+SINV|||NP VP NP *|||NP VP NP *
+SBAR|||ADVP S|||ADVP S
+S|||NP * VP * S|||NP * VP * S
+S|||PP * SBAR * ADVP PP *|||PP * SBAR * ADVP PP *
+S|||ADJP * NP VP *|||ADJP * NP VP *
+ADJP|||* ADVP PP|||* ADVP PP
+S|||VP NP|||VP NP
+FRAG|||SBAR * SBAR * PP *|||SBAR * SBAR * PP *
+X|||PP|||PP
+PP|||PP PRN|||PP PRN
+FRAG|||CONJP S|||CONJP S
+SBARQ|||* SBAR * WHNP SQ *|||* SBAR * WHNP SQ *
+SQ|||* NP VP * VP|||* NP VP * VP
+S|||PP * NP * NP VP *|||PP * NP * NP VP *
+VP|||* PP PP *|||* PP PP *
+NP|||NP * ADJP * VP|||NP * ADJP * VP
+FRAG|||NP * INTJ * NP|||NP * INTJ * NP
+VP|||* S *|||* S *
+VP|||* ADVP ADJP PP|||* ADVP ADJP PP
+S|||SBAR * VP * VP *|||SBAR * VP * VP *
+FRAG|||ADJP * SBAR * SBAR * S *|||ADJP * SBAR * SBAR * S *
+S|||* NP S * S *|||* NP S * S *
+PRN|||* FRAG SBAR *|||* FRAG SBAR *
+PP|||* UCP|||* UCP
+S|||* NP * PP * VP *|||* NP * PP * VP *
+FRAG|||* ADVP * INTJ * VP *|||* ADVP * INTJ * VP *
+S|||SBAR * S * FRAG *|||SBAR * S * FRAG *
+FRAG|||INTJ * FRAG|||INTJ * FRAG
+S|||ADVP NP VP * SBAR S * S *|||ADVP NP VP * SBAR S * S *
+VP|||* PP PP NP|||* PP PP NP
+FRAG|||PP * NP * S * FRAG *|||PP * NP * S * FRAG *
+FRAG|||ADJP * ADJP|||ADJP * ADJP
+SBARQ|||SBAR * SQ * SQ WHADVP SQ|||SBAR * SQ * SQ WHADVP SQ
+SQ|||* SBAR * SQ|||* SBAR * SQ
+SQ|||* NP * PP *|||* NP * PP *
+S|||PP NP ADJP|||PP NP ADJP
+X|||* VP NP *|||* VP NP *
+NX|||NX *|||NX *
+PRN|||* ADVP VP *|||* ADVP VP *
+FRAG|||FRAG * NP SBAR * VP * S *|||FRAG * NP SBAR * VP * S *
+S|||ADVP S * NP ADVP VP|||ADVP S * NP ADVP VP
+S|||ADVP * S *|||ADVP * S *
+S|||NP ADJP * VP|||NP ADJP * VP
+VP|||VP VP|||VP VP
+S|||PP S S|||PP S S
+S|||ADVP SBAR NP VP *|||ADVP SBAR NP VP *
+S|||* SBAR * SBAR * VP *|||* SBAR * SBAR * VP *
+SQ|||SQ * NP VP *|||SQ * NP VP *
+FRAG|||ADVP SBAR * FRAG * PP * INTJ * PP *|||ADVP SBAR * FRAG * PP * INTJ * PP *
+SQ|||* PP|||* PP
+VP|||* PP ADVP PRN SBAR|||* PP ADVP PRN SBAR
+VP|||VP * VP PP|||VP * VP PP
+VP|||* NP PP PP * PP|||* NP PP PP * PP
+VP|||* ADVP S * SBAR|||* ADVP S * SBAR
+NP|||QP NP|||QP NP
+S|||SBAR PRN VP|||SBAR PRN VP
+S|||ADVP SBAR *|||ADVP SBAR *
+S|||* SBAR * NP VP * VP|||* SBAR * NP VP * VP
+SBARQ|||WHADVP S *|||WHADVP S *
+S|||* ADVP * PP NP VP *|||* ADVP * PP NP VP *
+VP|||* PRN S|||* PRN S
+S|||S * NP NP VP *|||S * NP NP VP *
+PP|||* NP * PP|||* NP * PP
+S|||* VP * SQ *|||* VP * SQ *
+UCP|||SBAR * S *|||SBAR * S *
+S|||FRAG NP VP *|||FRAG NP VP *
+S|||* NP PP VP|||* NP PP VP
+S|||* SBAR * PP * NP VP *|||* SBAR * PP * NP VP *
+VP|||* NP * S * ADJP|||* NP * S * ADJP
+S|||* NP PRN|||* NP PRN
+S|||* NP * X NP VP *|||* NP * X NP VP *
+VP|||VP * INTJ|||VP * INTJ
+S|||PP PRN X ADVP NP VP *|||PP PRN X ADVP NP VP *
+S|||PP NP * PP * VP *|||PP NP * PP * VP *
+S|||SBAR PRN * NP VP|||SBAR PRN * NP VP
+PRN|||* NP|||* NP
+S|||* ADVP S * S * S *|||* ADVP S * S * S *
+SBARQ|||SBAR * WHADVP PRN SQ *|||SBAR * WHADVP PRN SQ *
+S|||ADVP PP NP VP * SBARQ|||ADVP PP NP VP * SBARQ
+VP|||CONJP VP VP|||CONJP VP VP
+NP|||NP PRN *|||NP PRN *
+VP|||* ADJP S * SBAR|||* ADJP S * SBAR
+NP|||SBAR * NP *|||SBAR * NP *
+FRAG|||ADJP * S * NP * S *|||ADJP * S * NP * S *
+FRAG|||SBAR * INTJ * NP *|||SBAR * INTJ * NP *
+S|||PP NP VP * S|||PP NP VP * S
+VP|||ADVP NP * S|||ADVP NP * S
+S|||NP * S * VP * S|||NP * S * VP * S
+ADJP|||* PP *|||* PP *
+VP|||* NP * FRAG SBAR|||* NP * FRAG SBAR
+S|||* PP * S * NP VP|||* PP * S * NP VP
+SINV|||VP VP NP *|||VP VP NP *
+S|||S * S * SBARQ *|||S * S * SBARQ *
+S|||NP ADVP * S * VP|||NP ADVP * S * VP
+VP|||* SBAR * S|||* SBAR * S
+S|||NP ADVP NP|||NP ADVP NP
+SBARQ|||SBAR * WHNP SQ * SQ *|||SBAR * WHNP SQ * SQ *
+S|||ADVP PP VP *|||ADVP PP VP *
+S|||PP * NP * SBAR * SBAR|||PP * NP * SBAR * SBAR
+NP|||NP RRC|||NP RRC
+RRC|||ADVP ADJP|||ADVP ADJP
+SQ|||* NP VP * NP * NP VP *|||* NP VP * NP * NP VP *
+VP|||* PRT PP PP * SBAR|||* PRT PP PP * SBAR
+S|||ADVP NP VP * S * VP *|||ADVP NP VP * S * VP *
+S|||SBAR * SBAR VP|||SBAR * SBAR VP
+S|||* PP NP VP * SBARQ NP *|||* PP NP VP * SBARQ NP *
+S|||* SBAR PRN VP *|||* SBAR PRN VP *
+PP|||PP * PP * PP PRN * PP|||PP * PP * PP PRN * PP
+S|||S * SINV * S|||S * SINV * S
+S|||SBAR * S|||SBAR * S
+UCP|||S * ADJP *|||S * ADJP *
+SQ|||SQ * VP *|||SQ * VP *
+SQ|||* NP ADVP VP * S|||* NP ADVP VP * S
+S|||* ADVP * S * S|||* ADVP * S * S
+VP|||* NP * ADVP|||* NP * ADVP
+ADVP|||NP * PP|||NP * PP
+S|||* SBAR * X NP VP *|||* SBAR * X NP VP *
+S|||* SBAR * ADVP S * S *|||* SBAR * ADVP S * S *
+SQ|||SBAR * NP S *|||SBAR * NP S *
+VP|||* S PP PP|||* S PP PP
+S|||INTJ * NP VP * S|||INTJ * NP VP * S
+S|||ADVP NP VP * SBAR|||ADVP NP VP * SBAR
+S|||NP ADVP|||NP ADVP
+FRAG|||* VP * VP * SBAR *|||* VP * VP * SBAR *
+SQ|||* NP ADVP ADVP PP *|||* NP ADVP ADVP PP *
+VP|||* NP ADVP * NP|||* NP ADVP * NP
+FRAG|||WHNP PP|||WHNP PP
+VP|||* UCP ADVP|||* UCP ADVP
+S|||SBAR ADVP VP|||SBAR ADVP VP
+S|||INTJ * S * S|||INTJ * S * S
+X|||* VP NP PP|||* VP NP PP
+S|||* SBAR * VP * S *|||* SBAR * VP * S *
+NP|||* NP * NP * NP * NP|||* NP * NP * NP * NP
+S|||INTJ * ADVP ADVP NP VP|||INTJ * ADVP ADVP NP VP
+S|||* ADVP * ADVP NP VP *|||* ADVP * ADVP NP VP *
+NP|||NP * PP * S *|||NP * PP * S *
+S|||S * SBARQ *|||S * SBARQ *
+SBARQ|||WHADVP S|||WHADVP S
+S|||ADVP PRN S * S|||ADVP PRN S * S
+VP|||* PP ADVP * PP|||* PP ADVP * PP
+FRAG|||VP * VP *|||VP * VP *
+S|||S * PP * NP VP|||S * PP * NP VP
+VP|||PP * VP|||PP * VP
+VP|||VP * VP PP * SBAR|||VP * VP PP * SBAR
+SINV|||PP VP NP * S *|||PP VP NP * S *
+VP|||* PRT NP NP|||* PRT NP NP
+PP|||PP ADVP * CONJP PP|||PP ADVP * CONJP PP
+VP|||NP * ADVP|||NP * ADVP
+S|||S * SBAR * NP VP|||S * SBAR * NP VP
+FRAG|||PP NP * NP|||PP NP * NP
+S|||* S PRN PP|||* S PRN PP
+SQ|||* NP VP PRN SBAR *|||* NP VP PRN SBAR *
+FRAG|||* SBAR * NP *|||* SBAR * NP *
+S|||PP * SBAR * S|||PP * SBAR * S
+S|||NP PRN VP|||NP PRN VP
+S|||* X NP VP|||* X NP VP
+NP|||NP * NP SBAR|||NP * NP SBAR
+FRAG|||NP *|||NP *
+S|||NP * S *|||NP * S *
+VP|||* ADVP * S * PP|||* ADVP * S * PP
+VP|||* PRT NP * ADVP * SBAR|||* PRT NP * ADVP * SBAR
+FRAG|||ADVP SBAR * ADVP S *|||ADVP SBAR * ADVP S *
+NP|||NP PP VP * PP|||NP PP VP * PP
+S|||SBAR * S * SINV *|||SBAR * S * SINV *
+S|||* SBAR * PP NP ADVP VP *|||* SBAR * PP NP ADVP VP *
+FRAG|||FRAG * PP * NP * PP *|||FRAG * PP * NP * PP *
+S|||NP PRN SBAR|||NP PRN SBAR
+S|||NP VP * ADVP NP VP *|||NP VP * ADVP NP VP *
+S|||* VP * SBAR|||* VP * SBAR
+S|||S * SBAR * S *|||S * SBAR * S *
+SINV|||VP * S *|||VP * S *
+SBARQ|||WHNP SQ WHNP SQ|||WHNP SQ WHNP SQ
+FRAG|||* SBAR * VP * NP * VP * SBAR *|||* SBAR * VP * NP * VP * SBAR *
+VP|||* PRT PP * PP S|||* PRT PP * PP S
+PP|||NP * SBAR|||NP * SBAR
+VP|||VP * VP * ADJP|||VP * VP * ADJP
+VP|||* S PRN|||* S PRN
+S|||* S * S * VP *|||* S * S * VP *
+S|||* ADVP VP *|||* ADVP VP *
+PP|||CONJP PP *|||CONJP PP *
+SBARQ|||WHNP SQ * S WHNP SQ *|||WHNP SQ * S WHNP SQ *
+SQ|||ADVP * NP VP|||ADVP * NP VP
+SQ|||* ADJP|||* ADJP
+SQ|||* SQ|||* SQ
+SQ|||SQ SQ FRAG|||SQ SQ FRAG
+SQ|||* NP ADJP *|||* NP ADJP *
+NP|||NP PP ADVP|||NP PP ADVP
+VP|||* ADVP NP * PP|||* ADVP NP * PP
+SQ|||SQ SQ SQ *|||SQ SQ SQ *
+FRAG|||NP * SBAR *|||NP * SBAR *
+S|||LST NP VP|||LST NP VP
+S|||* NP VP * INTJ VP *|||* NP VP * INTJ VP *
+FRAG|||FRAG * PP *|||FRAG * PP *
+S|||NP * PP *|||NP * PP *
+SBARQ|||WHNP SINV *|||WHNP SINV *
+FRAG|||NP * PP *|||NP * PP *
+S|||PP PRN S * S|||PP PRN S * S
+S|||ADVP NP NP VP|||ADVP NP NP VP
+SBARQ|||SBAR WHNP SQ *|||SBAR WHNP SQ *
+NP|||NP PP * VP|||NP PP * VP
+SBARQ|||* WHADVP SQ WHNP SQ *|||* WHADVP SQ WHNP SQ *
+SQ|||* NP VP * NP * VP|||* NP VP * NP * VP
+S|||* ADVP * S * S * NP VP *|||* ADVP * S * S * NP VP *
+UCP|||PP * ADVP PP|||PP * ADVP PP
+SQ|||SQ SQ NP VP *|||SQ SQ NP VP *
+NP|||NP * S * NP * NP|||NP * S * NP * NP
+S|||S * PRN S *|||S * PRN S *
+S|||SBAR * SBAR * NP VP|||SBAR * SBAR * NP VP
+S|||* PP * S * S *|||* PP * S * S *
+SQ|||SBAR * NP * VP *|||SBAR * NP * VP *
+ADJP|||* PRN S|||* PRN S
+S|||S * ADVP NP VP *|||S * ADVP NP VP *
+S|||SBAR * S VP *|||SBAR * S VP *
+VP|||* S PP NP|||* S PP NP
+S|||* ADVP * ADVP * NP VP|||* ADVP * ADVP * NP VP
+NP|||* QP *|||* QP *
+SQ|||INTJ * NP NP NP ADJP|||INTJ * NP NP NP ADJP
+NP|||NP SBAR SBAR|||NP SBAR SBAR
+UCP|||S * PP|||S * PP
+S|||ADVP * ADVP * PRN NP VP|||ADVP * ADVP * PRN NP VP
+FRAG|||* ADVP VP *|||* ADVP VP *
+S|||SBARQ * S * S *|||SBARQ * S * S *
+SBAR|||* S * PRN|||* S * PRN
+SINV|||S * VP NP *|||S * VP NP *
+S|||S PRN * S|||S PRN * S
+PRN|||* PP SINV *|||* PP SINV *
+FRAG|||S * NP *|||S * NP *
+UCP|||ADJP * NP PRN|||ADJP * NP PRN
+SINV|||ADVP * S *|||ADVP * S *
+SINV|||PP VP SBAR *|||PP VP SBAR *
+S|||* SBAR * SINV *|||* SBAR * SINV *
+VP|||* PP PP * ADVP|||* PP PP * ADVP
+ADVP|||ADVP * ADVP|||ADVP * ADVP
+S|||PP PP NP VP *|||PP PP NP VP *
+VP|||* NP * INTJ * ADVP|||* NP * INTJ * ADVP
+FRAG|||* VP * SBAR *|||* VP * SBAR *
+S|||PP * SBAR * X ADVP NP VP *|||PP * SBAR * X ADVP NP VP *
+FRAG|||FRAG * PP S * FRAG *|||FRAG * PP S * FRAG *
+FRAG|||* VP * PP|||* VP * PP
+VP|||* PP ADVP PP SBAR|||* PP ADVP PP SBAR
+S|||S * S * ADJP|||S * S * ADJP
+SBARQ|||* SQ * SQ *|||* SQ * SQ *
+SQ|||VP NP VP|||VP NP VP
+VP|||ADJP * SBAR|||ADJP * SBAR
+S|||PP NP ADVP * SBAR * VP *|||PP NP ADVP * SBAR * VP *
+S|||ADVP * SBAR *|||ADVP * SBAR *
+ADJP|||* PP S|||* PP S
+VP|||* SBAR * FRAG|||* SBAR * FRAG
+FRAG|||PP * NP * VP *|||PP * NP * VP *
+VP|||* S * PP * PP|||* S * PP * PP
+PP|||PP * SBAR|||PP * SBAR
+VP|||* VP VP|||* VP VP
+S|||FRAG * X NP VP *|||FRAG * X NP VP *
+S|||ADVP * NP * SBAR *|||ADVP * NP * SBAR *
+S|||INTJ * NP VP * VP *|||INTJ * NP VP * VP *
+SQ|||* NP ADJP * S|||* NP ADJP * S
+FRAG|||ADVP SBAR *|||ADVP SBAR *
+S|||* S NP VP|||* S NP VP
+S|||PP NP VP * VP|||PP NP VP * VP
+VP|||* ADVP ADVP VP|||* ADVP ADVP VP
+S|||PP NP * PP * NP VP *|||PP NP * PP * NP VP *
+NP|||NP PP * PP * VP *|||NP PP * PP * VP *
+S|||ADVP PRN SBAR VP *|||ADVP PRN SBAR VP *
+S|||PP * S * VP|||PP * S * VP
+VP|||* PP * S * PP|||* PP * S * PP
+VP|||PP * NP PP|||PP * NP PP
+PP|||* PP PRN * PP|||* PP PRN * PP
+SQ|||* SQ * S *|||* SQ * S *
+S|||* SBAR * PP * VP *|||* SBAR * PP * VP *
+S|||* INTJ * NP VP * NP VP *|||* INTJ * NP VP * NP VP *
+VP|||* PP * SBARQ * SBAR|||* PP * SBARQ * SBAR
+S|||PP * ADVP * NP VP *|||PP * ADVP * NP VP *
+NP|||NP SBAR * S|||NP SBAR * S
+S|||ADVP * X X NP VP|||ADVP * X X NP VP
+X|||* VP VP *|||* VP VP *
+SBAR|||SBAR * SBAR * SBAR|||SBAR * SBAR * SBAR
+S|||S * VP * VP *|||S * VP * VP *
+VP|||* NP ADVP NP ADVP * SBAR|||* NP ADVP NP ADVP * SBAR
+S|||* ADVP NP VP * S * S *|||* ADVP NP VP * S * S *
+S|||* PP SBAR * ADVP NP VP|||* PP SBAR * ADVP NP VP
+S|||ADVP * PP * S * S|||ADVP * PP * S * S
+SQ|||SBAR * NP PP *|||SBAR * NP PP *
+PP|||PP PRN CONJP PP|||PP PRN CONJP PP
+PRN|||* CONJP VP|||* CONJP VP
+S|||S * PP NP VP *|||S * PP NP VP *
+SBARQ|||* SBAR SQ *|||* SBAR SQ *
+S|||* NP VP * SQ *|||* NP VP * SQ *
+S|||* VP * S *|||* VP * S *
+S|||PP * PP * NP VP *|||PP * PP * NP VP *
+VP|||* PP * INTJ SBAR|||* PP * INTJ SBAR
+FRAG|||PP * PP *|||PP * PP *
+FRAG|||INTJ * NP * SBARQ *|||INTJ * NP * SBARQ *
+SBARQ|||SBARQ * WHADVP SQ|||SBARQ * WHADVP SQ
+SBARQ|||WHADJP SQ|||WHADJP SQ
+NP|||NP * VP * SBAR|||NP * VP * SBAR
+S|||ADJP NP VP *|||ADJP NP VP *
+FRAG|||SBAR|||SBAR
+PP|||CONJP PP * CONJP PP|||CONJP PP * CONJP PP
+VP|||* NP ADVP PP * S|||* NP ADVP PP * S
+FRAG|||SBAR * VP * NP *|||SBAR * VP * NP *
+SBAR|||WHNP S * S|||WHNP S * S
+SQ|||* NP * VP * VP|||* NP * VP * VP
+S|||S * S * FRAG *|||S * S * FRAG *
+FRAG|||* S ADVP * FRAG|||* S ADVP * FRAG
+FRAG|||WHNP SBAR|||WHNP SBAR
+S|||S * SBAR * NP ADVP VP *|||S * SBAR * NP ADVP VP *
+NP|||NP * PRN *|||NP * PRN *
+S|||INTJ * PP SBAR VP *|||INTJ * PP SBAR VP *
+S|||SBAR * ADVP ADVP VP|||SBAR * ADVP ADVP VP
+SQ|||SQ SQ NP VP|||SQ SQ NP VP
+SQ|||S * NP VP *|||S * NP VP *
+SQ|||SQ * ADVP ADJP|||SQ * ADVP ADJP
+SINV|||* VP NP *|||* VP NP *
+S|||S * ADVP VP *|||S * ADVP VP *
+VP|||* PP * ADVP S|||* PP * ADVP S
+VP|||VP * S * FRAG|||VP * S * FRAG
+FRAG|||INTJ * PP * SBAR|||INTJ * PP * SBAR
+S|||INTJ NP * NP VP *|||INTJ NP * NP VP *
+S|||SBAR * SBAR * SQ|||SBAR * SBAR * SQ
+SBARQ|||SBAR * WHADVP SQ * SQ *|||SBAR * WHADVP SQ * SQ *
+SQ|||SBAR * WHNP VP|||SBAR * WHNP VP
+SQ|||* NP VP SBAR *|||* NP VP SBAR *
+VP|||* S * SBARQ|||* S * SBARQ
+FRAG|||* S * ADVP S *|||* S * ADVP S *
+S|||* VP * SQ|||* VP * SQ
+SQ|||S * NP *|||S * NP *
+VP|||* SBAR SBAR * S|||* SBAR SBAR * S
+SBAR|||WHADVP S *|||WHADVP S *
+VP|||* SQ SBARQ|||* SQ SBARQ
+SQ|||* FRAG * ADVP VP *|||* FRAG * ADVP VP *
+S|||SBAR PRN * ADVP NP VP *|||SBAR PRN * ADVP NP VP *
+S|||SBARQ NP S *|||SBARQ NP S *
+S|||PP PRN PP * X ADVP NP VP *|||PP PRN PP * X ADVP NP VP *
+FRAG|||NP * FRAG *|||NP * FRAG *
+FRAG|||S * S * S * SINV *|||S * S * S * SINV *
+SINV|||* SBAR|||* SBAR
+FRAG|||ADVP * SBAR * SBARQ *|||ADVP * SBAR * SBARQ *
+FRAG|||* ADVP SBAR * SBAR * S *|||* ADVP SBAR * SBAR * S *
+S|||* NP * PP * VP * S *|||* NP * PP * VP * S *
+PP|||* PP PP * PP|||* PP PP * PP
+SBAR|||WHNP|||WHNP
+UCP|||ADJP * PP|||ADJP * PP
+S|||PP * S * S * VP *|||PP * S * S * VP *
+S|||PP * SBAR * ADVP NP VP *|||PP * SBAR * ADVP NP VP *
+VP|||SBAR|||SBAR
+SBARQ|||WHNP SQ SBARQ|||WHNP SQ SBARQ
+S|||* NP * SBAR ADVP *|||* NP * SBAR ADVP *
+S|||* SQ S * S *|||* SQ S * S *
+SQ|||* FRAG * NP VP *|||* FRAG * NP VP *
+FRAG|||PP * NP *|||PP * NP *
+VP|||VP PRN PP|||VP PRN PP
+VP|||* PP S * SBAR|||* PP S * SBAR
+FRAG|||NP * NP * S * ADJP|||NP * NP * S * ADJP
+S|||SINV * VP|||SINV * VP
+VP|||PP PP NP|||PP PP NP
+FRAG|||ADJP * SBAR * NP SBAR * VP * SBAR *|||ADJP * SBAR * NP SBAR * VP * SBAR *
+S|||ADVP SBAR * ADVP NP VP *|||ADVP SBAR * ADVP NP VP *
+S|||NP * SBAR * S *|||NP * SBAR * S *
+NP|||NP * NP * PP * NP|||NP * NP * PP * NP
+FRAG|||NP * VP * VP * SBARQ *|||NP * VP * VP * SBARQ *
+SBARQ|||* SQ WHNP SQ WHNP SQ * SQ * SQ|||* SQ WHNP SQ WHNP SQ * SQ * SQ
+SQ|||INTJ * S|||INTJ * S
+FRAG|||* NP * S * S * SBAR * NP *|||* NP * S * S * SBAR * NP *
+FRAG|||FRAG * ADVP NP *|||FRAG * ADVP NP *
+S|||INTJ * SBAR * NP VP|||INTJ * SBAR * NP VP
+UCP|||* FRAG * PP|||* FRAG * PP
+FRAG|||* ADVP|||* ADVP
+NP|||NP SBAR PP *|||NP SBAR PP *
+NP|||NP * INTJ * PP|||NP * INTJ * PP
+FRAG|||NP * NP * SBARQ *|||NP * NP * SBARQ *
+PP|||ADVP * NP *|||ADVP * NP *
+FRAG|||* NP * SBAR * SBAR *|||* NP * SBAR * SBAR *
+FRAG|||FRAG * S * SBAR * NP VP * S *|||FRAG * S * SBAR * NP VP * S *
+S|||ADVP * NP * SBAR * SBARQ|||ADVP * NP * SBAR * SBARQ
+SQ|||SQ SQ VP *|||SQ SQ VP *
+S|||PP * S * S * S *|||PP * S * S * S *
+S|||X X NP ADVP VP * S *|||X X NP ADVP VP * S *
+SQ|||VP NP * VP|||VP NP * VP
+S|||S * SQ * S|||S * SQ * S
+S|||* PP * S * NP VP *|||* PP * S * NP VP *
+S|||SBAR PRN SBAR * NP VP *|||SBAR PRN SBAR * NP VP *
+UCP|||NP * VP|||NP * VP
+S|||ADVP NP VP * VP|||ADVP NP VP * VP
+VP|||PRN * VP|||PRN * VP
+VP|||* NP PP PRN SBAR|||* NP PP PRN SBAR
+NP|||NP * SQ|||NP * SQ
+NP|||NP * ADJP * SBAR|||NP * ADJP * SBAR
+SQ|||* NP * VP * SBAR|||* NP * VP * SBAR
+FRAG|||ADJP *|||ADJP *
+ADVP|||ADVP * SBAR|||ADVP * SBAR
+S|||SBAR * ADVP VP *|||SBAR * ADVP VP *
+VP|||ADVP * PRT NP|||ADVP * PRT NP
+NP|||NP * SBAR * NP|||NP * SBAR * NP
+FRAG|||NP * ADVP SINV * SBAR *|||NP * ADVP SINV * SBAR *
+S|||NP ADVP * VP * VP|||NP ADVP * VP * VP
+NP|||NP PP * VP *|||NP PP * VP *
+VP|||* PRT ADVP NP|||* PRT ADVP NP
+S|||* S SQ *|||* S SQ *
+X|||S * PP|||S * PP
+NP|||NP * PP * S|||NP * PP * S
+VP|||ADVP * NP * PP|||ADVP * NP * PP
+S|||NP VP * NP NP VP *|||NP VP * NP NP VP *
+S|||ADVP VP S|||ADVP VP S
+S|||* PP * NP VP * S * S *|||* PP * NP VP * S * S *
+VP|||* ADJP NP * SBAR|||* ADJP NP * SBAR
+SQ|||ADVP * NP *|||ADVP * NP *
+SINV|||PP VP NP * NP NP *|||PP VP NP * NP NP *
+S|||PP * ADVP NP VP|||PP * ADVP NP VP
+VP|||* PP NP NP|||* PP NP NP
+S|||ADVP * PP NP VP|||ADVP * PP NP VP
+SQ|||* NP ADJP * S * WHNP SQ *|||* NP ADJP * S * WHNP SQ *
+VP|||* NP PP ADVP * S|||* NP PP ADVP * S
+VP|||* VP PRN SBAR|||* VP PRN SBAR
+FRAG|||SBAR * SBAR *|||SBAR * SBAR *
+S|||SBAR VP * NP VP *|||SBAR VP * NP VP *
+SQ|||VP NP PP|||VP NP PP
+VP|||* PP * NP PP|||* PP * NP PP
+S|||* PP * NP VP * S *|||* PP * NP VP * S *
+VP|||* ADVP ADVP * S|||* ADVP ADVP * S
+NP|||NP ADVP S|||NP ADVP S
+SINV|||PP * VP *|||PP * VP *
+ADJP|||ADJP * ADJP * NP|||ADJP * ADJP * NP
+NP|||* PP|||* PP
+S|||SQ * NP VP *|||SQ * NP VP *
+SQ|||* NP ADVP PP|||* NP ADVP PP
+PP|||* PP *|||* PP *
+S|||PP * NP VP * VP *|||PP * NP VP * VP *
+S|||PP * SBAR VP *|||PP * SBAR VP *
+NP|||NP * NP * S *|||NP * NP * S *
+VP|||* INTJ SBAR|||* INTJ SBAR
+S|||* S PRN * SBARQ|||* S PRN * SBARQ
+PP|||PP * ADVP PP *|||PP * ADVP PP *
+PP|||PP * PP * CONJP PP|||PP * PP * CONJP PP
+S|||ADVP * SBAR * NP VP * S *|||ADVP * SBAR * NP VP * S *
+VP|||PP PP|||PP PP
+VP|||* NP ADVP * PP * SBAR|||* NP ADVP * PP * SBAR
+VP|||VP * PP VP|||VP * PP VP
+SINV|||* S * VP NP *|||* S * VP NP *
+NP|||NP * SBAR NP|||NP * SBAR NP
+SQ|||* NP *|||* NP *
+S|||SBAR * NP NP VP|||SBAR * NP NP VP
+UCP|||* ADJP|||* ADJP
+S|||ADVP NP * S * VP|||ADVP NP * S * VP
+VP|||* PP PP * SBARQ|||* PP PP * SBARQ
+UCP|||UCP * ADVP S|||UCP * ADVP S
+UCP|||NP * ADJP|||NP * ADJP
+S|||* ADVP SBAR * NP ADVP VP|||* ADVP SBAR * NP ADVP VP
+S|||PP * NP NP|||PP * NP NP
+ADJP|||ADJP PRN SBAR|||ADJP PRN SBAR
+FRAG|||S * INTJ *|||S * INTJ *
+VP|||* NP SBAR * SBAR|||* NP SBAR * SBAR
+VP|||* ADVP * SBAR * SBAR|||* ADVP * SBAR * SBAR
+S|||* SBAR * PP * NP VP * S *|||* SBAR * PP * NP VP * S *
+S|||FRAG * PP * VP *|||FRAG * PP * VP *
+S|||NP ADVP ADVP VP|||NP ADVP ADVP VP
+PP|||PP PP PP|||PP PP PP
+VP|||* NP PRN S|||* NP PRN S
+VP|||* PP * ADVP|||* PP * ADVP
+NP|||NP * PP NP|||NP * PP NP
+SQ|||S * PP *|||S * PP *
+S|||ADVP * SBAR * SBAR *|||ADVP * SBAR * SBAR *
+S|||NP * SBAR * NP VP *|||NP * SBAR * NP VP *
+VP|||* NP * SBAR * S|||* NP * SBAR * S
+FRAG|||* SBAR * S * NP *|||* SBAR * S * NP *
+ADJP|||ADJP * S|||ADJP * S
+S|||* SBAR * ADVP PRN NP VP *|||* SBAR * ADVP PRN NP VP *
+S|||NP * SQ|||NP * SQ
+S|||INTJ * NP * S|||INTJ * NP * S
+NX|||NP SBAR|||NP SBAR
+UCP|||ADVP * PP|||ADVP * PP
+X|||* VP * NP *|||* VP * NP *
+VP|||* PP * PP * PP * PP|||* PP * PP * PP * PP
+VP|||* ADVP PRN VP|||* ADVP PRN VP
+VP|||VP * NP PRT PP|||VP * NP PRT PP
+S|||* S * SQ|||* S * SQ
+SQ|||SQ SQ SQ|||SQ SQ SQ
+SQ|||* NP ADVP *|||* NP ADVP *
+VP|||* NP * SBARQ *|||* NP * SBARQ *
+S|||PP * NP * S * VP *|||PP * NP * S * VP *
+VP|||* PRN * S|||* PRN * S
+VP|||* PP * NP * PP|||* PP * NP * PP
+S|||PP * S S * S|||PP * S S * S
+FRAG|||* NP VP * NP * S * NP *|||* NP VP * NP * S * NP *
+S|||PP VP * ADVP SBARQ|||PP VP * ADVP SBARQ
+S|||* NP PP *|||* NP PP *
+NP|||WHNP S|||WHNP S
+S|||NP VP * SBARQ SBAR|||NP VP * SBARQ SBAR
+S|||PP * S *|||PP * S *
+X|||* PP|||* PP
+VP|||* PP PRN S|||* PP PRN S
+VP|||* ADVP PP PP PP PP|||* ADVP PP PP PP PP
+S|||PP NP NP|||PP NP NP
+S|||* PRN NP VP *|||* PRN NP VP *
+FRAG|||SBAR * SBAR * INTJ *|||SBAR * SBAR * INTJ *
+SBARQ|||SBAR * SBARQ *|||SBAR * SBARQ *
+SBARQ|||* WHNP SQ WHNP SQ *|||* WHNP SQ WHNP SQ *
+SQ|||VP NP * S|||VP NP * S
+S|||S PRN SBARQ NP * S|||S PRN SBARQ NP * S
+NP|||QP * S *|||QP * S *
+VP|||* NP * NP * SBAR|||* NP * NP * SBAR
+VP|||* PP PP * NP|||* PP PP * NP
+FRAG|||* SBAR * FRAG|||* SBAR * FRAG
+S|||PP PRN NP ADVP VP *|||PP PRN NP ADVP VP *
+PRN|||PP *|||PP *
+VP|||* SBAR * INTJ|||* SBAR * INTJ
+S|||INTJ * PP NP VP *|||INTJ * PP NP VP *
+S|||SBAR PRN * VP *|||SBAR PRN * VP *
+VP|||* ADVP PP NP PP|||* ADVP PP NP PP
+SQ|||* NP VP * NP * ADVP VP *|||* NP VP * NP * ADVP VP *
+S|||PP PRN NP VP|||PP PRN NP VP
+SQ|||* NP * VP SBAR|||* NP * VP SBAR
+VP|||* NP PP PP * S|||* NP PP PP * S
+VP|||* PRT PP * FRAG|||* PRT PP * FRAG
+VP|||* NP PP * ADVP S|||* NP PP * ADVP S
+S|||* PP * SBAR PRN * NP VP *|||* PP * SBAR PRN * NP VP *
+PP|||PP * PP * PP * PP * PP * PP *|||PP * PP * PP * PP * PP * PP *
+S|||NP ADVP * S * VP *|||NP ADVP * S * VP *
+S|||* PP PP VP *|||* PP PP VP *
+X|||SBAR * NP|||SBAR * NP
+NP|||NP PP ADJP *|||NP PP ADJP *
+VP|||* ADJP SBARQ|||* ADJP SBARQ
+UCP|||PP * VP|||PP * VP
+UCP|||SBAR * ADVP PP|||SBAR * ADVP PP
+S|||* ADVP * SBAR * NP VP *|||* ADVP * SBAR * NP VP *
+NP|||NP NP PP * NP *|||NP NP PP * NP *
+SBARQ|||* WHNP * WHADVP SQ|||* WHNP * WHADVP SQ
+S|||NP * VP * VP|||NP * VP * VP
+VP|||* ADVP * SBARQ|||* ADVP * SBARQ
+SBARQ|||WHNP SQ WHNP SQ *|||WHNP SQ WHNP SQ *
+S|||NP ADVP ADJP|||NP ADVP ADJP
+NP|||NP ADVP SBAR * SQ|||NP ADVP SBAR * SQ
+SQ|||* NP * VP * SBAR * SQ *|||* NP * VP * SBAR * SQ *
+X|||* VP * SBAR *|||* VP * SBAR *
+SBARQ|||WHPP SQ SBARQ|||WHPP SQ SBARQ
+SQ|||* NP ADJP * WHNP SQ|||* NP ADJP * WHNP SQ
+SQ|||* SBARQ VP|||* SBARQ VP
+SQ|||* NP ADVP VP * WHPP|||* NP ADVP VP * WHPP
+SBARQ|||* SQ * SQ|||* SQ * SQ
+FRAG|||* FRAG VP * NP *|||* FRAG VP * NP *
+FRAG|||NP * S * ADVP * VP|||NP * S * ADVP * VP
+VP|||* VP VP * NP|||* VP VP * NP
+S|||FRAG * SBAR NP VP *|||FRAG * SBAR NP VP *
+VP|||* NP PP * S * SBAR|||* NP PP * S * SBAR
+S|||NP * S * NP VP *|||NP * S * NP VP *
+NP|||NP PP * PP *|||NP PP * PP *
+S|||S * SINV *|||S * SINV *
+ADJP|||ADJP * ADJP * ADVP|||ADJP * ADJP * ADVP
+VP|||* PP * SBARQ SBARQ|||* PP * SBARQ SBARQ
+SBARQ|||S * WHADVP SQ|||S * WHADVP SQ
+VP|||* PP * ADVP PP|||* PP * ADVP PP
+VP|||PP ADVP|||PP ADVP
+VP|||* ADJP SBAR SBAR|||* ADJP SBAR SBAR
+SBAR|||* WHADVP S|||* WHADVP S
+S|||PP * PP * PP *|||PP * PP * PP *
+S|||PP * PP * PP * NP VP *|||PP * PP * PP * NP VP *
+S|||* PP NP VP * S|||* PP NP VP * S
+VP|||VP * VP *|||VP * VP *
+VP|||* PP * SBARQ S * SBAR|||* PP * SBARQ S * SBAR
+NP|||NP SBAR PP|||NP SBAR PP
+VP|||* ADVP * PP PP|||* ADVP * PP PP
+S|||NP VP * S * S|||NP VP * S * S
+SQ|||* NP NP * S|||* NP NP * S
+SINV|||S * VP NP|||S * VP NP
+S|||ADVP * NP * NP ADVP VP *|||ADVP * NP * NP ADVP VP *
+PP|||PP * PP SBAR|||PP * PP SBAR
+FRAG|||NP * FRAG * NP *|||NP * FRAG * NP *
+FRAG|||* ADJP|||* ADJP
+ADJP|||ADJP * ADJP *|||ADJP * ADJP *
+S|||FRAG * S * S *|||FRAG * S * S *
+PP|||* PP * NP|||* PP * NP
+ADJP|||ADVP * SBAR|||ADVP * SBAR
+VP|||* SBARQ ADVP|||* SBARQ ADVP
+S|||ADVP NP NP VP *|||ADVP NP NP VP *
+PRN|||* ADJP *|||* ADJP *
+NP|||NP * ADVP SBAR|||NP * ADVP SBAR
+S|||S * VP * S|||S * VP * S
+VP|||ADVP * VP|||ADVP * VP
+S|||ADVP * PP *|||ADVP * PP *
+S|||NP * PP PRN * FRAG|||NP * PP PRN * FRAG
+PRN|||* ADVP PP *|||* ADVP PP *
+VP|||* PP S S|||* PP S S
+VP|||* PRT SBAR SBAR|||* PRT SBAR SBAR
+S|||ADJP SBAR|||ADJP SBAR
+VP|||* NP PP ADVP SBAR|||* NP PP ADVP SBAR
+S|||NP ADVP * SBAR *|||NP ADVP * SBAR *
+S|||* SBAR * NP * SBAR * VP *|||* SBAR * NP * SBAR * VP *
+SBARQ|||* WHADVP SQ * SQ|||* WHADVP SQ * SQ
+NP|||SBAR * S|||SBAR * S
+S|||* ADVP NP * S * VP *|||* ADVP NP * S * VP *
+S|||INTJ * VP|||INTJ * VP
+S|||PP S * SQ *|||PP S * SQ *
+SINV|||* S * VP NP VP|||* S * VP NP VP
+VP|||* PP PP PP *|||* PP PP PP *
+VP|||* NP * S S|||* NP * S S
+SQ|||SQ SQ * VP *|||SQ SQ * VP *
+SQ|||* NP VP * VP *|||* NP VP * VP *
+SQ|||SBAR * PRN *|||SBAR * PRN *
+VP|||* ADVP S * S|||* ADVP S * S
+NP|||NP * SBARQ *|||NP * SBARQ *
+SQ|||* NP ADJP * NP SQ *|||* NP ADJP * NP SQ *
+SBARQ|||S * WHADVP SQ *|||S * WHADVP SQ *
+SQ|||SQ * SBAR SBAR|||SQ * SBAR SBAR
+S|||PP * ADVP ADVP VP *|||PP * ADVP ADVP VP *
+VP|||* SBAR * S * S|||* SBAR * S * S
+PRN|||* ADJP|||* ADJP
+FRAG|||* SINV * NP *|||* SINV * NP *
+NP|||NP * S * CONJP NP|||NP * S * CONJP NP
+S|||* NP * NP VP|||* NP * NP VP
+SBAR|||FRAG|||FRAG
+FRAG|||NP * INTJ * NP * ADVP S|||NP * INTJ * NP * ADVP S
+S|||PP * S * SBAR *|||PP * S * SBAR *
+SQ|||* NP * SBAR|||* NP * SBAR
+NP|||NP SBAR * VP *|||NP SBAR * VP *
+FRAG|||PP * ADVP * NP * VP * PP * SBAR *|||PP * ADVP * NP * VP * PP * SBAR *
+VP|||* ADJP * ADVP PP|||* ADJP * ADVP PP
+VP|||* ADVP PP PP *|||* ADVP PP PP *
+S|||PP NP NP * NP VP *|||PP NP NP * NP VP *
+S|||NP * S * PP VP|||NP * S * PP VP
+FRAG|||WHNP SBAR *|||WHNP SBAR *
+S|||NP * SBAR * NP VP|||NP * SBAR * NP VP
+WHNP|||NP WHPP|||NP WHPP
+SBARQ|||* SBAR * WHADVP SQ *|||* SBAR * WHADVP SQ *
+VP|||VP * CONJP VP|||VP * CONJP VP
+VP|||* PRT ADVP PP * SBAR|||* PRT ADVP PP * SBAR
+S|||ADVP SINV * S * S|||ADVP SINV * S * S
+S|||ADVP NP * SBAR * VP *|||ADVP NP * SBAR * VP *
+NP|||NP NP PP|||NP NP PP
+FRAG|||INTJ * NP * VP *|||INTJ * NP * VP *
+VP|||* NP NP S * SBAR|||* NP NP S * SBAR
+SBAR|||* S * SBAR *|||* S * SBAR *
+S|||ADVP * S * VP *|||ADVP * S * VP *
+S|||ADVP SBAR NP VP * S *|||ADVP SBAR NP VP * S *
+NP|||NP PP * ADJP * SBAR|||NP PP * ADJP * SBAR
+UCP|||PP * ADJP *|||PP * ADJP *
+UCP|||ADVP * SBAR|||ADVP * SBAR
+S|||* NP VP * INTJ * S *|||* NP VP * INTJ * S *
+VP|||* NP * INTJ SBAR|||* NP * INTJ SBAR
+VP|||* PRN|||* PRN
+VP|||NP NP PP|||NP NP PP
+NP|||S * SBAR *|||S * SBAR *
+SQ|||* NP * NP * SBAR|||* NP * NP * SBAR
+SBARQ|||WHADVP SQ * SBARQ SBARQ|||WHADVP SQ * SBARQ SBARQ
+VP|||* VP * SBAR * SBAR|||* VP * SBAR * SBAR
+FRAG|||ADVP SBAR * FRAG|||ADVP SBAR * FRAG
+VP|||* NP NP * ADVP|||* NP NP * ADVP
+S|||ADVP S * VP|||ADVP S * VP
+S|||* ADVP * ADVP * NP VP *|||* ADVP * ADVP * NP VP *
+S|||* S * NP VP * VP *|||* S * NP VP * VP *
+SQ|||SQ * SBAR *|||SQ * SBAR *
+SQ|||* VP * PP|||* VP * PP
+S|||* ADVP * S * VP|||* ADVP * S * VP
+VP|||VP * VP PP SBAR|||VP * VP PP SBAR
+NP|||CONJP NP * NP|||CONJP NP * NP
+NP|||NP * VP * SBAR *|||NP * VP * SBAR *
+FRAG|||* SINV * S * PP PRN *|||* SINV * S * PP PRN *
+S|||* NP * SBAR * VP *|||* NP * SBAR * VP *
+VP|||* NP ADVP PP PP * S|||* NP ADVP PP PP * S
+VP|||* SQ S * PP|||* SQ S * PP
+NP|||* S * NP|||* S * NP
+VP|||* PRN PP SBAR|||* PRN PP SBAR
+VP|||* ADVP ADJP S|||* ADVP ADJP S
+SINV|||ADVP * NP ADJP *|||ADVP * NP ADJP *
+S|||ADVP * PP * NP VP *|||ADVP * PP * NP VP *
+VP|||* NP * SBARQ * S SBAR|||* NP * SBARQ * S SBAR
+FRAG|||* NP NP *|||* NP NP *
+S|||* PP * NP * VP * S *|||* PP * NP * VP * S *
+S|||INTJ * ADVP NP VP|||INTJ * ADVP NP VP
+FRAG|||* NP * SBAR *|||* NP * SBAR *
+PP|||PP * PP ADVP * PP|||PP * PP ADVP * PP
+VP|||* ADVP PRN PP|||* ADVP PRN PP
+VP|||* SBAR PRN|||* SBAR PRN
+SBAR|||UCP S|||UCP S
+UCP|||* PP * PP|||* PP * PP
+NP|||NP * NP * S * NP|||NP * NP * S * NP
+NP|||NP PP * UCP|||NP PP * UCP
+FRAG|||SBAR * ADVP * S *|||SBAR * ADVP * S *
+S|||* SBAR * NP * VP *|||* SBAR * NP * VP *
+SBAR|||SBAR * PRN|||SBAR * PRN
+VP|||* SQ S SBAR|||* SQ S SBAR
+S|||ADVP * ADVP * S * S|||ADVP * ADVP * S * S
+FRAG|||* NP * PP * ADVP *|||* NP * PP * ADVP *
+NP|||NP * ADJP * S|||NP * ADJP * S
+S|||ADVP * S * S * S|||ADVP * S * S * S
+SQ|||SQ SQ VP * NP *|||SQ SQ VP * NP *
+SBAR|||WHNP PRN S NP *|||WHNP PRN S NP *
+VP|||* ADVP ADVP PP PP * S|||* ADVP ADVP PP PP * S
+VP|||* UCP * VP|||* UCP * VP
+S|||NP VP PP *|||NP VP PP *
+VP|||PP * SBAR|||PP * SBAR
+S|||S PRN SQ PP|||S PRN SQ PP
+S|||FRAG * VP *|||FRAG * VP *
+FRAG|||* INTJ * S * NP * VP *|||* INTJ * S * NP * VP *
+VP|||* ADVP PRN|||* ADVP PRN
+S|||S * NP * S * S *|||S * NP * S * S *
+SQ|||SQ SQ ADJP *|||SQ SQ ADJP *
+S|||SQ * PRN * VP|||SQ * PRN * VP
+VP|||VP * VP * INTJ SBAR|||VP * VP * INTJ SBAR
+S|||* SQ * PRN * NP VP|||* SQ * PRN * NP VP
+SQ|||* NP NP * NP *|||* NP NP * NP *
+S|||S * ADVP * NP VP *|||S * ADVP * NP VP *
+SINV|||S * SBARQ|||S * SBARQ
+VP|||ADVP * PP * NP|||ADVP * PP * NP
+SBARQ|||* SQ WHNP SQ *|||* SQ WHNP SQ *
+S|||NP ADVP PP|||NP ADVP PP
+PP|||NP * S|||NP * S
+S|||* NP PP|||* NP PP
+VP|||CONJP VP CONJP VP|||CONJP VP CONJP VP
+S|||ADVP SBAR PRN NP VP|||ADVP SBAR PRN NP VP
+SINV|||PP VP NP * NP VP *|||PP VP NP * NP VP *
+S|||NP * SBAR *|||NP * SBAR *
+NP|||* ADVP S * NP * NP|||* ADVP S * NP * NP
+S|||NP VP * SQ * PRN * NP VP *|||NP VP * SQ * PRN * NP VP *
+SQ|||* NP ADJP SBAR|||* NP ADJP SBAR
+S|||* SBARQ * PRN * VP|||* SBARQ * PRN * VP
+S|||PP * NP * S|||PP * NP * S
+S|||ADVP * ADVP * NP VP * S * S *|||ADVP * ADVP * NP VP * S * S *
+VP|||VP * ADJP NP|||VP * ADJP NP
+VP|||* NP PP PRN S|||* NP PP PRN S
+PRN|||* NP S *|||* NP S *
+SQ|||* NP * VP * NP SBAR *|||* NP * VP * NP SBAR *
+VP|||* ADVP NP ADVP * S|||* ADVP NP ADVP * S
+ADVP|||ADVP PRN PP|||ADVP PRN PP
+SINV|||ADVP VP NP * S|||ADVP VP NP * S
+VP|||* S * SBAR * SBAR|||* S * SBAR * SBAR
+S|||ADVP NP PRN VP *|||ADVP NP PRN VP *
+SBAR|||* NP|||* NP
+VP|||* PP * PP * PP|||* PP * PP * PP
+S|||SBAR PRN * S *|||SBAR PRN * S *
+PRN|||SINV *|||SINV *
+SINV|||ADVP VP SBAR|||ADVP VP SBAR
+VP|||* NP * SQ * S|||* NP * SQ * S
+SBARQ|||* SBAR * WHNP SQ * SQ *|||* SBAR * WHNP SQ * SQ *
+SQ|||* ADVP NP VP|||* ADVP NP VP
+S|||SBAR PRN * PP|||SBAR PRN * PP
+S|||* NP PRN S * S *|||* NP PRN S * S *
+ADJP|||* CONJP *|||* CONJP *
+S|||ADVP ADVP S NP VP *|||ADVP ADVP S NP VP *
+S|||PP * PP * NP ADVP VP *|||PP * PP * NP ADVP VP *
+S|||NP ADVP PRN VP|||NP ADVP PRN VP
+NP|||NP * VP * VP * VP|||NP * VP * VP * VP
+SQ|||SQ * SQ|||SQ * SQ
+VP|||* PP * INTJ PP|||* PP * INTJ PP
+FRAG|||WHNP ADVP SINV * NP * INTJ * S * ADVP *|||WHNP ADVP SINV * NP * INTJ * S * ADVP *
+S|||SQ * S|||SQ * S
+SQ|||* NP VP * PP|||* NP VP * PP
+S|||SBAR * INTJ * NP VP|||SBAR * INTJ * NP VP
+S|||SBAR * NP VP * SQ|||SBAR * NP VP * SQ
+SQ|||* NP PP SBAR *|||* NP PP SBAR *
+FRAG|||PP NP * SBAR *|||PP NP * SBAR *
+NP|||NP SBAR * SBAR *|||NP SBAR * SBAR *
+X|||S * NP *|||S * NP *
+PRN|||* S NP *|||* S NP *
+SBARQ|||* SBARQ SBARQ|||* SBARQ SBARQ
+S|||SBAR * ADVP * NP VP * VP *|||SBAR * ADVP * NP VP * VP *
+S|||* ADVP * S *|||* ADVP * S *
+VP|||VP * NP PP PP * SBAR|||VP * NP PP PP * SBAR
+FRAG|||* ADVP NP * NP *|||* ADVP NP * NP *
+S|||PP S PRN S *|||PP S PRN S *
+S|||* NP VP PRN * S *|||* NP VP PRN * S *
+VP|||VP * VP NP PP|||VP * VP NP PP
+PP|||* ADJP * PP PP *|||* ADJP * PP PP *
+VP|||* NP * FRAG|||* NP * FRAG
+FRAG|||NP * PP|||NP * PP
+S|||S * PRN NP VP|||S * PRN NP VP
+S|||S * FRAG|||S * FRAG
+FRAG|||VP * PRN * WHADVP|||VP * PRN * WHADVP
+S|||VP * VP *|||VP * VP *
+VP|||* PP ADVP NP|||* PP ADVP NP
+SBARQ|||* SQ WHNP SQ|||* SQ WHNP SQ
+SBARQ|||* WHADVP SQ * SQ *|||* WHADVP SQ * SQ *
+S|||S * SINV|||S * SINV
+S|||S * SQ ADVP|||S * SQ ADVP
+VP|||* S * S * SBAR|||* S * S * SBAR
+VP|||* NP * SBARQ * S|||* NP * SBARQ * S
+WHNP|||WHNP *|||WHNP *
+S|||FRAG * ADVP NP ADVP VP *|||FRAG * ADVP NP ADVP VP *
+FRAG|||NP * SBAR * S * SBAR|||NP * SBAR * S * SBAR
+S|||S * SQ * NP VP *|||S * SQ * NP VP *
+S|||SBARQ * PRN * NP VP|||SBARQ * PRN * NP VP
+S|||SBAR * ADVP NP ADVP VP|||SBAR * ADVP NP ADVP VP
+VP|||* NP NP ADVP * SBAR|||* NP NP ADVP * SBAR
+NP|||NP ADJP SBAR|||NP ADJP SBAR
+VP|||* NP SBAR X|||* NP SBAR X
+SBARQ|||WHADVP SQ SBARQ|||WHADVP SQ SBARQ
+SQ|||INTJ * NP * SBAR *|||INTJ * NP * SBAR *
+S|||* X NP VP *|||* X NP VP *
+SBARQ|||SBAR * WHNP SQ * SQ|||SBAR * WHNP SQ * SQ
+VP|||* PP NP PP * SQ|||* PP NP PP * SQ
+VP|||* PP * VP * VP|||* PP * VP * VP
+VP|||* S * PP PP|||* S * PP PP
+S|||* PP PRN PP * SBAR * VP *|||* PP PRN PP * SBAR * VP *
+SQ|||* NP SBAR * VP|||* NP SBAR * VP
+NP|||PP|||PP
+VP|||VP PRN * ADVP VP|||VP PRN * ADVP VP
+VP|||* NP PRN VP|||* NP PRN VP
+UCP|||PP|||PP
+VP|||* ADVP NP *|||* ADVP NP *
+FRAG|||SBAR * SBAR|||SBAR * SBAR
+S|||* PP SBARQ|||* PP SBARQ
+VP|||* ADVP ADVP NP|||* ADVP ADVP NP
+VP|||* NP PP ADVP PP|||* NP PP ADVP PP
+UCP|||* PP ADJP PRN|||* PP ADJP PRN
+S|||S * INTJ PP NP VP *|||S * INTJ PP NP VP *
+SINV|||* VP NP|||* VP NP
+S|||ADVP * SBAR NP VP|||ADVP * SBAR NP VP
+UCP|||ADJP * ADJP * NP * ADJP * ADJP * PP|||ADJP * ADJP * NP * ADJP * ADJP * PP
+S|||ADVP NP VP * SBARQ|||ADVP NP VP * SBARQ
+S|||SQ * INTJ * NP VP *|||SQ * INTJ * NP VP *
+VP|||* NP S * PP|||* NP S * PP
+FRAG|||INTJ * FRAG * SBAR *|||INTJ * FRAG * SBAR *
+SQ|||S * NP|||S * NP
+FRAG|||ADVP SBAR * NP|||ADVP SBAR * NP
+NP|||NP * NP * NP * NP * NP *|||NP * NP * NP * NP * NP *
+WHNP|||WHADVP *|||WHADVP *
+S|||* PP * NP ADVP VP|||* PP * NP ADVP VP
+SQ|||* NP ADVP FRAG|||* NP ADVP FRAG
+FRAG|||NP * ADVP *|||NP * ADVP *
+UCP|||SBAR * ADVP|||SBAR * ADVP
+S|||NP ADVP * S * S * VP *|||NP ADVP * S * S * VP *
+S|||* SBARQ * PRN * NP VP|||* SBARQ * PRN * NP VP
+SQ|||* NP ADJP S *|||* NP ADJP S *
+S|||PRN * PP *|||PRN * PP *
+S|||PP PRN NP VP * S *|||PP PRN NP VP * S *
+VP|||* NP S * SBAR * SBAR|||* NP S * SBAR * SBAR
+S|||S PRN *|||S PRN *
+S|||* SBAR *|||* SBAR *
+PP|||PP PRN * PP|||PP PRN * PP
+S|||* PP ADVP SINV * SBARQ|||* PP ADVP SINV * SBARQ
+NP|||NP * PP * SBAR|||NP * PP * SBAR
+S|||PP * ADVP SBAR VP|||PP * ADVP SBAR VP
+VP|||VP * SQ|||VP * SQ
+FRAG|||* NP * NP * S * S *|||* NP * NP * S * S *
+SQ|||S * NP VP|||S * NP VP
+S|||SQ * ADVP S *|||SQ * ADVP S *
+FRAG|||X VP * INTJ *|||X VP * INTJ *
+X|||* VP * NP * PP|||* VP * NP * PP
+FRAG|||* S * PP * PP * NP *|||* S * PP * PP * NP *
+FRAG|||* INTJ PP *|||* INTJ PP *
+SINV|||* S * S * NP VP|||* S * S * NP VP
+SQ|||* NP ADVP ADJP *|||* NP ADVP ADJP *
+X|||* VP SBAR *|||* VP SBAR *
+VP|||* NP * ADVP PP|||* NP * ADVP PP
+SQ|||S * VP|||S * VP
+S|||PP VP SBAR|||PP VP SBAR
+S|||* ADVP * SBAR * S|||* ADVP * SBAR * S
+S|||SBAR * SBAR * S * SBARQ *|||SBAR * SBAR * S * SBARQ *
+S|||* S PRN * S|||* S PRN * S
+PRN|||* CONJP NP *|||* CONJP NP *
+SBARQ|||* SBAR *|||* SBAR *
+S|||* SBAR * S * S|||* SBAR * S * S
+S|||SBAR * SQ|||SBAR * SQ
+S|||ADVP S VP * S *|||ADVP S VP * S *
+UCP|||SBAR * PP|||SBAR * PP
+S|||NP PRN PP * NP VP|||NP PRN PP * NP VP
+FRAG|||PP * PP * PP * NP * PP * NP *|||PP * PP * PP * NP * PP * NP *
+S|||VP * SINV *|||VP * SINV *
+SINV|||* NP ADJP|||* NP ADJP
+VP|||* UCP SBAR PRN|||* UCP SBAR PRN
+UCP|||ADVP * ADJP|||ADVP * ADJP
+S|||* SBAR PRN NP ADVP VP|||* SBAR PRN NP ADVP VP
+S|||FRAG * X ADVP NP VP *|||FRAG * X ADVP NP VP *
+VP|||ADVP * PP PP * SBAR|||ADVP * PP PP * SBAR
+NX|||NP PP|||NP PP
+NP|||NP PP ADJP|||NP PP ADJP
+SQ|||* NP * VP * S|||* NP * VP * S
+NAC|||* PP|||* PP
+VP|||* NP PRT PP PP|||* NP PRT PP PP
+VP|||* NP NP * ADVP * SBAR|||* NP NP * ADVP * SBAR
+S|||S * X NP VP|||S * X NP VP
+VP|||ADVP * ADVP PP S|||ADVP * ADVP PP S
+VP|||* S ADVP * NP|||* S ADVP * NP
+VP|||* S PP * SBAR|||* S PP * SBAR
+SQ|||SQ * SQ *|||SQ * SQ *
+VP|||* S * S * PP * SBAR|||* S * S * PP * SBAR
+FRAG|||PP NP * SBAR * S *|||PP NP * SBAR * S *
+S|||NP * SBAR * S * S *|||NP * SBAR * S * S *
+SINV|||ADJP VP NP PP *|||ADJP VP NP PP *
+VP|||* PP * S * S|||* PP * S * S
+FRAG|||* NP * NP *|||* NP * NP *
+NP|||* NP PP SBAR|||* NP PP SBAR
+SBARQ|||* WHNP SQ WHADVP SQ *|||* WHNP SQ WHADVP SQ *
+S|||* NP VP * NP PP VP *|||* NP VP * NP PP VP *
+PP|||PP * PP * NP|||PP * PP * NP
+S|||PP * INTJ NP S * S|||PP * INTJ NP S * S
+SQ|||* NP VP * WHNP VP|||* NP VP * WHNP VP
+S|||* PP PRN NP VP *|||* PP PRN NP VP *
+FRAG|||ADVP *|||ADVP *
+VP|||* SBARQ * S * SBAR|||* SBARQ * S * SBAR
+SBAR|||* PRN S|||* PRN S
+SQ|||* NP ADVP NP|||* NP ADVP NP
+ADJP|||ADJP * SBAR|||ADJP * SBAR
+S|||PP NP|||PP NP
+X|||NP PP * X *|||NP PP * X *
+S|||NP * S * S|||NP * S * S
+FRAG|||INTJ * S * S * S *|||INTJ * S * S * S *
+S|||S * S * SBARQ|||S * S * SBARQ
+NP|||NP * SBAR * SBAR *|||NP * SBAR * SBAR *
+SQ|||* NP * VP * SBAR *|||* NP * VP * SBAR *
+VP|||* NP * PP PP|||* NP * PP PP
+FRAG|||* PP *|||* PP *
+S|||* S * SQ *|||* S * SQ *
+S|||ADVP * ADVP * SBAR * VP *|||ADVP * ADVP * SBAR * VP *
+S|||S * SBAR * VP|||S * SBAR * VP
+SBARQ|||* SBAR PRN SQ * SQ *|||* SBAR PRN SQ * SQ *
+S|||PP * NP VP * S|||PP * NP VP * S
+S|||* SBAR * NP VP * PP * VP *|||* SBAR * NP VP * PP * VP *
+PP|||PP * PP * PP *|||PP * PP * PP *
+VP|||* PP * SBAR * SBAR|||* PP * SBAR * SBAR
+S|||* NP VP * SBAR * S * S *|||* NP VP * SBAR * S * S *
+FRAG|||FRAG * VP *|||FRAG * VP *
+VP|||* NP NP PP SBAR|||* NP NP PP SBAR
+SQ|||* NP ADVP VP * NP * VP *|||* NP ADVP VP * NP * VP *
+S|||* NP VP * S * S|||* NP VP * S * S
+S|||NP * S * S *|||NP * S * S *
+VP|||* PRT ADVP S|||* PRT ADVP S
+VP|||* ADVP PP PP SBAR|||* ADVP PP PP SBAR
+S|||* SBAR S *|||* SBAR S *
+S|||NP VP * PP * ADVP VP *|||NP VP * PP * ADVP VP *
+UCP|||SBAR * S|||SBAR * S
+FRAG|||SBAR * VP * SBAR *|||SBAR * VP * SBAR *
+S|||* ADVP * S * VP *|||* ADVP * S * VP *
+S|||S * SBAR * NP *|||S * SBAR * NP *
+VP|||* NP PRT PP * SBAR|||* NP PRT PP * SBAR
+VP|||LST * PP|||LST * PP
+S|||NP * ADVP * X NP VP|||NP * ADVP * X NP VP
+FRAG|||* INTJ * S * NP * VP * NP *|||* INTJ * S * NP * VP * NP *
+S|||S * PP * VP *|||S * PP * VP *
+VP|||* NP S * S * S|||* NP S * S * S
