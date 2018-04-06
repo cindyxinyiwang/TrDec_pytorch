@@ -124,6 +124,7 @@ for h in hyps:
     tree = Tree.from_rule_deriv(deriv)
     line = tree.to_string()
     if hparams.merge_bpe:
+      line = line.replace(' ', '')
       line = line.replace('▁', ' ')
     out_file.write(line + '\n')
     out_file.flush()
