@@ -75,15 +75,18 @@ class TreeDecoder(nn.Module):
     logits = []
     states = [Variable(state_zeros, requires_grad=False)] # (timestep, batch_size, d_model)
     offset = torch.arange(batch_size).long() 
+    #print(y_train)
     if self.hparams.cuda:
       offset = offset.cuda()
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
 
-      all_state = torch.cat(states, dim=1).contiguous().view((t+1)*batch_size, self.hparams.d_model) # [batch_size*t, d_model]
+      state_idx_t = t 
+      if t == 0: state_idx_t += 1
+      all_state = torch.cat(states, dim=1).contiguous().view(state_idx_t*batch_size, self.hparams.d_model) # [batch_size*t, d_model]
       if self.hparams.cuda:
         all_state = all_state.cuda()
-      parent_t = y_train.data[:, t, 1] + (t+1) * offset # [batch_size,]
+      parent_t = y_train.data[:, t, 1] + state_idx_t * offset # [batch_size,]
       parent_t = Variable(parent_t, requires_grad=False)
       parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
       
@@ -123,7 +126,8 @@ class TreeDecoder(nn.Module):
       rule_hidden = (rule_h_t, rule_c_t)
       word_hidden = (word_h_t, word_c_t)
 
-      states.append(rule_h_t)
+      if t > 0:
+        states.append(rule_h_t)
     # [len_y, batch_size, trg_vocab_size]
     logits = torch.stack(logits).transpose(0, 1).contiguous()
     return logits
@@ -162,21 +166,25 @@ class TreeDecoder(nn.Module):
       word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
       word_pre_readout = self.dropout(word_pre_readout)
       score_t = self.readout(word_pre_readout)
+      num_rule_index = -1
     else:
       rule_with_lhs = target_rule_vocab.rule_index_with_lhs(cur_nonterm.label)
       rule_index = torch.LongTensor(rule_with_lhs) + self.hparams.target_word_vocab_size
       #print(rule_index)
       #print(mask)
+      num_rule_index = len(rule_index)
       mask.index_fill_(1, rule_index, 0)
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))  
       rule_pre_readout = self.dropout(rule_pre_readout)
       score_t = self.readout(rule_pre_readout)
     if self.hparams.cuda:
       mask = mask.cuda()
-    score_t.data.masked_fill_(mask, float("-inf"))
+    #print(score_t)
+    #print(mask)
+    #score_t.data.masked_fill_(mask, float("-inf"))
     rule_hidden = (rule_h_t, rule_c_t)
     word_hidden = (word_h_t, word_c_t)
-    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, open_nonterms
+    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, open_nonterms, num_rule_index, mask
 
 class TrDec(nn.Module):
   
@@ -238,9 +246,9 @@ class TrDec(nn.Module):
                   score=0.)]
     while len(completed_hyp) < beam_size and length < max_len:
       length += 1
-      new_hyp_score_list = []
+      new_active_hyp = []
       for i, hyp in enumerate(active_hyp):
-        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, open_nonterms = self.decoder.step(x_enc, 
+        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, open_nonterms, num_rule_index, mask = self.decoder.step(x_enc, 
           x_enc_k, hyp, target_rule_vocab)
         hyp.rule_hidden = rule_hidden
         hyp.word_hidden = word_hidden
@@ -249,42 +257,44 @@ class TrDec(nn.Module):
         hyp.open_nonterms = open_nonterms
 
         p_t = F.softmax(logits, -1).data
-        new_hyp_scores = hyp.score + p_t 
-        new_hyp_score_list.append(new_hyp_scores)
-
-      live_hyp_num = beam_size - len(completed_hyp)
-      new_hyp_scores = np.concatenate(new_hyp_score_list).flatten()
-      new_hyp_pos = (-new_hyp_scores).argsort()[:live_hyp_num]
-      prev_hyp_ids = new_hyp_pos / self.decoder.target_vocab_size
-      word_ids = new_hyp_pos % self.decoder.target_vocab_size
-      new_hyp_scores = new_hyp_scores[new_hyp_pos]
-
-      new_hypotheses = []
-      for prev_hyp_id, word_id, hyp_score in zip(prev_hyp_ids, word_ids, new_hyp_scores):
-        prev_hyp = active_hyp[int(prev_hyp_id)]
-        open_nonterms = prev_hyp.open_nonterms[:]
-        if word_id >= self.hparams.target_word_vocab_size:
-          rule = target_rule_vocab[word_id]
-          open_nonterms.pop()
-          for c in reversed(rule.rhs):
-            open_nonterms.append(OpenNonterm(label=c, parent_state=prev_hyp.rule_hidden[0]))
-        else:
-          assert open_nonterms[-1].label == '*'
-          if word_id == self.hparams.eos_id: 
+        new_hyp_scores = (hyp.score + p_t).masked_fill_(mask, -float("inf"))
+        new_hyp_scores = new_hyp_scores.view(-1)
+        num_select = beam_size
+        if num_rule_index >= 0: num_select = min(num_select, num_rule_index)
+        top_ids = (-new_hyp_scores).cpu().numpy().argsort()[:num_select]
+        #print(top_ids)
+        for word_id in top_ids:
+          open_nonterms = hyp.open_nonterms[:]
+          if word_id >= self.hparams.target_word_vocab_size:
+            rule = target_rule_vocab[word_id]
             open_nonterms.pop()
-
-        hyp = TrHyp(rule_hidden=prev_hyp.rule_hidden, 
-                    word_hidden=prev_hyp.word_hidden,
-                    y=prev_hyp.y+[word_id], 
-                    rule_ctx_tm1=prev_hyp.rule_ctx_tm1, 
-                    word_ctx_tm1=prev_hyp.word_ctx_tm1,
+            for c in reversed(rule.rhs):
+              open_nonterms.append(OpenNonterm(label=c, parent_state=hyp.rule_hidden[0]))
+          else:
+            if open_nonterms[-1].label != '*':
+              print(open_nonterms[-1].label, word_id, new_hyp_scores[word_id])
+              print(target_rule_vocab.rule_index_with_lhs(open_nonterms[-1].label))
+            assert open_nonterms[-1].label == '*'
+            if word_id == self.hparams.eos_id: 
+              open_nonterms.pop()
+          new_hyp = TrHyp(rule_hidden=hyp.rule_hidden, 
+                    word_hidden=hyp.word_hidden,
+                    y=hyp.y+[word_id], 
+                    rule_ctx_tm1=hyp.rule_ctx_tm1, 
+                    word_ctx_tm1=hyp.word_ctx_tm1,
                     open_nonterms=open_nonterms,
-                    score=hyp_score)
-        if len(hyp.open_nonterms) == 0:
-          completed_hyp.append(hyp)
-        else:
-          new_hypotheses.append(hyp)
-      active_hyp = new_hypotheses
+                    score=new_hyp_scores[word_id])
+          if len(new_hyp.open_nonterms) == 0:
+            completed_hyp.append(hyp)
+          else:
+            new_active_hyp.append(new_hyp)
+      live_hyp_num = beam_size - len(completed_hyp)
+      new_active_hyp = sorted(new_active_hyp, key=lambda x:x.score, reverse=True)[:min(beam_size, live_hyp_num)]
+      #if open_nonterms[-1].label == 'PRT':
+      #  print(num_rule_index)
+      #  print(target_rule_vocab.rule_index_with_lhs(open_nonterms[-1].label))
+      #  print(word_ids)
+      active_hyp = new_active_hyp
 
     if len(completed_hyp) == 0:
       completed_hyp.append(active_hyp[0])
