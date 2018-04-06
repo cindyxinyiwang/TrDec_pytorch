@@ -10,23 +10,29 @@ import torch.nn as nn
 import torch.nn.init as init
 
 def get_criterion(hparams):
-  crit = nn.CrossEntropyLoss(ignore_index=hparams.pad_id, size_average=False, reduce=True)
+  loss_reduce = True 
+  if hparams.trdec:
+    loss_reduce = False
+  crit = nn.CrossEntropyLoss(ignore_index=hparams.pad_id, size_average=False, reduce=loss_reduce)
   if hparams.cuda:
     crit = crit.cuda()
   return crit
 
-def get_performance(crit, logits, labels, hparams, offset=None):
+def get_performance(crit, logits, labels, hparams):
   mask = (labels == hparams.pad_id)
   loss = crit(logits, labels)
-  #if not offset is None:
-  #  mask_t = (labels == hparams.pad_id + offset)
-  #  mask_t = mask | mask_t
-  #  loss.masked_fill_(mask_t, 0)
-  #loss = loss.sum()  
   _, preds = torch.max(logits, dim=1)
   acc = torch.eq(preds, labels).int().masked_fill_(mask, 0).sum()
-
-  return loss, acc
+  if hparams.trdec:
+    rule_mask = (labels >= hparams.target_word_vocab_size)
+    eos_mask = (labels == hparams.eos_id)
+    word_mask = (labels < hparams.target_word_vocab_size) ^ eos_mask ^ mask
+    rule_loss = loss[rule_mask].sum()
+    eos_loss = loss[eos_mask].sum()
+    word_loss = loss[word_mask].sum()
+    return loss.sum(), acc, rule_loss, word_loss, eos_loss, rule_mask.sum(), word_mask.sum(), eos_mask.sum()
+  else:
+    return loss.sum(), acc
 
 def count_params(params):
   num_params = sum(p.data.nelement() for p in params)

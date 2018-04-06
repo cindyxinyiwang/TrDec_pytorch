@@ -35,7 +35,14 @@ class TreeDecoder(nn.Module):
     self.word_lstm_cell = nn.LSTMCell(hparams.d_word_vec + hparams.d_model * 3, 
                              hparams.d_model)
     self.dropout = nn.Dropout(hparams.dropout)
+
+    vocab_mask = torch.ones(1, self.target_vocab_size)
+    self.word_vocab_mask = vocab_mask.index_fill_(1, torch.arange(self.hparams.target_word_vocab_size).long(), 0).byte()
+    self.rule_vocab_mask = ~self.word_vocab_mask
+
     if self.hparams.cuda:
+      self.rule_vocab_mask = self.rule_vocab_mask.cuda()
+      self.word_vocab_mask = self.word_vocab_mask.cuda()
       self.emb = self.emb.cuda()
       self.rule_attention = self.rule_attention.cuda()
       self.word_attention = self.word_attention.cuda()
@@ -45,6 +52,8 @@ class TreeDecoder(nn.Module):
       self.rule_lstm_cell = self.rule_lstm_cell.cuda()
       self.word_lstm_cell = self.word_lstm_cell.cuda()
       self.dropout = self.dropout.cuda()
+    #self.word_vocab_mask = Variable(self.word_vocab_mask, requires_grad=False)
+    #self.rule_vocab_mask = Variable(self.rule_vocab_mask, requires_grad=False)
 
   def forward(self, x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask):
     # get decoder init state and cell, use x_ct
@@ -117,6 +126,8 @@ class TreeDecoder(nn.Module):
       rule_score_t = self.readout(rule_pre_readout)
       word_score_t = self.readout(word_pre_readout)
 
+      #rule_score_t.data.masked_fill_(self.rule_vocab_mask.repeat(batch_size, 1), -float('inf'))
+      #word_score_t.data.masked_fill_(self.word_vocab_mask.repeat(batch_size, 1), -float('inf'))
       score_t = word_score_t*word_mask_vocab + rule_score_t*(1 - word_mask_vocab)
       logits.append(score_t)
 

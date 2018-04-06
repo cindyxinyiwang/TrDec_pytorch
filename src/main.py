@@ -83,6 +83,7 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
   n_batches = 0
 
   valid_total = valid_rule_count = valid_word_count = valid_eos_count = 0
+  valid_word_loss, valid_rule_loss, valid_eos_loss = 0, 0, 0
   valid_bleu = None
   if eval_bleu:
     valid_hyp_file = os.path.join(args.output_dir, "dev.trans_{0}".format(step))
@@ -105,6 +106,7 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
       valid_total += (y_total_count - batch_size)
       valid_rule_count += y_rule_count
       valid_word_count += (y_word_count - batch_size)
+      valid_eos_count += y_eos_count
     else:
       y_count -= batch_size
       # word count
@@ -116,7 +118,11 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
         y_valid[:,:-1,:], y_mask[:,:-1], y_len, y_valid[:,1:,2])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_valid[:,1:,0].contiguous().view(-1)
-      val_loss, val_acc = get_performance(crit, logits, labels, hparams, offset=hparams.target_word_vocab_size)
+      val_loss, val_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count =  \
+        get_performance(crit, logits, labels, hparams)
+      valid_word_loss += word_loss.data[0]
+      valid_rule_loss += rule_loss.data[0]
+      valid_eos_loss += eos_loss.data[0]
     else:
       logits = model.forward(
         x_valid, x_mask, x_len,
@@ -149,6 +155,10 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     log_string += " loss={0:<6.2f}".format(valid_loss / valid_word_count)
     log_string += " acc={0:<5.4f}".format(valid_acc / valid_total)
     log_string += " val_ppl={0:<.2f}".format(val_ppl)
+    log_string += " num_word={} num_rule={} num_eos={}".format(valid_word_count, valid_rule_count, valid_eos_count)
+    log_string += " ppl_word={0:<8.2f}".format(np.exp(valid_word_loss / valid_word_count))
+    log_string += " ppl_rule={0:<8.2f}".format(np.exp(valid_rule_loss / valid_rule_count))
+    log_string += " ppl_eos={0:<8.2f}".format(np.exp(valid_eos_loss / valid_eos_count))
   else:
     val_ppl = np.exp(valid_loss / valid_words)
     log_string = "val_step={0:<6d}".format(step)
@@ -269,6 +279,7 @@ def train():
   start_time = log_start_time = time.time()
   target_words, total_loss, total_corrects = 0, 0, 0
   target_rules, target_total, target_eos = 0, 0, 0
+  total_word_loss, total_rule_loss, total_eos_loss = 0, 0, 0
   model.train()
   while True:
     ((x_train, x_mask, x_len, x_count),
@@ -290,7 +301,16 @@ def train():
       logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len, y_train[:,1:,2])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_train[:,1:,0].contiguous().view(-1)
-      tr_loss, tr_acc = get_performance(crit, logits, labels, hparams, offset=hparams.target_word_vocab_size)
+      tr_loss, tr_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count = \
+        get_performance(crit, logits, labels, hparams)
+      #print(y_rule_count)
+      #print(rule_count.data[0])
+      assert y_rule_count == rule_count.data[0], "data rule count {}, performance rule count {}".format(y_rule_count, rule_count.data[0])
+      assert y_eos_count == eos_count.data[0], "data eos count {}, performance eos count {}".format(y_eos_count, eos_count.data[0])
+      assert y_word_count - batch_size == word_count.data[0], "data word count {}, performance word count {}".format(y_word_count-batch_size, word_count.data[0])
+      total_word_loss += word_loss.data[0]
+      total_rule_loss += rule_loss.data[0]
+      total_eos_loss += eos_loss.data[0]
     else:
       target_words += (y_count - batch_size)
 
@@ -319,7 +339,10 @@ def train():
       log_string += " |g|={0:<5.2f}".format(grad_norm)
       if args.trdec:
         log_string += " num_word={} num_rule={} num_eos={}".format(target_words, target_rules, target_eos)
-        log_string += " ppl/word={0:<8.2f}".format(np.exp(total_loss / target_words))
+        log_string += " ppl={0:<8.2f}".format(np.exp(total_loss / target_words))
+        log_string += " ppl_word={0:<8.2f}".format(np.exp(total_word_loss / target_words))
+        log_string += " ppl_rule={0:<8.2f}".format(np.exp(total_rule_loss / target_rules))
+        log_string += " ppl_eos={0:<8.2f}".format(np.exp(total_eos_loss / target_eos))
         log_string += " acc={0:<5.4f}".format(total_corrects / target_total)
       else:
         log_string += " ppl={0:<8.2f}".format(np.exp(total_loss / target_words))
@@ -357,6 +380,7 @@ def train():
       log_start_time = time.time()
       target_words = total_corrects = total_loss = 0
       target_rules = target_total = target_eos = 0
+      total_word_loss = total_rule_loss = total_eos_loss = 0
     if args.patience >= 0:
       if cur_attempt > args.patience: break
     else:
