@@ -173,8 +173,6 @@ class TreeDecoder(nn.Module):
       score_t = self.readout(rule_pre_readout)
     if self.hparams.cuda:
       mask = mask.cuda()
-    #print(score_t)
-    #print(mask)
     score_t.data.masked_fill_(mask, float("-inf"))
     rule_hidden = (rule_h_t, rule_c_t)
     word_hidden = (word_h_t, word_c_t)
