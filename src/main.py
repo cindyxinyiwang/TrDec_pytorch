@@ -298,7 +298,7 @@ def train():
       target_eos += y_eos_count
       target_words += (y_word_count - batch_size)
 
-      logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len, y_train[:,1:,2])
+      logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len, y_train[:,1:,2], y_label=y_train[:,1:,0])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_train[:,1:,0].contiguous().view(-1)
       tr_loss, tr_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count = \
