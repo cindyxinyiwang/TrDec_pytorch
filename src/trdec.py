@@ -36,10 +36,11 @@ class TreeDecoder(nn.Module):
                              hparams.d_model)
     self.dropout = nn.Dropout(hparams.dropout)
 
-    vocab_mask = torch.ones(1, self.target_vocab_size)
-    self.word_vocab_mask = vocab_mask.index_fill_(1, torch.arange(self.hparams.target_word_vocab_size).long(), 0).byte()
-    self.rule_vocab_mask = ~self.word_vocab_mask
-
+    vocab_mask = torch.zeros(1, self.target_vocab_size)
+    self.word_vocab_mask = vocab_mask.index_fill_(1, torch.arange(self.hparams.target_word_vocab_size).long(), 1)
+    self.rule_vocab_mask = 1 - self.word_vocab_mask
+    #self.word_vocab_mask = Variable(self.word_vocab_mask, requires_grad=False)
+    #self.rule_vocab_mask = Variable(self.rule_vocab_mask, requires_grad=False)
     if self.hparams.cuda:
       self.rule_vocab_mask = self.rule_vocab_mask.cuda()
       self.word_vocab_mask = self.word_vocab_mask.cuda()
@@ -52,10 +53,8 @@ class TreeDecoder(nn.Module):
       self.rule_lstm_cell = self.rule_lstm_cell.cuda()
       self.word_lstm_cell = self.word_lstm_cell.cuda()
       self.dropout = self.dropout.cuda()
-    #self.word_vocab_mask = Variable(self.word_vocab_mask, requires_grad=False)
-    #self.rule_vocab_mask = Variable(self.rule_vocab_mask, requires_grad=False)
 
-  def forward(self, x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask):
+  def forward(self, x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask, y_label=None):
     # get decoder init state and cell, use x_ct
     """
     x_enc: [batch_size, max_x_len, d_model * 2]
@@ -84,6 +83,7 @@ class TreeDecoder(nn.Module):
     logits = []
     states = [Variable(state_zeros, requires_grad=False)] # (timestep, batch_size, d_model)
     offset = torch.arange(batch_size).long() 
+
     #print(y_train)
     if self.hparams.cuda:
       offset = offset.cuda()
@@ -126,10 +126,31 @@ class TreeDecoder(nn.Module):
       rule_score_t = self.readout(rule_pre_readout)
       word_score_t = self.readout(word_pre_readout)
 
-      #rule_score_t.data.masked_fill_(self.rule_vocab_mask.repeat(batch_size, 1), -float('inf'))
-      #word_score_t.data.masked_fill_(self.word_vocab_mask.repeat(batch_size, 1), -float('inf'))
-      score_t = word_score_t*word_mask_vocab + rule_score_t*(1 - word_mask_vocab)
+      #y_label_t = y_label[0][t]
+      #score_mask_t = score_mask[0][t]
+      #print('y_label:', y_label_t.data[0], "is_word:", score_mask_t.data[0])
+      #print('rule_score:', rule_score_t[0][y_label_t].data[0], "word_score:", word_score_t[0][y_label_t].data[0])
+
+      m = score_mask[:, t].unsqueeze(1).expand(-1, self.target_vocab_size).float().data
+      mask_t = self.word_vocab_mask.expand(batch_size, -1) * (1-m) + self.rule_vocab_mask.expand(batch_size, -1) * m
+      mask_t = mask_t.byte()
+
+      score_t = torch.ones_like(word_score_t)
+      rule_score_t_half = rule_score_t[:, -self.hparams.target_rule_vocab_size:]
+      word_score_t_half = word_score_t[:, :self.hparams.target_word_vocab_size]
+      score_t = torch.cat([word_score_t_half, rule_score_t_half], dim=1)
+      score_t.data.masked_fill_(mask_t, -float('inf'))
+      #print(rule_score_t.data[:, -3:])
+      #print(score_t.data[:, -3:])
+      #print(self.rule_vocab_mask.expand(batch_size, -1).byte()[:, -3:])
+      
+      #print('score_t:', score_t[0][y_label_t].data[0])
       logits.append(score_t)
+
+      #if score_mask_t.data[0] == 0:
+      #  print(rule_score_t.data)
+      #  print(score_t.data)
+      #  exit(0)
 
       rule_input_feed = rule_ctx
       word_input_feed = word_ctx
@@ -209,7 +230,7 @@ class TrDec(nn.Module):
     if self.hparams.cuda:
       self.enc_to_k = self.enc_to_k.cuda()
 
-  def forward(self, x_train, x_mask, x_len, y_train, y_mask, y_len, score_mask):
+  def forward(self, x_train, x_mask, x_len, y_train, y_mask, y_len, score_mask, y_label=None):
     # [batch_size, x_len, d_model * 2]
     #print("x_train", x_train)
     #print("x_mask", x_mask)
@@ -217,7 +238,7 @@ class TrDec(nn.Module):
     x_enc, dec_init = self.encoder(x_train, x_len)
     x_enc_k = self.enc_to_k(x_enc)
     # [batch_size, y_len-1, trg_vocab_size]
-    logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask)
+    logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask, y_label)
     return logits
 
   def translate(self, x_train, target_rule_vocab, max_len=100, beam_size=5):
