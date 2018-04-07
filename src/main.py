@@ -301,8 +301,12 @@ def train():
       logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len, y_train[:,1:,2], y_label=y_train[:,1:,0])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_train[:,1:,0].contiguous().view(-1)
+
+      #print("total:", y_total_count, "rule_count:", y_rule_count, "word_count:", y_word_count, "eos_count:", y_eos_count)
       tr_loss, tr_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count = \
         get_performance(crit, logits, labels, hparams)
+      #print("perform rule_count:", rule_count, "word_count:", word_count, "eos_count", eos_count)
+      #print((y_train[:,:,0] >= hparams.target_word_vocab_size).long().sum().data[0])
       #print(y_rule_count)
       #print(rule_count.data[0])
       assert y_rule_count == rule_count.data[0], "data rule count {}, performance rule count {}".format(y_rule_count, rule_count.data[0])

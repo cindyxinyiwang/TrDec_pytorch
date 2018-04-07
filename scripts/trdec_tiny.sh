@@ -22,7 +22,7 @@ python3 src/main.py \
   --source_vocab="vocab.orm" \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
-  --batch_size=2 \
+  --batch_size=16 \
   --n_train_sents=200000 \
   --max_len=2000 \
   --n_train_steps=10000 \

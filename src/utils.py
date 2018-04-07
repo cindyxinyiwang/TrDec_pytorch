@@ -30,7 +30,7 @@ def get_performance(crit, logits, labels, hparams):
     rule_loss = loss[rule_mask].sum()
     eos_loss = loss[eos_mask].sum()
     word_loss = loss[word_mask].sum()
-    return loss.sum(), acc, rule_loss, word_loss, eos_loss, rule_mask.sum(), word_mask.sum(), eos_mask.sum()
+    return loss.sum(), acc, rule_loss, word_loss, eos_loss, rule_mask.long().sum(), word_mask.long().sum(), eos_mask.long().sum()
   else:
     return loss.sum(), acc
 

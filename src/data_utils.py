@@ -311,19 +311,21 @@ class DataLoader(object):
     padded_sentences = Variable(torch.LongTensor(padded_sentences))
     mask = torch.ByteTensor(mask)
 
-    num_padding = (padded_sentences.data[:,:,0] == pad_id).long().sum()
-    num_rule = (padded_sentences.data[:,:,0] >= self.target_word_vocab_size).long().sum()
-    num_eos = (padded_sentences.data[:,:,0] == self.hparams.eos_id).long().sum()
-    num_word = sum_len - num_rule - num_eos
-    assert num_rule + num_word + num_eos + num_padding == max_len * len(sentences)
-    #l = Variable(torch.FloatTensor(lengths))
+    num_padding = (padded_sentences[:,:,0] == pad_id).long().sum()
+    num_rule = (padded_sentences[:,:,0] >= self.target_word_vocab_size).long().sum()
+    #print(num_rule)
+    num_eos = (padded_sentences[:,:,0] == self.hparams.eos_id).long().sum()
+    num_word = sum_len - num_rule.data[0] - num_eos.data[0]
+    #print(num_rule.data[0] + num_word + num_eos.data[0] + num_padding.data[0])
+    #print(max_len * len(sentences))
+    assert num_rule.data[0] + num_word + num_eos.data[0] + num_padding.data[0] == max_len * len(sentences)
 
     if self.hparams.cuda:
       padded_sentences = padded_sentences.cuda()
       mask = mask.cuda()
       #l = l.cuda()
 
-    return padded_sentences, mask, lengths, sum_len, num_rule, num_word, num_eos
+    return padded_sentences, mask, lengths, sum_len, num_rule.data[0], num_word, num_eos.data[0]
 
   def _build_parallel(self, source_file, target_file, is_training, sort=False):
     """Build pair of data."""
