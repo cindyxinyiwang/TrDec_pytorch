@@ -58,7 +58,7 @@ parser.add_argument("--target_word_vocab", type=str, default=None, help="target 
 parser.add_argument("--batch_size", type=int, default=32, help="batch_size")
 parser.add_argument("--batcher", type=str, default="sent", help="sent|word. Batch either by number of words or number of sentences")
 parser.add_argument("--n_train_steps", type=int, default=100000, help="n_train_steps")
-parser.add_argument("--dropout", type=float, default=0.1, help="probability of dropping")
+parser.add_argument("--dropout", type=float, default=0., help="probability of dropping")
 parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
 parser.add_argument("--lr_dec", type=float, default=0.5, help="learning rate decay")
 parser.add_argument("--clip_grad", type=float, default=5., help="gradient clipping")
@@ -71,8 +71,8 @@ parser.add_argument("--init_type", type=str, default="uniform", help="uniform|xa
 
 args = parser.parse_args()
 def eval(model, data, crit, step, hparams, eval_bleu=False,
-         valid_batch_size=20):
-  valid_batch_size = 2
+         valid_batch_size=20, tr_logits=None):
+  valid_batch_size = 10
   print("Eval at step {0}. valid_batch_size={1}".format(step, valid_batch_size))
 
   model.eval()
@@ -118,6 +118,16 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
         y_valid[:,:-1,:], y_mask[:,:-1], y_len, y_valid[:,1:,2])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_valid[:,1:,0].contiguous().view(-1)
+      #print("x_valid", x_valid)
+      #print("x_mask", x_mask)
+      #print("x_len", x_len)
+      #print("y_valid", y_valid)
+      #print("y_mask", y_mask)
+      #print(tr_logits)
+      #print(logits)
+      #diff = (tr_logits - logits).sum()
+      #print('diff: ', diff)
+      #exit(0)
       val_loss, val_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count =  \
         get_performance(crit, logits, labels, hparams)
       valid_word_loss += word_loss.data[0]
@@ -285,10 +295,11 @@ def train():
     ((x_train, x_mask, x_len, x_count),
      (y_train, y_mask, y_len, y_count),
      batch_size) = data.next_train()
-    #print(x_train)
-    #print(x_mask)
-    #print(y_train)
-    #print(y_mask)
+    #print("x_train", x_train)
+    #print("x_mask", x_mask)
+    #print("x_len", x_len)
+    #print("y_train", y_train)
+    #print("y_mask", y_mask)
     #exit(0)
     optim.zero_grad()
     if args.trdec:
@@ -301,7 +312,7 @@ def train():
       logits = model.forward(x_train, x_mask, x_len, y_train[:,:-1,:], y_mask[:,:-1], y_len, y_train[:,1:,2], y_label=y_train[:,1:,0])
       logits = logits.view(-1, hparams.target_word_vocab_size+hparams.target_rule_vocab_size)
       labels = y_train[:,1:,0].contiguous().view(-1)
-
+      #print("x_train_logits", logits)
       #print("total:", y_total_count, "rule_count:", y_rule_count, "word_count:", y_word_count, "eos_count:", y_eos_count)
       tr_loss, tr_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count = \
         get_performance(crit, logits, labels, hparams)
@@ -356,7 +367,7 @@ def train():
       log_string += " time(min)={0:<5.2f}".format(since_start)
       print(log_string)
     if step % args.eval_every == 0:
-      val_ppl, val_bleu = eval(model, data, crit, step, hparams, eval_bleu=args.eval_bleu, valid_batch_size=20)	
+      val_ppl, val_bleu = eval(model, data, crit, step, hparams, eval_bleu=args.eval_bleu, valid_batch_size=20, tr_logits=logits)	
       based_on_bleu = args.eval_bleu
       if based_on_bleu:
         if best_val_bleu <= val_bleu:

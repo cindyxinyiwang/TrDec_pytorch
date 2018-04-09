@@ -564,5 +564,5 @@ class DataLoader(object):
       indices = np.argsort(source_lens)
       source_data = [source_data[index] for index in indices]
       target_data = [target_data[index] for index in indices]
-
+      trg_tree_data = [trg_tree_data[index] for index in indices]
     return np.array(source_data), np.array(target_data), np.array(trg_tree_data)
