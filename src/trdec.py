@@ -100,13 +100,10 @@ class TreeDecoder(nn.Module):
       parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
       
       word_mask = y_train[:, t, 2].unsqueeze(1).expand(-1, self.hparams.d_model).float() # (1 is word, 0 is rule)
-      word_mask_vocab = score_mask[:, t].unsqueeze(1).expand(-1, self.target_vocab_size).float()
 
       word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
-      #print(word_h_t.size())
-      #print(word_mask.size())
-      #print(word_hidden[0].size())
+
       word_h_t = word_h_t * word_mask + word_hidden[0] * (1-word_mask)
       word_c_t = word_c_t * word_mask + word_hidden[1] * (1-word_mask)
 
@@ -126,11 +123,6 @@ class TreeDecoder(nn.Module):
       rule_score_t = self.readout(rule_pre_readout)
       word_score_t = self.readout(word_pre_readout)
 
-      #y_label_t = y_label[0][t]
-      #score_mask_t = score_mask[0][t]
-      #print('y_label:', y_label_t.data[0], "is_word:", score_mask_t.data[0])
-      #print('rule_score:', rule_score_t[0][y_label_t].data[0], "word_score:", word_score_t[0][y_label_t].data[0])
-
       m = score_mask[:, t].unsqueeze(1).expand(-1, self.target_vocab_size).float().data
       mask_t = self.word_vocab_mask.expand(batch_size, -1) * (1-m) + self.rule_vocab_mask.expand(batch_size, -1) * m
       mask_t = mask_t.byte()
@@ -140,17 +132,8 @@ class TreeDecoder(nn.Module):
       word_score_t_half = word_score_t[:, :self.hparams.target_word_vocab_size]
       score_t = torch.cat([word_score_t_half, rule_score_t_half], dim=1)
       score_t.data.masked_fill_(mask_t, -float('inf'))
-      #print(rule_score_t.data[:, -3:])
-      #print(score_t.data[:, -3:])
-      #print(self.rule_vocab_mask.expand(batch_size, -1).byte()[:, -3:])
-      
-      #print('score_t:', score_t[0][y_label_t].data[0])
-      logits.append(score_t)
 
-      #if score_mask_t.data[0] == 0:
-      #  print(rule_score_t.data)
-      #  print(score_t.data)
-      #  exit(0)
+      logits.append(score_t)
 
       rule_input_feed = rule_ctx
       word_input_feed = word_ctx
@@ -299,7 +282,10 @@ class TrDec(nn.Module):
           open_nonterms = hyp.open_nonterms[:]
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
-            open_nonterms.pop()
+            cur_nonterm = open_nonterms.pop()
+            parent_state = hyp.rule_hidden[0]
+            if rule.lhs == 'ROOT':
+              parent_state = cur_nonterm.parent_state
             for c in reversed(rule.rhs):
               open_nonterms.append(OpenNonterm(label=c, parent_state=hyp.rule_hidden[0]))
           else:
