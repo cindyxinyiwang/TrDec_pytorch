@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import numpy as np
 from utils import *
 from models import *
+import gc
 
 class TreeDecoder(nn.Module):
   def __init__(self, hparams):
@@ -84,21 +85,21 @@ class TreeDecoder(nn.Module):
     states = [Variable(state_zeros, requires_grad=False)] # (timestep, batch_size, d_model)
     offset = torch.arange(batch_size).long() 
 
-    #print(y_train)
     if self.hparams.cuda:
       offset = offset.cuda()
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
 
       state_idx_t = t 
-      if t == 0: state_idx_t += 1
+      state_idx_t += 1
       all_state = torch.cat(states, dim=1).contiguous().view(state_idx_t*batch_size, self.hparams.d_model) # [batch_size*t, d_model]
       if self.hparams.cuda:
         all_state = all_state.cuda()
       parent_t = y_train.data[:, t, 1] + state_idx_t * offset # [batch_size,]
       parent_t = Variable(parent_t, requires_grad=False)
       parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
-      
+ 
+      #print('paren_t', y_train.data[:, t, 1], 'train_paren', parent_state.data[0][:2])     
       word_mask = y_train[:, t, 2].unsqueeze(1).expand(-1, self.hparams.d_model).float() # (1 is word, 0 is rule)
 
       word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
@@ -114,6 +115,8 @@ class TreeDecoder(nn.Module):
       word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
 
       inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
+      #print(inp.sum())
+      #print(inp.data[0][:3])
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))
       word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
       
@@ -141,8 +144,7 @@ class TreeDecoder(nn.Module):
       rule_hidden = (rule_h_t, rule_c_t)
       word_hidden = (word_h_t, word_c_t)
 
-      if t > 0:
-        states.append(rule_h_t)
+      states.append(rule_h_t)
     # [len_y, batch_size, trg_vocab_size]
     logits = torch.stack(logits).transpose(0, 1).contiguous()
     return logits
@@ -175,31 +177,29 @@ class TreeDecoder(nn.Module):
 
     inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
     mask = torch.ones(1, self.target_vocab_size).byte()
+    #print("label", cur_nonterm.label, "trans_paren:", parent_state.data[0][:2])
+    #print(inp.sum().data)
+    #print(inp.data[0][:3])
     if cur_nonterm.label == '*':
       word_index = torch.arange(self.hparams.target_word_vocab_size).long()
       mask.index_fill_(1, word_index, 0)
       word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
-      word_pre_readout = self.dropout(word_pre_readout)
+      #word_pre_readout = self.dropout(word_pre_readout)
       score_t = self.readout(word_pre_readout)
       num_rule_index = -1
     else:
       rule_with_lhs = target_rule_vocab.rule_index_with_lhs(cur_nonterm.label)
       rule_index = torch.LongTensor(rule_with_lhs) + self.hparams.target_word_vocab_size
-      #print(rule_index)
-      #print(mask)
-      num_rule_index = len(rule_index)
+      num_rule_index = len(rule_with_lhs)
       mask.index_fill_(1, rule_index, 0)
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))  
-      rule_pre_readout = self.dropout(rule_pre_readout)
+      #rule_pre_readout = self.dropout(rule_pre_readout)
       score_t = self.readout(rule_pre_readout)
     if self.hparams.cuda:
       mask = mask.cuda()
-    #print(score_t)
-    #print(mask)
-    #score_t.data.masked_fill_(mask, float("-inf"))
     rule_hidden = (rule_h_t, rule_c_t)
     word_hidden = (word_h_t, word_c_t)
-    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, open_nonterms, num_rule_index, mask
+    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, mask
 
 class TrDec(nn.Module):
   
@@ -224,19 +224,32 @@ class TrDec(nn.Module):
     logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask, y_label)
     return logits
 
-  def translate(self, x_train, target_rule_vocab, max_len=100, beam_size=5):
+  def translate(self, x_train, target_rule_vocab, max_len=100, beam_size=5, y_label=None):
     hyps = []
+    scores = []
+    i = 0
     for x in x_train:
-      #print(x)
       x = Variable(torch.LongTensor(x), volatile=True)
+      if y_label:
+        y = y_label[i][1:]
+      else:
+        y = None
       if self.hparams.cuda:
         x = x.cuda()
-      hyp = self.translate_sent(x, target_rule_vocab, max_len=max_len, beam_size=beam_size)[0]
+      hyp, nll_score = self.translate_sent(x, target_rule_vocab, max_len=max_len, beam_size=beam_size, y_label=y)
+      #for h in hyp:
+      #  print(h.y, h.score)
+      hyp = hyp[0]
       hyps.append(hyp.y[1:])
+      scores.append(sum(nll_score))
       #print(hyp.y)
-    return hyps
+      #print("trans score:", nll_score)
+      #print("trans label:", y)
+      i += 1
+      gc.collect()
+    return hyps, scores
 
-  def translate_sent(self, x_train, target_rule_vocab, max_len=100, beam_size=5):
+  def translate_sent(self, x_train, target_rule_vocab, max_len=100, beam_size=5, y_label=None):
     assert len(x_train.size()) == 1
     x_len = [x_train.size(0)]
     x_train = x_train.unsqueeze(0)
@@ -259,64 +272,80 @@ class TrDec(nn.Module):
                   open_nonterms=[OpenNonterm(label='ROOT', 
                     parent_state=Variable(state_zeros, requires_grad=False))],
                   score=0.)]
+    nll_score = []
+    if y_label is not None:
+      max_len = len(y_label)
     while len(completed_hyp) < beam_size and length < max_len:
       length += 1
       new_active_hyp = []
       for i, hyp in enumerate(active_hyp):
-        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, open_nonterms, num_rule_index, mask = self.decoder.step(x_enc, 
+        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, mask = self.decoder.step(x_enc, 
           x_enc_k, hyp, target_rule_vocab)
         hyp.rule_hidden = rule_hidden
         hyp.word_hidden = word_hidden
         hyp.rule_ctx_tm1 = rule_ctx 
         hyp.word_ctx_tm1 = word_ctx
-        hyp.open_nonterms = open_nonterms
 
+        logits.data.masked_fill_(mask, -float("inf"))
         p_t = F.softmax(logits, -1).data
-        new_hyp_scores = (hyp.score + p_t).masked_fill_(mask, -float("inf"))
+        #new_hyp_scores = (hyp.score + p_t).masked_fill_(mask, -float("inf"))
+        new_hyp_scores = hyp.score + p_t
         new_hyp_scores = new_hyp_scores.view(-1)
-        num_select = beam_size
-        if num_rule_index >= 0: num_select = min(num_select, num_rule_index)
-        top_ids = (-new_hyp_scores).cpu().numpy().argsort()[:num_select]
-        #print(top_ids)
+        if y_label is not None:
+          top_ids = [y_label[length-1][0]]
+          nll = -np.log(p_t[0][top_ids[0]])
+          #nll = logits.data[0][top_ids[0]]
+          nll_score.append(nll)
+        else:
+          num_select = beam_size
+          if num_rule_index >= 0: num_select = min(num_select, num_rule_index)
+          top_ids = (-new_hyp_scores).cpu().numpy().argsort()[:num_select]
+          #print(top_ids)
         for word_id in top_ids:
+          if p_t[0][word_id] == 0: continue
           open_nonterms = hyp.open_nonterms[:]
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
             cur_nonterm = open_nonterms.pop()
             parent_state = hyp.rule_hidden[0]
-            if rule.lhs == 'ROOT':
-              parent_state = cur_nonterm.parent_state
             for c in reversed(rule.rhs):
-              open_nonterms.append(OpenNonterm(label=c, parent_state=hyp.rule_hidden[0]))
+              open_nonterms.append(OpenNonterm(label=c, parent_state=parent_state))
           else:
             if open_nonterms[-1].label != '*':
               print(open_nonterms[-1].label, word_id, new_hyp_scores[word_id])
               print(target_rule_vocab.rule_index_with_lhs(open_nonterms[-1].label))
+              print(top_ids)
             assert open_nonterms[-1].label == '*'
             if word_id == self.hparams.eos_id: 
               open_nonterms.pop()
-          new_hyp = TrHyp(rule_hidden=hyp.rule_hidden, 
-                    word_hidden=hyp.word_hidden,
+          new_hyp = TrHyp(rule_hidden=(hyp.rule_hidden[0], hyp.rule_hidden[1]), 
+                    word_hidden=(hyp.word_hidden[0], hyp.word_hidden[1]),
                     y=hyp.y+[word_id], 
                     rule_ctx_tm1=hyp.rule_ctx_tm1, 
                     word_ctx_tm1=hyp.word_ctx_tm1,
                     open_nonterms=open_nonterms,
                     score=new_hyp_scores[word_id])
-          if len(new_hyp.open_nonterms) == 0:
+          #print(length, "id", word_id, "score", new_hyp.score)
+          #if len(new_hyp.open_nonterms) == 0:
+          #  completed_hyp.append(new_hyp)
+          #else:
+          new_active_hyp.append(new_hyp)
+      if y_label is None:
+        live_hyp_num = beam_size - len(completed_hyp)
+        new_active_hyp = sorted(new_active_hyp, key=lambda x:x.score, reverse=True)[:min(beam_size, live_hyp_num)]
+        active_hyp = []
+        for hyp  in new_active_hyp:
+          if len(hyp.open_nonterms) == 0:
+            hyp.score = hyp.score / len(hyp.y)
             completed_hyp.append(hyp)
           else:
-            new_active_hyp.append(new_hyp)
-      live_hyp_num = beam_size - len(completed_hyp)
-      new_active_hyp = sorted(new_active_hyp, key=lambda x:x.score, reverse=True)[:min(beam_size, live_hyp_num)]
-      #if open_nonterms[-1].label == 'PRT':
-      #  print(num_rule_index)
-      #  print(target_rule_vocab.rule_index_with_lhs(open_nonterms[-1].label))
-      #  print(word_ids)
-      active_hyp = new_active_hyp
+            active_hyp.append(hyp)
+      else:
+        active_hyp = new_active_hyp
 
     if len(completed_hyp) == 0:
       completed_hyp.append(active_hyp[0])
-    return sorted(completed_hyp, key=lambda x: x.score, reverse=True)
+    return sorted(completed_hyp, key=lambda x: x.score, reverse=True), nll_score
 
 class TrHyp(object):
   def __init__(self, rule_hidden, word_hidden, y, rule_ctx_tm1, word_ctx_tm1, score, open_nonterms):

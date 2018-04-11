@@ -265,6 +265,7 @@ class TreeNode(object):
     for c in self.children:
       if hasattr(c, 'is_preterminal'):
         c.get_leaf_lens(len_dict)
+
   def set_timestep_old(self, t, t2n=None, id2n=None, last_word_t=0, sib_t=0, open_stack=[]):
     """
     initialize timestep for each node
@@ -330,11 +331,13 @@ class TreeNode(object):
       self.frontir_label = Vocab.ES_STR
     c_t = t
     for c in self.children:
-      c_t = t + 1  # time of current child
+      if not hasattr(c, 'label') or c.label != '*':
+        c_t += 1  # time of current child
       if hasattr(c, 'set_timestep'):
         num_node += 1
-        t, num_node = c.set_timestep(c_t, num_node, t2n, id2n, open_stack)
-    return t, num_node
+        #print(c_t, c.label)
+        c_t, num_node = c.set_timestep(c_t, num_node, t2n, id2n, open_stack)
+    return c_t, num_node
 
 class Tree(object):
   """A class that represents a parse tree"""
@@ -495,10 +498,14 @@ class Tree(object):
         for c in node.children:
           d = [word_vocab.convert(c), paren_t, is_terminal]
           data.append(d)
+          #print(c)
+          #print(d)
       else:
         r = Rule(node.label, children, open_nonterms)
         d = [rule_vocab.convert(r), paren_t, is_terminal]
         data.append(d)
+        #print(str(r))
+        #print(d)
     return data
 
   def get_bpe_rule(self, rule_vocab):

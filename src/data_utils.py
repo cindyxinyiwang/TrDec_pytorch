@@ -131,7 +131,7 @@ class DataLoader(object):
   def reset_test(self):
     self.test_index = 0
 
-  def next_test(self, test_batch_size=1):
+  def next_test(self, test_batch_size=1, sort_by_x=False):
     end_of_epoch = False
     start_index = self.test_index
     end_index = min(start_index + test_batch_size, self.test_size)
@@ -140,7 +140,8 @@ class DataLoader(object):
     # pad data
     x_test = self.x_test[start_index: end_index]
     y_test = self.y_test[start_index: end_index]
-    #x_test, y_test = self.sort_by_xlen(x_test, y_test)
+    if sort_by_x:
+      x_test, y_test = self.sort_by_xlen(x_test, y_test)
 
     x_test, x_mask, x_len, x_count = self._pad(
       sentences=x_test, pad_id=self.pad_id, volatile=True)
@@ -526,8 +527,11 @@ class DataLoader(object):
       tree.reset_timestep()
       trg_tree_indices = tree.get_data_root(self.target_tree_vocab, self.target_word_vocab) # (len_y, 3)
       trg_tree_indices = [[self.bos_id, 0, 1]] + trg_tree_indices
-      #trg_tree_indices = np.array(trg_tree_indices)
-      #trg_tree_indices[:, 1] = np.append(trg_tree_indices[1:, 1], 0) # parent timestep, last one not used
+      trg_tree_indices = np.array(trg_tree_indices)
+      trg_tree_indices[:, 1] = np.append(trg_tree_indices[1:, 1], 0) # parent timestep, last one not used
+      trg_tree_indices = trg_tree_indices.tolist()
+      #print(trg_tree_indices)
+      #exit(0)
       #trg_tree_indices[:, 2] = np.append(trg_tree_indices[1:, 2], 0) # is word, last one not used in training
       #trg_tree_indices = trg_tree_indices.tolist()
       #for data in trg_tree_indices:

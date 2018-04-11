@@ -18,7 +18,7 @@ def get_criterion(hparams):
     crit = crit.cuda()
   return crit
 
-def get_performance(crit, logits, labels, hparams):
+def get_performance(crit, logits, labels, hparams, sum_loss=True):
   mask = (labels == hparams.pad_id)
   loss = crit(logits, labels)
   _, preds = torch.max(logits, dim=1)
@@ -30,9 +30,11 @@ def get_performance(crit, logits, labels, hparams):
     rule_loss = loss[rule_mask].sum()
     eos_loss = loss[eos_mask].sum()
     word_loss = loss[word_mask].sum()
-    return loss.sum(), acc, rule_loss, word_loss, eos_loss, rule_mask.long().sum(), word_mask.long().sum(), eos_mask.long().sum()
+    if sum_loss: loss = loss.sum()
+    return loss, acc, rule_loss, word_loss, eos_loss, rule_mask.long().sum(), word_mask.long().sum(), eos_mask.long().sum()
   else:
-    return loss.sum(), acc
+    if sum_loss: loss = loss.sum()
+    return loss, acc
 
 def count_params(params):
   num_params = sum(p.data.nelement() for p in params)

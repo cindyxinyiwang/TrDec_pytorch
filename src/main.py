@@ -72,7 +72,7 @@ parser.add_argument("--init_type", type=str, default="uniform", help="uniform|xa
 args = parser.parse_args()
 def eval(model, data, crit, step, hparams, eval_bleu=False,
          valid_batch_size=20, tr_logits=None):
-  valid_batch_size = 10
+  valid_batch_size = 7
   print("Eval at step {0}. valid_batch_size={1}".format(step, valid_batch_size))
 
   model.eval()

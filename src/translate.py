@@ -46,6 +46,7 @@ add_argument(parser, "target_tree_vocab", type="str", default=None, help="name o
 add_argument(parser, "target_word_vocab", type="str", default=None, help="name of target vocab file")
 add_argument(parser, "n_train_sents", type="int", default=None, help="max number of training sentences to load")
 add_argument(parser, "out_file", type="str", default="trans", help="output file for hypothesis")
+add_argument(parser, "debug", type="bool", default=False, help="output file for hypothesis")
 
 
 args = parser.parse_args()
@@ -78,8 +79,16 @@ hparams = TranslationHparams(
 )
 
 hparams.add_param("filtered_tokens", set([model.hparams.pad_id, model.hparams.eos_id, model.hparams.bos_id]))
+hparams.add_param("pad_id", model.hparams.pad_id)
+hparams.add_param("bos_id", model.hparams.bos_id)
+hparams.add_param("eos_id", model.hparams.eos_id)
+hparams.add_param("unk_id", model.hparams.unk_id)
 model.hparams.cuda = hparams.cuda
 data = DataLoader(hparams=hparams, decode=True)
+if args.debug:
+  hparams.add_param("target_word_vocab_size", data.target_word_vocab_size)
+  hparams.add_param("target_rule_vocab_size", data.target_rule_vocab_size)
+  crit = get_criterion(hparams)
 
 out_file = open(hparams.out_file, 'w', encoding='utf-8')
 if args.trdec:
@@ -89,30 +98,50 @@ end_of_epoch = False
 num_sentences = 0
 
 x_test = data.x_test.tolist()
+if args.debug:
+  y_test = data.y_test.tolist()
+else:
+  y_test = None
 #print(x_test)
 if args.trdec:
-  hyps = model.translate(
+  hyps, scores = model.translate(
         x_test, target_rule_vocab=data.target_tree_vocab,
-        beam_size=args.beam_size, max_len=args.max_len)
+        beam_size=args.beam_size, max_len=args.max_len, y_label=y_test)
 else:
   hyps = model.translate(
         x_test, beam_size=args.beam_size, max_len=args.max_len)
-#while not end_of_epoch:
-#  ((x_test, x_mask, x_len, x_count),
-#   (y_test, y_mask, y_len, y_count),
-#   batch_size, end_of_epoch) = data.next_test(test_batch_size=hparams.batch_size)
-#
-#  num_sentences += batch_size
-#
-#  # The normal, correct way:
-#  hyps = model.translate(
-#        x_test, x_len, beam_size=args.beam_size, max_len=args.max_len)
-#  # For debugging:
-#  # model.debug_translate_batch(
-#  #   x_test, x_mask, x_pos_emb_indices, hparams.beam_size, hparams.max_len,
-#  #   y_test, y_mask, y_pos_emb_indices)
-#  # sys.exit(0)
 
+if args.debug:
+  forward_scores = []
+  while not end_of_epoch:
+    ((x_test, x_mask, x_len, x_count),
+     (y_test, y_mask, y_len, y_count),
+     batch_size, end_of_epoch) = data.next_test(test_batch_size=hparams.batch_size, sort_by_x=True)
+  
+    num_sentences += batch_size
+    logits = model.forward(x_test, x_mask, x_len, y_test[:,:-1,:], y_mask[:,:-1], y_len, y_test[:,1:,2])
+    logits = logits.view(-1, hparams.target_rule_vocab_size+hparams.target_word_vocab_size)
+    labels = y_test[:,1:,0].contiguous().view(-1)
+    val_loss, val_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count =  \
+        get_performance(crit, logits, labels, hparams)
+    #print("train forward:", val_loss.data)
+    #print("train label:", labels.data)
+    #logit_score = []
+    #for i,l in enumerate(labels): logit_score.append(logits[i][l].data[0])
+    #print("train_logit", logit_score)
+    #print("train_label", labels)
+    forward_scores.append(val_loss.sum().data[0])
+    # The normal, correct way:
+    #hyps = model.translate(
+    #      x_test, x_len, beam_size=args.beam_size, max_len=args.max_len)
+    # For debugging:
+    # model.debug_translate_batch(
+    #   x_test, x_mask, x_pos_emb_indices, hparams.beam_size, hparams.max_len,
+    #   y_test, y_mask, y_pos_emb_indices)
+    # sys.exit(0)
+  print("translate_score:", sum(scores))
+  print("forward_score:", sum(forward_scores))
+  exit(0)
 for h in hyps:
   if args.trdec:
     deriv = []
@@ -125,7 +154,7 @@ for h in hyps:
     line = tree.to_string()
     if hparams.merge_bpe:
       line = line.replace(' ', '')
-      line = line.replace('▁', ' ')
+      line = line.replace('▁', ' ').strip()
     out_file.write(line + '\n')
     out_file.flush()
     out_parse_file.write(tree.to_parse_string() + '\n')
