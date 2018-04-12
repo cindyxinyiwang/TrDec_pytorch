@@ -37,6 +37,7 @@ add_argument(parser, "target_test", type="str", default=None, help="name of targ
 add_argument(parser, "target_tree_test", type="str", default=None, help="name of target test parse file")
 add_argument(parser, "beam_size", type="int", default=None, help="beam size")
 add_argument(parser, "max_len", type="int", default=300, help="maximum len considered on the target side")
+add_argument(parser, "poly_norm_m", type="float", default=0, help="m in polynormial normalization")
 add_argument(parser, "non_batch_translate", type="bool", default=False, help="use non-batched translation")
 add_argument(parser, "batch_size", type="int", default=32, help="")
 add_argument(parser, "merge_bpe", type="bool", default=True, help="")
@@ -106,7 +107,7 @@ else:
 if args.trdec:
   hyps, scores = model.translate(
         x_test, target_rule_vocab=data.target_tree_vocab,
-        beam_size=args.beam_size, max_len=args.max_len, y_label=y_test)
+        beam_size=args.beam_size, max_len=args.max_len, y_label=y_test, poly_norm_m=args.poly_norm_m)
 else:
   hyps = model.translate(
         x_test, beam_size=args.beam_size, max_len=args.max_len)

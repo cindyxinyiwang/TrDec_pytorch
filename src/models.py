@@ -270,7 +270,7 @@ class Seq2Seq(nn.Module):
         hyp.state = dec_state
         hyp.ctx_tm1 = ctx 
 
-        p_t = F.softmax(logits, -1).data
+        p_t = F.log_softmax(logits, -1).data
         new_hyp_scores = hyp.score + p_t 
         #print(new_hyp_scores)
         #print(p_t)

@@ -187,19 +187,25 @@ class TreeDecoder(nn.Module):
       #word_pre_readout = self.dropout(word_pre_readout)
       score_t = self.readout(word_pre_readout)
       num_rule_index = -1
+      rule_index = []
     else:
       rule_with_lhs = target_rule_vocab.rule_index_with_lhs(cur_nonterm.label)
-      rule_index = torch.LongTensor(rule_with_lhs) + self.hparams.target_word_vocab_size
+      #rule_index = torch.LongTensor(rule_with_lhs) + self.hparams.target_word_vocab_size
+      rule_index = []
+      for i in rule_with_lhs: rule_index.append(i + self.hparams.target_word_vocab_size)
       num_rule_index = len(rule_with_lhs)
-      mask.index_fill_(1, rule_index, 0)
+      #mask.index_fill_(1, rule_index, 0)
+      rule_fill_index = torch.arange(self.hparams.target_rule_vocab_size).long() + self.hparams.target_word_vocab_size
+      mask.index_fill_(1, rule_fill_index, 0)
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))  
       #rule_pre_readout = self.dropout(rule_pre_readout)
       score_t = self.readout(rule_pre_readout)
     if self.hparams.cuda:
       mask = mask.cuda()
+    score_t.data.masked_fill_(mask, -float("inf"))
     rule_hidden = (rule_h_t, rule_c_t)
     word_hidden = (word_h_t, word_c_t)
-    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, mask
+    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_index, mask
 
 class TrDec(nn.Module):
   
@@ -224,10 +230,11 @@ class TrDec(nn.Module):
     logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask, score_mask, y_label)
     return logits
 
-  def translate(self, x_train, target_rule_vocab, max_len=100, beam_size=5, y_label=None):
+  def translate(self, x_train, target_rule_vocab, max_len=100, beam_size=5, y_label=None, poly_norm_m=0):
     hyps = []
     scores = []
     i = 0
+    self.logsoftmax = nn.LogSoftmax(dim=1)
     for x in x_train:
       x = Variable(torch.LongTensor(x), volatile=True)
       if y_label:
@@ -236,7 +243,7 @@ class TrDec(nn.Module):
         y = None
       if self.hparams.cuda:
         x = x.cuda()
-      hyp, nll_score = self.translate_sent(x, target_rule_vocab, max_len=max_len, beam_size=beam_size, y_label=y)
+      hyp, nll_score = self.translate_sent(x, target_rule_vocab, max_len=max_len, beam_size=beam_size, y_label=y, poly_norm_m=poly_norm_m)
       #for h in hyp:
       #  print(h.y, h.score)
       hyp = hyp[0]
@@ -249,7 +256,7 @@ class TrDec(nn.Module):
       gc.collect()
     return hyps, scores
 
-  def translate_sent(self, x_train, target_rule_vocab, max_len=100, beam_size=5, y_label=None):
+  def translate_sent(self, x_train, target_rule_vocab, max_len=100, beam_size=5, y_label=None, poly_norm_m=1.):
     assert len(x_train.size()) == 1
     x_len = [x_train.size(0)]
     x_train = x_train.unsqueeze(0)
@@ -279,22 +286,27 @@ class TrDec(nn.Module):
       length += 1
       new_active_hyp = []
       for i, hyp in enumerate(active_hyp):
-        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, mask = self.decoder.step(x_enc, 
+        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_index, mask = self.decoder.step(x_enc, 
           x_enc_k, hyp, target_rule_vocab)
         hyp.rule_hidden = rule_hidden
         hyp.word_hidden = word_hidden
         hyp.rule_ctx_tm1 = rule_ctx 
         hyp.word_ctx_tm1 = word_ctx
 
-        logits.data.masked_fill_(mask, -float("inf"))
-        p_t = F.softmax(logits, -1).data
+        rule_index = set(rule_index)
+        logits = logits.view(-1)
+        p_t = F.log_softmax(logits, dim=0).data
+        #p_t = self.logsoftmax(logits).data
         #new_hyp_scores = (hyp.score + p_t).masked_fill_(mask, -float("inf"))
-        new_hyp_scores = hyp.score + p_t
-        new_hyp_scores = new_hyp_scores.view(-1)
+        if poly_norm_m > 0 and length > 1:
+          new_hyp_scores = (hyp.score * pow(length-1, poly_norm_m) + p_t) / pow(length, poly_norm_m)
+        else:
+          new_hyp_scores = hyp.score + p_t
+        #if num_rule_index >= 0:
+        #  new_hyp_scores.index_fill_(0, rule_index.view(-1), -float("inf"))
         if y_label is not None:
           top_ids = [y_label[length-1][0]]
-          nll = -np.log(p_t[0][top_ids[0]])
-          #nll = logits.data[0][top_ids[0]]
+          nll = -(p_t[top_ids[0]])
           nll_score.append(nll)
         else:
           num_select = beam_size
@@ -302,7 +314,8 @@ class TrDec(nn.Module):
           top_ids = (-new_hyp_scores).cpu().numpy().argsort()[:num_select]
           #print(top_ids)
         for word_id in top_ids:
-          if p_t[0][word_id] == 0: continue
+          #if p_t[word_id] == 0: continue
+          if len(rule_index) > 0 and word_id not in rule_index: continue
           open_nonterms = hyp.open_nonterms[:]
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
@@ -324,7 +337,8 @@ class TrDec(nn.Module):
                     rule_ctx_tm1=hyp.rule_ctx_tm1, 
                     word_ctx_tm1=hyp.word_ctx_tm1,
                     open_nonterms=open_nonterms,
-                    score=new_hyp_scores[word_id])
+                    score=new_hyp_scores[word_id],
+                    c_p=p_t[word_id])
           #print(length, "id", word_id, "score", new_hyp.score)
           #if len(new_hyp.open_nonterms) == 0:
           #  completed_hyp.append(new_hyp)
@@ -335,8 +349,10 @@ class TrDec(nn.Module):
         new_active_hyp = sorted(new_active_hyp, key=lambda x:x.score, reverse=True)[:min(beam_size, live_hyp_num)]
         active_hyp = []
         for hyp  in new_active_hyp:
+          #print(hyp.y, hyp.score, hyp.c_p)
           if len(hyp.open_nonterms) == 0:
-            hyp.score = hyp.score / len(hyp.y)
+            #if poly_norm_m <= 0:
+            #  hyp.score = hyp.score / len(hyp.y)
             completed_hyp.append(hyp)
           else:
             active_hyp.append(hyp)
@@ -348,7 +364,7 @@ class TrDec(nn.Module):
     return sorted(completed_hyp, key=lambda x: x.score, reverse=True), nll_score
 
 class TrHyp(object):
-  def __init__(self, rule_hidden, word_hidden, y, rule_ctx_tm1, word_ctx_tm1, score, open_nonterms):
+  def __init__(self, rule_hidden, word_hidden, y, rule_ctx_tm1, word_ctx_tm1, score, open_nonterms, c_p=0):
     self.rule_hidden = rule_hidden
     self.word_hidden = word_hidden
     # [length_y, 2], each element (index, is_word)
@@ -357,6 +373,7 @@ class TrHyp(object):
     self.word_ctx_tm1 = word_ctx_tm1
     self.score = score
     self.open_nonterms = open_nonterms
+    self.c_p = c_p
 
 class OpenNonterm(object):
   def __init__(self, label, parent_state):
