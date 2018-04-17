@@ -33,6 +33,7 @@ parser.add_argument("--beam_size", type=int, default=5, help="beam size for dev 
 parser.add_argument("--cuda", action="store_true", help="GPU or not")
 
 parser.add_argument("--max_len", type=int, default=300, help="maximum len considered on the target side")
+parser.add_argument("--max_tree_len", type=int, default=300, help="maximum tree sequence len, truncate if exceed")
 parser.add_argument("--n_train_sents", type=int, default=None, help="max number of training sentences to load")
 
 parser.add_argument("--d_word_vec", type=int, default=288, help="size of word and positional embeddings")
@@ -90,7 +91,7 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     out_file = open(valid_hyp_file, 'w', encoding='utf-8')
   while True:
     # clear GPU memory
-    #gc.collect()
+    gc.collect()
 
     # next batch
     ((x_valid, x_mask, x_len, x_count),
@@ -209,6 +210,7 @@ def train():
       source_test=args.source_test,
       target_test=args.target_test,
       max_len=args.max_len,
+      max_tree_len=args.max_tree_len,
       n_train_sents=args.n_train_sents,
       cuda=args.cuda,
       d_word_vec=args.d_word_vec,
@@ -291,10 +293,15 @@ def train():
   target_rules, target_total, target_eos = 0, 0, 0
   total_word_loss, total_rule_loss, total_eos_loss = 0, 0, 0
   model.train()
+  i = 0
   while True:
     ((x_train, x_mask, x_len, x_count),
      (y_train, y_mask, y_len, y_count),
      batch_size) = data.next_train()
+    #print("x_train", x_train.size())
+    #print("y_train", y_train.size())
+    #print(i)
+    #i += 1
     #print("x_train", x_train)
     #print("x_mask", x_mask)
     #print("x_len", x_len)
@@ -336,12 +343,18 @@ def train():
     total_loss += tr_loss.data[0]
     total_corrects += tr_acc.data[0]
     step += 1
-
-    tr_loss.div_(batch_size).backward()
+    #print(tr_loss)
+    #print(tr_loss.div_(batch_size))
+    #time.sleep(10)
+    tr_loss.div_(batch_size)
+    torch.cuda.synchronize()
+    tr_loss.backward()
     grad_norm = torch.nn.utils.clip_grad_norm(model.parameters(), args.clip_grad)
     #grad_norm = 0
     optim.step()
-
+    # clean up GPU memory
+    if step % args.clean_mem_every == 0:
+      gc.collect()
     if step % args.log_every == 0:
       epoch = step // data.n_train_batches
       curr_time = time.time()

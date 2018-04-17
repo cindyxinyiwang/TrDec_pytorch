@@ -26,6 +26,13 @@ class TreeDecoder(nn.Module):
    
     self.word_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
 
+    #self.rule_readout = nn.Linear(hparams.d_model, 
+    #                              self.hparams.target_rule_vocab_size, 
+    #                              bias=False)  
+    #self.word_readout = nn.Linear(hparams.d_model, 
+    #                              self.hparams.target_word_vocab_size, 
+    #                              bias=False)  
+ 
     self.readout = nn.Linear(hparams.d_model, 
                                   self.target_vocab_size, 
                                   bias=False)  
@@ -40,9 +47,11 @@ class TreeDecoder(nn.Module):
     vocab_mask = torch.zeros(1, self.target_vocab_size)
     self.word_vocab_mask = vocab_mask.index_fill_(1, torch.arange(self.hparams.target_word_vocab_size).long(), 1)
     self.rule_vocab_mask = 1 - self.word_vocab_mask
-    #self.word_vocab_mask = Variable(self.word_vocab_mask, requires_grad=False)
-    #self.rule_vocab_mask = Variable(self.rule_vocab_mask, requires_grad=False)
+    #self.word_vocab_mask = self.word_vocab_mask.byte()
+    #self.rule_vocab_mask = self.rule_vocab_mask.byte()
+    #self.rule_zero_pre_input = Variable(torch.zeros(1, hparams.d_word_vec + hparams.d_model * 3), requires_grad=False)
     if self.hparams.cuda:
+      #self.rule_zero_pre_input = self.rule_zero_pre_input.cuda()
       self.rule_vocab_mask = self.rule_vocab_mask.cuda()
       self.word_vocab_mask = self.word_vocab_mask.cuda()
       self.emb = self.emb.cuda()
@@ -51,6 +60,8 @@ class TreeDecoder(nn.Module):
       self.rule_ctx_to_readout = self.rule_ctx_to_readout.cuda()
       self.word_ctx_to_readout = self.word_ctx_to_readout.cuda()
       self.readout = self.readout.cuda()
+      #self.rule_readout = self.rule_readout.cuda()
+      #self.word_readout = self.word_readout.cuda()
       self.rule_lstm_cell = self.rule_lstm_cell.cuda()
       self.word_lstm_cell = self.word_lstm_cell.cuda()
       self.dropout = self.dropout.cuda()
@@ -82,25 +93,24 @@ class TreeDecoder(nn.Module):
     # [batch_size, y_len, d_word_vec]
     trg_emb = self.emb(y_train[:, :, 0])
     logits = []
-    states = [Variable(state_zeros, requires_grad=False)] # (timestep, batch_size, d_model)
+    all_state = Variable(torch.zeros(batch_size, self.hparams.d_model),  requires_grad=False)
     offset = torch.arange(batch_size).long() 
-
     if self.hparams.cuda:
       offset = offset.cuda()
+      all_state = all_state.cuda()
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
 
       state_idx_t = t 
       state_idx_t += 1
-      all_state = torch.cat(states, dim=1).contiguous().view(state_idx_t*batch_size, self.hparams.d_model) # [batch_size*t, d_model]
-      if self.hparams.cuda:
-        all_state = all_state.cuda()
+      #all_state = torch.cat(states, dim=1).contiguous().view(state_idx_t*batch_size, self.hparams.d_model) # [batch_size*t, d_model]
+      #if self.hparams.cuda:
+      #  all_state = all_state.cuda()
       parent_t = y_train.data[:, t, 1] + state_idx_t * offset # [batch_size,]
       parent_t = Variable(parent_t, requires_grad=False)
-      parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
- 
-      #print('paren_t', y_train.data[:, t, 1], 'train_paren', parent_state.data[0][:2])     
-      word_mask = y_train[:, t, 2].unsqueeze(1).expand(-1, self.hparams.d_model).float() # (1 is word, 0 is rule)
+      parent_state = torch.index_select(all_state.view(state_idx_t*batch_size, self.hparams.d_model), dim=0, index=parent_t) # [batch_size, d_model]
+      
+      word_mask = y_train[:, t, 2].unsqueeze(1).float() # (1 is word, 0 is rule)
 
       word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
@@ -108,6 +118,9 @@ class TreeDecoder(nn.Module):
       word_h_t = word_h_t * word_mask + word_hidden[0] * (1-word_mask)
       word_c_t = word_c_t * word_mask + word_hidden[1] * (1-word_mask)
 
+      #rule_pre_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed], dim=1)
+      #rule_pre_input = self.rule_zero_pre_input.expand(batch_size, -1) * word_mask + rule_pre_input * (1-word_mask)
+      #rule_input = torch.cat([rule_pre_input, word_h_t], dim=1)
       rule_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed, word_h_t], dim=1)
       rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
 
@@ -115,27 +128,48 @@ class TreeDecoder(nn.Module):
       word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
 
       inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
-      #print(inp.sum())
-      #print(inp.data[0][:3])
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))
       word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
       
       rule_pre_readout = self.dropout(rule_pre_readout)
       word_pre_readout = self.dropout(word_pre_readout)
-
+      
       rule_score_t = self.readout(rule_pre_readout)
       word_score_t = self.readout(word_pre_readout)
+      m = score_mask[:, t].unsqueeze(1).float().data
+      mask_t = self.word_vocab_mask * (1-m) + self.rule_vocab_mask * m
+      mask_t = mask_t.byte().expand(batch_size, -1)
 
-      m = score_mask[:, t].unsqueeze(1).expand(-1, self.target_vocab_size).float().data
-      mask_t = self.word_vocab_mask.expand(batch_size, -1) * (1-m) + self.rule_vocab_mask.expand(batch_size, -1) * m
-      mask_t = mask_t.byte()
-
-      score_t = torch.ones_like(word_score_t)
       rule_score_t_half = rule_score_t[:, -self.hparams.target_rule_vocab_size:]
       word_score_t_half = word_score_t[:, :self.hparams.target_word_vocab_size]
       score_t = torch.cat([word_score_t_half, rule_score_t_half], dim=1)
       score_t.data.masked_fill_(mask_t, -float('inf'))
 
+      #score_t = []
+      #rule_score_t.data.masked_fill_(self.word_vocab_mask, -float("inf"))
+      #word_score_t.data.masked_fill_(self.rule_vocab_mask, 1)
+      #for i in range(batch_size):
+      #  if score_mask[i, t].data[0]:
+      #    # word
+      #    #print(score_mask[i, t].data[0], 'word')
+      #    word_pre_readout = F.tanh(self.word_ctx_to_readout(inp[i,:]))
+      #    word_pre_readout = self.dropout(word_pre_readout)
+      #    word_score_t = self.rule_readout(rule_pre_readout)
+      #    #word_score_t.data.masked_fill_(self.rule_vocab_mask, 1)
+      #    score_t.append(word_score_t.unsqueeze(0))
+      #    #print("word_score_t", word_score_t.size())
+      #  else:
+      #    #print(score_mask[i, t].data[0], 'rule')
+      #    rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp[i,:]))
+      #    rule_pre_readout = self.dropout(rule_pre_readout)
+      #    rule_score_t = self.word_readout(rule_pre_readout)
+      #    #rule_score_t.data.masked_fill_(self.word_vocab_mask, 1)
+      #    #score_t.append(rule_score_t.unsqueeze(0))
+      #    #print( "rule_score_t", rule_score_t.size())
+      #score_t = torch.cat(score_t, dim=0)
+      #print("score_t dim", score_t.size())
+      #score_t = torch.where(score_mask[:, t].byte().data, word_score_t, rule_score_t)
+      #score_t = word_score_t
       logits.append(score_t)
 
       rule_input_feed = rule_ctx
@@ -144,7 +178,8 @@ class TreeDecoder(nn.Module):
       rule_hidden = (rule_h_t, rule_c_t)
       word_hidden = (word_h_t, word_c_t)
 
-      states.append(rule_h_t)
+      all_state = torch.cat([all_state, rule_h_t], dim=1)
+      #all_state[:,t*self.hparams.d_model:(t+1)*self.hparams.d_model].data = rule_h_t.data
     # [len_y, batch_size, trg_vocab_size]
     logits = torch.stack(logits).transpose(0, 1).contiguous()
     return logits
@@ -164,22 +199,28 @@ class TreeDecoder(nn.Module):
     y_emb_tm1 = self.emb(y_tm1)
     cur_nonterm = open_nonterms[-1]
     parent_state = cur_nonterm.parent_state
+   
+    word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
+    #word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
+    #word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc)
+
     if hyp.y[-1] < self.hparams.target_word_vocab_size:
       # word
       word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
       word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc)
+      #rule_pre_input = self.rule_zero_pre_input
     else:
       word_ctx = hyp.word_ctx_tm1
+      #rule_pre_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed], dim=1)
+
+    #rule_input = torch.cat([rule_pre_input, word_h_t], dim=1)
     rule_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed, word_h_t], dim=1)
     rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
     rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc)
 
     inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
     mask = torch.ones(1, self.target_vocab_size).byte()
-    #print("label", cur_nonterm.label, "trans_paren:", parent_state.data[0][:2])
-    #print(inp.sum().data)
-    #print(inp.data[0][:3])
     if cur_nonterm.label == '*':
       word_index = torch.arange(self.hparams.target_word_vocab_size).long()
       mask.index_fill_(1, word_index, 0)
@@ -187,16 +228,14 @@ class TreeDecoder(nn.Module):
       #word_pre_readout = self.dropout(word_pre_readout)
       score_t = self.readout(word_pre_readout)
       num_rule_index = -1
-      rule_index = []
+      rule_select_index = []
     else:
       rule_with_lhs = target_rule_vocab.rule_index_with_lhs(cur_nonterm.label)
-      #rule_index = torch.LongTensor(rule_with_lhs) + self.hparams.target_word_vocab_size
-      rule_index = []
-      for i in rule_with_lhs: rule_index.append(i + self.hparams.target_word_vocab_size)
+      rule_select_index = []
+      for i in rule_with_lhs: rule_select_index.append(i + self.hparams.target_word_vocab_size)
       num_rule_index = len(rule_with_lhs)
-      #mask.index_fill_(1, rule_index, 0)
-      rule_fill_index = torch.arange(self.hparams.target_rule_vocab_size).long() + self.hparams.target_word_vocab_size
-      mask.index_fill_(1, rule_fill_index, 0)
+      rule_index = torch.arange(self.hparams.target_rule_vocab_size).long() + self.hparams.target_word_vocab_size
+      mask.index_fill_(1, rule_index, 0)
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))  
       #rule_pre_readout = self.dropout(rule_pre_readout)
       score_t = self.readout(rule_pre_readout)
@@ -205,7 +244,7 @@ class TreeDecoder(nn.Module):
     score_t.data.masked_fill_(mask, -float("inf"))
     rule_hidden = (rule_h_t, rule_c_t)
     word_hidden = (word_h_t, word_c_t)
-    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_index, mask
+    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_select_index
 
 class TrDec(nn.Module):
   
@@ -221,9 +260,6 @@ class TrDec(nn.Module):
 
   def forward(self, x_train, x_mask, x_len, y_train, y_mask, y_len, score_mask, y_label=None):
     # [batch_size, x_len, d_model * 2]
-    #print("x_train", x_train)
-    #print("x_mask", x_mask)
-    #print("x_len", x_len)
     x_enc, dec_init = self.encoder(x_train, x_len)
     x_enc_k = self.enc_to_k(x_enc)
     # [batch_size, y_len-1, trg_vocab_size]
@@ -244,8 +280,6 @@ class TrDec(nn.Module):
       if self.hparams.cuda:
         x = x.cuda()
       hyp, nll_score = self.translate_sent(x, target_rule_vocab, max_len=max_len, beam_size=beam_size, y_label=y, poly_norm_m=poly_norm_m)
-      #for h in hyp:
-      #  print(h.y, h.score)
       hyp = hyp[0]
       hyps.append(hyp.y[1:])
       scores.append(sum(nll_score))
@@ -286,7 +320,7 @@ class TrDec(nn.Module):
       length += 1
       new_active_hyp = []
       for i, hyp in enumerate(active_hyp):
-        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_index, mask = self.decoder.step(x_enc, 
+        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_index = self.decoder.step(x_enc, 
           x_enc_k, hyp, target_rule_vocab)
         hyp.rule_hidden = rule_hidden
         hyp.word_hidden = word_hidden
@@ -296,14 +330,10 @@ class TrDec(nn.Module):
         rule_index = set(rule_index)
         logits = logits.view(-1)
         p_t = F.log_softmax(logits, dim=0).data
-        #p_t = self.logsoftmax(logits).data
-        #new_hyp_scores = (hyp.score + p_t).masked_fill_(mask, -float("inf"))
         if poly_norm_m > 0 and length > 1:
           new_hyp_scores = (hyp.score * pow(length-1, poly_norm_m) + p_t) / pow(length, poly_norm_m)
         else:
           new_hyp_scores = hyp.score + p_t
-        #if num_rule_index >= 0:
-        #  new_hyp_scores.index_fill_(0, rule_index.view(-1), -float("inf"))
         if y_label is not None:
           top_ids = [y_label[length-1][0]]
           nll = -(p_t[top_ids[0]])
@@ -312,10 +342,8 @@ class TrDec(nn.Module):
           num_select = beam_size
           if num_rule_index >= 0: num_select = min(num_select, num_rule_index)
           top_ids = (-new_hyp_scores).cpu().numpy().argsort()[:num_select]
-          #print(top_ids)
         for word_id in top_ids:
-          #if p_t[word_id] == 0: continue
-          if len(rule_index) > 0 and word_id not in rule_index: continue
+          if y_label is None and len(rule_index) > 0 and word_id not in rule_index: continue
           open_nonterms = hyp.open_nonterms[:]
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
@@ -339,17 +367,12 @@ class TrDec(nn.Module):
                     open_nonterms=open_nonterms,
                     score=new_hyp_scores[word_id],
                     c_p=p_t[word_id])
-          #print(length, "id", word_id, "score", new_hyp.score)
-          #if len(new_hyp.open_nonterms) == 0:
-          #  completed_hyp.append(new_hyp)
-          #else:
           new_active_hyp.append(new_hyp)
       if y_label is None:
         live_hyp_num = beam_size - len(completed_hyp)
         new_active_hyp = sorted(new_active_hyp, key=lambda x:x.score, reverse=True)[:min(beam_size, live_hyp_num)]
         active_hyp = []
         for hyp  in new_active_hyp:
-          #print(hyp.y, hyp.score, hyp.c_p)
           if len(hyp.open_nonterms) == 0:
             #if poly_norm_m <= 0:
             #  hyp.score = hyp.score / len(hyp.y)

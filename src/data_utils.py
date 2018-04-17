@@ -400,11 +400,11 @@ class DataLoader(object):
     print("{0:>6d} pairs. src_unk={1}. tgt_unk={2}".format(
       total_sents, source_unk_count, target_unk_count))
 
-    if sort:
-      print("Heuristic sort based on source lens")
-      indices = np.argsort(source_lens)
-      source_data = [source_data[index] for index in indices]
-      target_data = [target_data[index] for index in indices]
+    #if sort:
+    #  print("Heuristic sort based on source lens")
+    #  indices = np.argsort(source_lens)
+    #  source_data = [source_data[index] for index in indices]
+    #  target_data = [target_data[index] for index in indices]
 
     return np.array(source_data), np.array(target_data)
 
@@ -487,7 +487,9 @@ class DataLoader(object):
 
     source_data, target_data, trg_tree_data = [], [], []
     source_lens = []
+    trg_tree_lens = []
     total_sents = 0
+    truncate_sents = 0
     source_unk_count, target_unk_count, trg_tree_unk_count = 0, 0, 0
     for i, (source_line, target_line, trg_tree_line) in enumerate(
         zip(source_lines, target_lines, trg_tree_lines)):
@@ -530,6 +532,9 @@ class DataLoader(object):
       trg_tree_indices = np.array(trg_tree_indices)
       trg_tree_indices[:, 1] = np.append(trg_tree_indices[1:, 1], 0) # parent timestep, last one not used
       trg_tree_indices = trg_tree_indices.tolist()
+      if len(trg_tree_indices) > self.hparams.max_tree_len:
+        trg_tree_indices = trg_tree_indices[:self.hparams.max_tree_len]
+        truncate_sents += 1
       #print(trg_tree_indices)
       #exit(0)
       #trg_tree_indices[:, 2] = np.append(trg_tree_indices[1:, 2], 0) # is word, last one not used in training
@@ -547,6 +552,7 @@ class DataLoader(object):
       #assert target_indices[-1] == self.eos_id
 
       source_lens.append(len(source_indices))
+      trg_tree_lens.append(len(trg_tree_indices))
       source_data.append(source_indices)
       target_data.append(target_indices)
       trg_tree_data.append(trg_tree_indices)
@@ -562,10 +568,13 @@ class DataLoader(object):
     assert len(source_data) == len(target_data)
     print("{0:>6d} pairs. src_unk={1}. tgt_unk={2}".format(
       total_sents, source_unk_count, target_unk_count))
-
+    
+    print("truncated sents={}".format(truncate_sents))
     if sort:
       print("Heuristic sort based on source lens")
+      #print("Heuristic sort based on tree lens")
       indices = np.argsort(source_lens)
+      #indices = np.argsort(trg_tree_lens)
       source_data = [source_data[index] for index in indices]
       target_data = [target_data[index] for index in indices]
       trg_tree_data = [trg_tree_data[index] for index in indices]

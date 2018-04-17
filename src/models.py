@@ -230,17 +230,17 @@ class Seq2Seq(nn.Module):
     logits = self.decoder(x_enc, x_enc_k, dec_init, x_mask, y_train, y_mask)
     return logits
 
-  def translate(self, x_train, max_len=100, beam_size=5):
+  def translate(self, x_train, max_len=100, beam_size=5, poly_norm_m=0):
     hyps = []
     for x in x_train:
       x = Variable(torch.LongTensor(x), volatile=True)
       if self.hparams.cuda:
         x = x.cuda()
-      hyp = self.translate_sent(x, max_len=max_len, beam_size=beam_size)[0]
+      hyp = self.translate_sent(x, max_len=max_len, beam_size=beam_size, poly_norm_m=poly_norm_m)[0]
       hyps.append(hyp.y[1:-1])
     return hyps
 
-  def translate_sent(self, x_train, max_len=100, beam_size=5):
+  def translate_sent(self, x_train, max_len=100, beam_size=5, poly_norm_m=0):
     assert len(x_train.size()) == 1
     x_len = [x_train.size(0)]
     x_train = x_train.unsqueeze(0)
@@ -271,7 +271,10 @@ class Seq2Seq(nn.Module):
         hyp.ctx_tm1 = ctx 
 
         p_t = F.log_softmax(logits, -1).data
-        new_hyp_scores = hyp.score + p_t 
+        if poly_norm_m > 0 and length > 1:
+          new_hyp_scores = (hyp.score * pow(length-1, poly_norm_m) + p_t) / pow(length, poly_norm_m)
+        else:
+          new_hyp_scores = hyp.score + p_t 
         #print(new_hyp_scores)
         #print(p_t)
         new_hyp_score_list.append(new_hyp_scores)

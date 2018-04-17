@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import gc
 
 from datetime import datetime
 
@@ -8,6 +9,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.init as init
+
+def memReport():
+  for obj in gc.get_objects():
+    if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+      print(type(obj), obj.size())
 
 def get_criterion(hparams):
   loss_reduce = True 
@@ -20,19 +26,25 @@ def get_criterion(hparams):
 
 def get_performance(crit, logits, labels, hparams, sum_loss=True):
   mask = (labels == hparams.pad_id)
-  loss = crit(logits, labels)
-  _, preds = torch.max(logits, dim=1)
-  acc = torch.eq(preds, labels).int().masked_fill_(mask, 0).sum()
   if hparams.trdec:
     rule_mask = (labels >= hparams.target_word_vocab_size)
     eos_mask = (labels == hparams.eos_id)
     word_mask = (labels < hparams.target_word_vocab_size) ^ eos_mask ^ mask
+
+    #labels = labels - rule_mask.long() * hparams.target_word_vocab_size
+    loss = crit(logits, labels)
+    _, preds = torch.max(logits, dim=1)
+    acc = torch.eq(preds, labels).int().masked_fill_(mask, 0).sum()
+
     rule_loss = loss[rule_mask].sum()
     eos_loss = loss[eos_mask].sum()
     word_loss = loss[word_mask].sum()
     if sum_loss: loss = loss.sum()
     return loss, acc, rule_loss, word_loss, eos_loss, rule_mask.long().sum(), word_mask.long().sum(), eos_mask.long().sum()
   else:
+    loss = crit(logits, labels)
+    _, preds = torch.max(logits, dim=1)
+    acc = torch.eq(preds, labels).int().masked_fill_(mask, 0).sum()
     if sum_loss: loss = loss.sum()
     return loss, acc
 

@@ -110,7 +110,7 @@ if args.trdec:
         beam_size=args.beam_size, max_len=args.max_len, y_label=y_test, poly_norm_m=args.poly_norm_m)
 else:
   hyps = model.translate(
-        x_test, beam_size=args.beam_size, max_len=args.max_len)
+        x_test, beam_size=args.beam_size, max_len=args.max_len, poly_norm_m=args.poly_norm_m)
 
 if args.debug:
   forward_scores = []
