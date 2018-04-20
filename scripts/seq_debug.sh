@@ -26,10 +26,9 @@ python src/main.py \
   --source_vocab="full-vocab.ja" \
   --source_test="kyoto-lseq.lowpiece.ja" \
   --target_test="kyoto-lseq.lowpiece.en" \
-  --batch_size=16 \
+  --batch_size=1 \
   --n_train_sents=200000000 \
   --max_len=10000 \
-  --max_tree_len=500 \
   --n_train_steps=80000 \
   --seed 0 \
   --cuda \
