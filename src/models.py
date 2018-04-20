@@ -163,35 +163,29 @@ class Decoder(nn.Module):
     batch_size_x = x_enc.size()[0]
     batch_size, y_max_len = y_train.size()
     assert batch_size_x == batch_size
-    #print(y_train)
     hidden = dec_init 
-    #x_enc_k = self.enc_to_k(x_enc.contiguous().view(-1, self.hparams.d_model * 2)).contiguous().view(batch_size, -1, self.hparams.d_model)
     input_feed = Variable(torch.zeros(batch_size, self.hparams.d_model * 2), requires_grad=False)
     #input_feed = Variable(dec_init[1][1].data.new(batch_size, self.hparams.d_model).zero_(), requires_grad=False)
     if self.hparams.cuda:
       input_feed = input_feed.cuda()
     # [batch_size, y_len, d_word_vec]
     trg_emb = self.word_emb(y_train)
+    pre_readouts = []
     logits = []
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
       y_input = torch.cat([y_emb_tm1, input_feed], dim=1)
       
       h_t, c_t = self.layer(y_input, hidden)
-      #print(y_input.size())
-      #print(h_t.size())
-      #print(c_t.size())
       ctx = self.attention(h_t, x_enc_k, x_enc, attn_mask=x_mask)
       pre_readout = F.tanh(self.ctx_to_readout(torch.cat([h_t, ctx], dim=1)))
       pre_readout = self.dropout(pre_readout)
-
-      score_t = self.readout(pre_readout)
-      logits.append(score_t)
+      pre_readouts.append(pre_readout)
 
       input_feed = ctx
       hidden = (h_t, c_t)
     # [len_y, batch_size, trg_vocab_size]
-    logits = torch.stack(logits).transpose(0, 1).contiguous()
+    logits = self.readout(torch.stack(pre_readouts)).transpose(0, 1).contiguous()
     return logits
 
   def step(self, x_enc, x_enc_k, y_tm1, dec_state, ctx_t):

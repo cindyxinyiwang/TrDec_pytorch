@@ -293,7 +293,7 @@ def train():
   target_rules, target_total, target_eos = 0, 0, 0
   total_word_loss, total_rule_loss, total_eos_loss = 0, 0, 0
   model.train()
-  i = 0
+  #i = 0
   while True:
     ((x_train, x_mask, x_len, x_count),
      (y_train, y_mask, y_len, y_count),
@@ -347,7 +347,7 @@ def train():
     #print(tr_loss.div_(batch_size))
     #time.sleep(10)
     tr_loss.div_(batch_size)
-    torch.cuda.synchronize()
+    #torch.cuda.synchronize()
     tr_loss.backward()
     grad_norm = torch.nn.utils.clip_grad_norm(model.parameters(), args.clip_grad)
     #grad_norm = 0

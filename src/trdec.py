@@ -26,13 +26,6 @@ class TreeDecoder(nn.Module):
    
     self.word_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
 
-    #self.rule_readout = nn.Linear(hparams.d_model, 
-    #                              self.hparams.target_rule_vocab_size, 
-    #                              bias=False)  
-    #self.word_readout = nn.Linear(hparams.d_model, 
-    #                              self.hparams.target_word_vocab_size, 
-    #                              bias=False)  
- 
     self.readout = nn.Linear(hparams.d_model, 
                                   self.target_vocab_size, 
                                   bias=False)  
@@ -44,14 +37,13 @@ class TreeDecoder(nn.Module):
                              hparams.d_model)
     self.dropout = nn.Dropout(hparams.dropout)
 
-    vocab_mask = torch.zeros(1, self.target_vocab_size)
-    self.word_vocab_mask = vocab_mask.index_fill_(1, torch.arange(self.hparams.target_word_vocab_size).long(), 1)
+    vocab_mask = torch.zeros(1, 1, self.target_vocab_size)
+    self.word_vocab_mask = vocab_mask.index_fill_(2, torch.arange(self.hparams.target_word_vocab_size).long(), 1)
     self.rule_vocab_mask = 1 - self.word_vocab_mask
     #self.word_vocab_mask = self.word_vocab_mask.byte()
     #self.rule_vocab_mask = self.rule_vocab_mask.byte()
     #self.rule_zero_pre_input = Variable(torch.zeros(1, hparams.d_word_vec + hparams.d_model * 3), requires_grad=False)
     if self.hparams.cuda:
-      #self.rule_zero_pre_input = self.rule_zero_pre_input.cuda()
       self.rule_vocab_mask = self.rule_vocab_mask.cuda()
       self.word_vocab_mask = self.word_vocab_mask.cuda()
       self.emb = self.emb.cuda()
@@ -60,8 +52,6 @@ class TreeDecoder(nn.Module):
       self.rule_ctx_to_readout = self.rule_ctx_to_readout.cuda()
       self.word_ctx_to_readout = self.word_ctx_to_readout.cuda()
       self.readout = self.readout.cuda()
-      #self.rule_readout = self.rule_readout.cuda()
-      #self.word_readout = self.word_readout.cuda()
       self.rule_lstm_cell = self.rule_lstm_cell.cuda()
       self.word_lstm_cell = self.word_lstm_cell.cuda()
       self.dropout = self.dropout.cuda()
@@ -93,6 +83,8 @@ class TreeDecoder(nn.Module):
     # [batch_size, y_len, d_word_vec]
     trg_emb = self.emb(y_train[:, :, 0])
     logits = []
+    rule_pre_readouts = []
+    word_pre_readouts = []
     all_state = Variable(torch.zeros(batch_size, self.hparams.d_model),  requires_grad=False)
     offset = torch.arange(batch_size).long() 
     if self.hparams.cuda:
@@ -109,6 +101,7 @@ class TreeDecoder(nn.Module):
       parent_t = y_train.data[:, t, 1] + state_idx_t * offset # [batch_size,]
       parent_t = Variable(parent_t, requires_grad=False)
       parent_state = torch.index_select(all_state.view(state_idx_t*batch_size, self.hparams.d_model), dim=0, index=parent_t) # [batch_size, d_model]
+      #parent_state = torch.index_select(all_state, dim=0, index=parent_t) # [batch_size, d_model]
       
       word_mask = y_train[:, t, 2].unsqueeze(1).float() # (1 is word, 0 is rule)
 
@@ -118,9 +111,6 @@ class TreeDecoder(nn.Module):
       word_h_t = word_h_t * word_mask + word_hidden[0] * (1-word_mask)
       word_c_t = word_c_t * word_mask + word_hidden[1] * (1-word_mask)
 
-      #rule_pre_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed], dim=1)
-      #rule_pre_input = self.rule_zero_pre_input.expand(batch_size, -1) * word_mask + rule_pre_input * (1-word_mask)
-      #rule_input = torch.cat([rule_pre_input, word_h_t], dim=1)
       rule_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed, word_h_t], dim=1)
       rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
 
@@ -134,43 +124,19 @@ class TreeDecoder(nn.Module):
       rule_pre_readout = self.dropout(rule_pre_readout)
       word_pre_readout = self.dropout(word_pre_readout)
       
-      rule_score_t = self.readout(rule_pre_readout)
-      word_score_t = self.readout(word_pre_readout)
-      m = score_mask[:, t].unsqueeze(1).float().data
-      mask_t = self.word_vocab_mask * (1-m) + self.rule_vocab_mask * m
-      mask_t = mask_t.byte().expand(batch_size, -1)
+      rule_pre_readouts.append(rule_pre_readout)
+      word_pre_readouts.append(word_pre_readout)
+      #rule_score_t = self.readout(rule_pre_readout)
+      #word_score_t = self.readout(word_pre_readout)
+      #m = score_mask[:, t].unsqueeze(1).float().data
+      #mask_t = self.word_vocab_mask * (1-m) + self.rule_vocab_mask * m
+      #mask_t = mask_t.byte().expand(batch_size, -1)
 
-      rule_score_t_half = rule_score_t[:, -self.hparams.target_rule_vocab_size:]
-      word_score_t_half = word_score_t[:, :self.hparams.target_word_vocab_size]
-      score_t = torch.cat([word_score_t_half, rule_score_t_half], dim=1)
-      score_t.data.masked_fill_(mask_t, -float('inf'))
-
-      #score_t = []
-      #rule_score_t.data.masked_fill_(self.word_vocab_mask, -float("inf"))
-      #word_score_t.data.masked_fill_(self.rule_vocab_mask, 1)
-      #for i in range(batch_size):
-      #  if score_mask[i, t].data[0]:
-      #    # word
-      #    #print(score_mask[i, t].data[0], 'word')
-      #    word_pre_readout = F.tanh(self.word_ctx_to_readout(inp[i,:]))
-      #    word_pre_readout = self.dropout(word_pre_readout)
-      #    word_score_t = self.rule_readout(rule_pre_readout)
-      #    #word_score_t.data.masked_fill_(self.rule_vocab_mask, 1)
-      #    score_t.append(word_score_t.unsqueeze(0))
-      #    #print("word_score_t", word_score_t.size())
-      #  else:
-      #    #print(score_mask[i, t].data[0], 'rule')
-      #    rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp[i,:]))
-      #    rule_pre_readout = self.dropout(rule_pre_readout)
-      #    rule_score_t = self.word_readout(rule_pre_readout)
-      #    #rule_score_t.data.masked_fill_(self.word_vocab_mask, 1)
-      #    #score_t.append(rule_score_t.unsqueeze(0))
-      #    #print( "rule_score_t", rule_score_t.size())
-      #score_t = torch.cat(score_t, dim=0)
-      #print("score_t dim", score_t.size())
-      #score_t = torch.where(score_mask[:, t].byte().data, word_score_t, rule_score_t)
-      #score_t = word_score_t
-      logits.append(score_t)
+      #rule_score_t_half = rule_score_t[:, -self.hparams.target_rule_vocab_size:]
+      #word_score_t_half = word_score_t[:, :self.hparams.target_word_vocab_size]
+      #score_t = torch.cat([word_score_t_half, rule_score_t_half], dim=1)
+      #score_t.data.masked_fill_(mask_t, -float('inf'))
+      #logits.append(score_t)
 
       rule_input_feed = rule_ctx
       word_input_feed = word_ctx
@@ -181,7 +147,14 @@ class TreeDecoder(nn.Module):
       all_state = torch.cat([all_state, rule_h_t], dim=1)
       #all_state[:,t*self.hparams.d_model:(t+1)*self.hparams.d_model].data = rule_h_t.data
     # [len_y, batch_size, trg_vocab_size]
-    logits = torch.stack(logits).transpose(0, 1).contiguous()
+    rule_readouts = self.readout(torch.stack(rule_pre_readouts))[:,:,-self.hparams.target_rule_vocab_size:]
+    word_readouts = self.readout(torch.stack(word_pre_readouts))[:,:,:self.hparams.target_word_vocab_size]
+    # [batch_size, len_y, trg_vocab_size]
+    logits = torch.cat([word_readouts, rule_readouts], dim=2).transpose(0, 1).contiguous()
+    score_mask = score_mask.unsqueeze(2).float().data
+    mask_t = self.word_vocab_mask * (1-score_mask) + self.rule_vocab_mask * score_mask
+    logits.data.masked_fill_(mask_t.byte(), -float("inf"))
+    #logits = self.readout(torch.stack(rule_pre_readouts)).transpose(0, 1).contiguous()
     return logits
 
   def step(self, x_enc, x_enc_k, hyp, target_rule_vocab):
