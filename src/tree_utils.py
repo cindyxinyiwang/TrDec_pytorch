@@ -677,6 +677,13 @@ def remove_preterminal_POS(root):
       root.children[i] = c.children[0]
     else:
       remove_preterminal_POS(c)
+def remove_lhs(root, label):
+  ''' replace all lhs with the label '''
+  root.label = label 
+  for i, c in enumerate(root.children):
+    if not hasattr(c, 'is_preterminal'): continue
+    if not c.is_preterminal():
+      remove_lhs(c, label)
 def replace_POS(root):
   ''' simply replace POS with * '''
   for i, c in enumerate(root.children):

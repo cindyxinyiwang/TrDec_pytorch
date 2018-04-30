@@ -12,12 +12,13 @@ import time
 
 import numpy as np
 
-#DATA_PATH = "/projects/tir2/users/xinyiw1/kftt-data-1.0/data/tok/"
-#INP_NAMES = ["kyoto-train.lowpiece.en", "kyoto-train.lowpiece.ja"]
-#OUT_NAMES = ["full-vocab.en", "full-vocab.ja"]
-DATA_PATH = "data/orm_data/"
-INP_NAMES = ["set0-trainunfilt.tok.piece.eng", "set0-trainunfilt.tok.piece.orm"]
-OUT_NAMES = ["vocab.eng", "vocab.orm"]
+DATA_PATH = "/projects/tir2/users/xinyiw1/kftt-data-1.0/data/tok/"
+INP_NAMES = ["kyoto-train.interleave.en.filt"]
+OUT_NAMES = ["full-vocab.ccg.en"]
+#DATA_PATH = "data/orm_data/"
+#DATA_PATH = "/projects/tir2/users/xinyiw1/loreili/orm-eng/data/"
+#INP_NAMES = ["set0-trainunfilt.interleave.eng"]
+#OUT_NAMES = ["vocab.ccg.eng"]
 
 
 def main():

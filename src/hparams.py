@@ -22,5 +22,6 @@ class HParams(object):
     self.tiny = 0.
     self.inf = float("inf")
 
+
   def add_param(self, name, value):
     setattr(self, name, value)
