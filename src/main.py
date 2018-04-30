@@ -70,6 +70,8 @@ parser.add_argument("--seed", type=int, default=19920206, help="random seed")
 parser.add_argument("--init_range", type=float, default=0.1, help="L2 init range")
 parser.add_argument("--init_type", type=str, default="uniform", help="uniform|xavier_uniform|xavier_normal|kaiming_uniform|kaiming_normal")
 
+parser.add_argument("--loss_type", type=str, default="total", help="total|rule|word")
+
 args = parser.parse_args()
 def eval(model, data, crit, step, hparams, eval_bleu=False,
          valid_batch_size=20, tr_logits=None):
@@ -343,14 +345,16 @@ def train():
     total_loss += tr_loss.data[0]
     total_corrects += tr_acc.data[0]
     step += 1
-    #print(tr_loss)
-    #print(tr_loss.div_(batch_size))
-    #time.sleep(10)
-    tr_loss.div_(batch_size)
-    #torch.cuda.synchronize()
-    tr_loss.backward()
+    if args.trdec and args.loss_type == "rule":
+      rule_loss.div_(batch_size)
+      rule_loss.backward()
+    elif args.trdec and args.loss_type == "word":
+      word_loss.div_(batch_size)
+      word_loss.backward()
+    else:
+      tr_loss.div_(batch_size)
+      tr_loss.backward()
     grad_norm = torch.nn.utils.clip_grad_norm(model.parameters(), args.clip_grad)
-    #grad_norm = 0
     optim.step()
     # clean up GPU memory
     if step % args.clean_mem_every == 0:
