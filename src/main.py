@@ -20,6 +20,9 @@ from trdec import *
 parser = argparse.ArgumentParser(description="Neural MT")
 
 parser.add_argument("--trdec", action="store_true", help="use the trdec model")
+parser.add_argument("--parent_feed",type=int, default=1, help="whether to enable input feeding [0|1]")
+parser.add_argument("--rule_parent_feed",type=int, default=1, help="whether to enable input feeding for rules [0|1]")
+parser.add_argument("--attn",type=str, default="mlp", help="type of attention layer [mlp|dot_prod]")
 
 parser.add_argument("--load_model", action="store_true", help="load an existing model")
 parser.add_argument("--reset_output_dir", action="store_true", help="delete output directory if it exists")
@@ -32,8 +35,8 @@ parser.add_argument("--beam_size", type=int, default=5, help="beam size for dev 
 
 parser.add_argument("--cuda", action="store_true", help="GPU or not")
 
-parser.add_argument("--max_len", type=int, default=300, help="maximum len considered on the target side")
-parser.add_argument("--max_tree_len", type=int, default=300, help="maximum tree sequence len, truncate if exceed")
+parser.add_argument("--max_len", type=int, default=10000, help="maximum len considered on the target side")
+parser.add_argument("--max_tree_len", type=int, default=10000, help="maximum tree sequence len, truncate if exceed")
 parser.add_argument("--n_train_sents", type=int, default=None, help="max number of training sentences to load")
 
 parser.add_argument("--d_word_vec", type=int, default=288, help="size of word and positional embeddings")
@@ -55,6 +58,10 @@ parser.add_argument("--target_tree_valid", type=str, default=None, help="target 
 parser.add_argument("--target_tree_test", type=str, default=None, help="target test file")
 parser.add_argument("--target_tree_vocab", type=str, default=None, help="target rule vocab file")
 parser.add_argument("--target_word_vocab", type=str, default=None, help="target word vocab file")
+parser.add_argument("--max_tree_depth", type=int, default=0, help="maximum tree depth. 0 if not set.")
+parser.add_argument("--no_lhs", action="store_true", help="use only two tags to represent open non terminal")
+parser.add_argument("--pos", type=int, default=0, help="preserve pos tag on trees or not")
+parser.add_argument("--root_label", type=str, default="ROOT", help="name of the nonterminal to start a tree")
 
 parser.add_argument("--batch_size", type=int, default=32, help="batch_size")
 parser.add_argument("--batcher", type=str, default="sent", help="sent|word. Batch either by number of words or number of sentences")
@@ -70,10 +77,17 @@ parser.add_argument("--seed", type=int, default=19920206, help="random seed")
 parser.add_argument("--init_range", type=float, default=0.1, help="L2 init range")
 parser.add_argument("--init_type", type=str, default="uniform", help="uniform|xavier_uniform|xavier_normal|kaiming_uniform|kaiming_normal")
 
+parser.add_argument("--label_smooth", type=float, default=0, help="label smoothing, float from (0,1)")
+parser.add_argument("--raml_tau", type=float, default=0.9, help="temperature for raml")
+parser.add_argument("--raml_rule", action="store_true", help="use raml for rules")
+
+parser.add_argument("--single_readout", action="store_true", help="use only one Mlp for readout")
+parser.add_argument("--single_attn", action="store_true", help="use only one Mlp for attention")
+parser.add_argument("--share_emb_softmax", action="store_true", help="weight tieing")
 args = parser.parse_args()
 def eval(model, data, crit, step, hparams, eval_bleu=False,
          valid_batch_size=20, tr_logits=None):
-  valid_batch_size = 7
+  valid_batch_size = 2
   print("Eval at step {0}. valid_batch_size={1}".format(step, valid_batch_size))
 
   model.eval()
@@ -220,6 +234,7 @@ def train():
       n_train_steps=args.n_train_steps,
       dropout=args.dropout,
       lr=args.lr,
+      lr_dec=args.lr_dec,
       init_type=args.init_type,
       init_range=args.init_range,
       trdec=args.trdec,
@@ -228,6 +243,19 @@ def train():
       target_tree_train=args.target_tree_train,
       target_tree_valid=args.target_tree_valid,
       target_tree_test=args.target_tree_test,
+      max_tree_depth=args.max_tree_depth,
+      parent_feed=args.parent_feed,
+      rule_parent_feed=args.rule_parent_feed,
+      label_smooth=args.label_smooth,
+      raml_rule=args.raml_rule,
+      raml_tau=args.raml_tau,
+      no_lhs=args.no_lhs,
+      root_label=args.root_label,
+      single_readout=args.single_readout,
+      single_attn=args.single_attn,
+      pos=args.pos,
+      share_emb_softmax=args.share_emb_softmax,
+      attn=args.attn,
     )
   data = DataLoader(hparams=hparams)
   hparams.add_param("source_vocab_size", data.source_vocab_size)
@@ -273,7 +301,6 @@ def train():
       p for p in model.parameters() if p.requires_grad]
     optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
     #optim = torch.optim.Adam(trainable_params)
-
     step = 0
     best_val_ppl = 1e10
     best_val_bleu = 0

@@ -12,6 +12,7 @@ import time
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+import torch.nn.functional as F
 from tree_utils import *
 
 import numpy as np
@@ -237,7 +238,7 @@ class DataLoader(object):
       sentences=x_train, pad_id=self.pad_id)
     if self.hparams.trdec:
       y_train, y_mask, y_len, y_count, y_count_rule, y_count_word, y_count_eos = self._pad_tree(
-        sentences=y_train, pad_id=self.pad_id)
+        sentences=y_train, pad_id=self.pad_id, raml_rule=self.hparams.raml_rule)
       y_count = (y_count, y_count_rule, y_count_word, y_count_eos)
     else:
       y_train, y_mask, y_len, y_count = self._pad(
@@ -292,14 +293,14 @@ class DataLoader(object):
     if self.hparams.cuda:
       padded_sentences = padded_sentences.cuda()
       mask = mask.cuda()
-      #l = l.cuda()
 
     return padded_sentences, mask, lengths, sum_len
 
-  def _pad_tree(self, sentences, pad_id, volatile=False):
+  def _pad_tree(self, sentences, pad_id, volatile=False, raml_rule=False):
     lengths = [len(sentence) for sentence in sentences]
     sum_len = sum(lengths)
     max_len = max(lengths)
+    batch_size = len(lengths)
     
     item_size = len(sentences[0][0])
     padded_sentences = [
@@ -313,7 +314,8 @@ class DataLoader(object):
     mask = torch.ByteTensor(mask)
 
     num_padding = (padded_sentences[:,:,0] == pad_id).long().sum()
-    num_rule = (padded_sentences[:,:,0] >= self.target_word_vocab_size).long().sum()
+    rule_mask = (padded_sentences[:,:,0] >= self.target_word_vocab_size)
+    num_rule = rule_mask.long().sum()
     #print(num_rule)
     num_eos = (padded_sentences[:,:,0] == self.hparams.eos_id).long().sum()
     num_word = sum_len - num_rule.data[0] - num_eos.data[0]
@@ -324,8 +326,51 @@ class DataLoader(object):
     if self.hparams.cuda:
       padded_sentences = padded_sentences.cuda()
       mask = mask.cuda()
-      #l = l.cuda()
+    if not raml_rule:
+      return padded_sentences, mask, lengths, sum_len, num_rule.data[0], num_word, num_eos.data[0]
 
+    # sample the number of words to corrupt
+    logits = torch.arange(max_len)
+    rule_len = rule_mask.long().sum(dim=1).unsqueeze(1)
+    rule_len_data = rule_len.data.cpu().numpy().tolist()
+    #print(rule_len_data)
+    rule_len_mask = [([0] * rule_len_data[i][0] + [1] * (max_len - rule_len_data[i][0])) for i in range(len(rule_len_data))]
+    #print(rule_len_mask)
+    rule_len_mask = torch.ByteTensor(rule_len_mask)
+    if self.hparams.cuda:
+      logits = logits.cuda()
+      rule_len_mask = rule_len_mask.cuda()
+      rule_len = rule_len.cuda()
+      rule_mask = rule_mask.cuda()
+    logits = logits.mul_(-1).unsqueeze(0).expand_as(padded_sentences[:,:,0]).contiguous().masked_fill_(rule_len_mask, -float("inf")) 
+    logits = Variable(logits, volatile=True)
+    if self.hparams.cuda:
+      logits = logits.cuda()
+    probs = F.softmax(logits.mul_(self.hparams.raml_tau), dim=1)
+    num_words = torch.distributions.Categorical(probs).sample()
+    # sample the rule indices
+    corrupt_pos = num_words.data.float().div_(rule_len.float().data).unsqueeze(1).expand_as(padded_sentences[:,:,0]).contiguous().masked_fill_(~rule_mask.data, 0)
+    corrupt_pos = torch.bernoulli(corrupt_pos, out=corrupt_pos).byte()
+    total_words = int(corrupt_pos.sum())
+
+    corrupt_val = torch.LongTensor(total_words).random_(self.target_word_vocab_size, self.target_word_vocab_size+self.target_rule_vocab_size)
+    corrupts = torch.zeros(batch_size, max_len).long()
+    if self.hparams.cuda:
+      corrupt_val = corrupt_val.long().cuda()
+      corrupts = corrupts.cuda()
+      corrupt_pos = corrupt_pos.cuda()
+    #corrupts = corrupts.masked_scatter_(corrupt_pos, corrupt_val)
+    #print(padded_sentences[:,:,0].masked_select(Variable(corrupt_pos)))
+    padded_sentences[:,:,0].data.masked_scatter_(corrupt_pos, corrupt_val)
+    #sampled_sentences = padded_sentences[:,:,0] - Variable(corrupt_pos.long())*self.target_word_vocab_size
+    #sampled_sentences.add_(Variable(corrupts)).remainder_(self.target_rule_vocab_size)
+    #sampled_sentences.add_(Variable(corrupt_pos.long())*self.target_word_vocab_size)
+    #sampled_sentences.masked_fill_(Variable(mask), pad_id)
+    #print(sampled_sentences)
+    #print(padded_sentences[:,:,0].masked_select(Variable(corrupt_pos)))
+    #print(corrupt_pos)
+    #print(corrupt_val)
+    #exit(0)
     return padded_sentences, mask, lengths, sum_len, num_rule.data[0], num_word, num_eos.data[0]
 
   def _build_parallel(self, source_file, target_file, is_training, sort=False):
@@ -522,10 +567,16 @@ class DataLoader(object):
 
       # Process tree
       tree = Tree(parse_root(tokenize(trg_tree_line)))
-      remove_preterminal_POS(tree.root)
+      if self.hparams.pos == 0:
+        remove_preterminal_POS(tree.root)
+      if self.hparams.max_tree_depth > 0:
+        merge_depth(tree.root, self.hparams.max_tree_depth, 0)
       pieces = sent_piece_segs(target_line)
       split_sent_piece(tree.root, pieces, 0)
       add_preterminal_wordswitch(tree.root, add_eos=True)
+      if self.hparams.no_lhs:
+        remove_lhs(tree.root, self.hparams.root_label)
+        tree.root.label = 'XXX'
       tree.reset_timestep()
       trg_tree_indices = tree.get_data_root(self.target_tree_vocab, self.target_word_vocab) # (len_y, 3)
       trg_tree_indices = [[self.bos_id, 0, 1]] + trg_tree_indices

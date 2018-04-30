@@ -30,7 +30,6 @@ class MlpAttn(nn.Module):
     att_src_hidden = nn.functional.tanh(k + self.w_trg(q).unsqueeze(1))
     # (batch_size, len_k)
     att_src_weights = self.w_att(att_src_hidden).squeeze(2)
-    #att_src_weights = self.w_att(att_src_hidden.view(-1, d_k)).view(batch_size, len_v)
     if not attn_mask is None:
       att_src_weights.data.masked_fill_(attn_mask, -self.hparams.inf)
     att_src_weights = F.softmax(att_src_weights, dim=-1)
@@ -117,16 +116,14 @@ class Encoder(nn.Module):
     x_train = x_train.transpose(0, 1)
     # [batch_size, max_len, d_word_vec]
     word_emb = self.word_emb(x_train)
-    #word_emb = self.dropout(word_emb)
+    word_emb = self.dropout(word_emb)
     packed_word_emb = pack_padded_sequence(word_emb, x_len)
     enc_output, (ht, ct) = self.layer(packed_word_emb)
-    #enc_output, (ht, ct) = self.layer(word_emb)
     enc_output, _ = pad_packed_sequence(enc_output,  padding_value=self.hparams.pad_id)
     enc_output = enc_output.permute(1, 0, 2)
 
     dec_init_cell = self.bridge(torch.cat([ct[0], ct[1]], 1))
     dec_init_state = F.tanh(dec_init_cell)
-    #dec_init_state = self.bridge(torch.cat([ht[0], ht[1]], 1))
     dec_init = (dec_init_state, dec_init_cell)
     return enc_output, dec_init
 
