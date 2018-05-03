@@ -140,6 +140,12 @@ class TreeDecoder(nn.Module):
         rule_input = torch.cat([y_emb_tm1, rule_input_feed, word_h_t], dim=1)
       rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
 
+      if hasattr(self.hparams, "no_word_to_rule") and self.hparams.no_word_to_rule:
+        eos_mask = (y_train[:, t, 0] == self.hparams.eos_id).unsqueeze(1).float()
+        word_mask = word_mask - eos_mask
+        rule_h_t = rule_h_t * (1-word_mask) + rule_hidden[0] * word_mask
+        rule_c_t = rule_c_t * (1-word_mask) + rule_hidden[1] * word_mask
+
       if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
         rule_ctx = self.attention(rule_h_t, x_enc_k, x_enc, attn_mask=x_mask)
         word_ctx = self.attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
@@ -217,15 +223,24 @@ class TreeDecoder(nn.Module):
         word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc)
     else:
       word_ctx = hyp.word_ctx_tm1
-    if self.hparams.rule_parent_feed:
-      rule_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed, word_h_t], dim=1)
+
+    update_rule_rnn = True
+    if hasattr(self.hparams, "no_word_to_rule") and self.hparams.no_word_to_rule and hyp.y[-1] < self.hparams.target_word_vocab_size:
+      if hyp.y[-1] != self.hparams.eos_id:
+        update_rule_rnn = False
+
+    if update_rule_rnn:
+      if self.hparams.rule_parent_feed:
+        rule_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed, word_h_t], dim=1)
+      else:
+        rule_input = torch.cat([y_emb_tm1, rule_input_feed, word_h_t], dim=1)
+      rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
+      if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
+        rule_ctx = self.attention(rule_h_t, x_enc_k, x_enc)
+      else:
+        rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc)
     else:
-      rule_input = torch.cat([y_emb_tm1, rule_input_feed, word_h_t], dim=1)
-    rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
-    if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
-      rule_ctx = self.attention(rule_h_t, x_enc_k, x_enc)
-    else:
-      rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc)
+      rule_ctx = hyp.rule_ctx_tm1
 
     inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
     mask = torch.ones(1, self.target_vocab_size).byte()

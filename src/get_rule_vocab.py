@@ -3,9 +3,9 @@ from tree_utils import *
 from hparams import HParams
 
 piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
-tree_file = "data/orm_data/set0-trainunfilt.tok.eng.tri"
-rule_vocab_file = "data/orm_data/vocab.tri_rule.eng"
-word_vocab_file = "data/orm_data/vocab.tri_word.eng"
+tree_file = "data/orm_data/set0-trainunfilt.tok.eng.random_bina"
+rule_vocab_file = "data/orm_data/vocab.random_bina_rule.eng"
+word_vocab_file = "data/orm_data/vocab.random_bina_word.eng"
 #
 #piece_file = "data/kftt_data/kyoto-train.lowpiece.en"
 #tree_file = "data/kftt_data/kyoto-train.lower.en.bina"
