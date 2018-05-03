@@ -12,12 +12,12 @@ python3.6 src/translate.py \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
   --target_tree_test="set0-test.tok.eng.random_bina" \
-  --beam_size=20 \
+  --beam_size=10 \
   --max_len=500 \
   --n_train_sents=10000 \
   --merge_bpe \
   --poly_norm_m=1 \
-  --out_file="beam20_m1" \
+  --out_file="beam10_m1" \
   --max_tree_len=3000 \
   --no_lhs \
   --pos=1 \
@@ -35,12 +35,12 @@ python3.6 src/translate.py \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
   --target_tree_test="set0-test.tok.eng.random_bina" \
-  --beam_size=20 \
+  --beam_size=10 \
   --max_len=500 \
   --n_train_sents=10000 \
   --merge_bpe \
   --poly_norm_m=1 \
-  --out_file="beam20_m1" \
+  --out_file="beam10_m1" \
   --max_tree_len=3000 \
   --no_lhs \
   --pos=1 \
@@ -57,12 +57,12 @@ python3.6 src/translate.py \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
   --target_tree_test="set0-test.tok.eng.random_bina" \
-  --beam_size=20 \
+  --beam_size=10 \
   --max_len=500 \
   --n_train_sents=10000 \
   --merge_bpe \
   --poly_norm_m=1 \
-  --out_file="beam20_m1" \
+  --out_file="beam10_m1" \
   --max_tree_len=3000 \
   --no_lhs \
   --pos=1 \
@@ -80,12 +80,12 @@ python3.6 src/translate.py \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
   --target_tree_test="set0-test.tok.eng.random_bina" \
-  --beam_size=20 \
+  --beam_size=10 \
   --max_len=500 \
   --n_train_sents=10000 \
   --merge_bpe \
   --poly_norm_m=1 \
-  --out_file="beam20_m1" \
+  --out_file="beam10_m1" \
   --max_tree_len=3000 \
   --no_lhs \
   --pos=1 \
@@ -103,12 +103,12 @@ python3.6 src/translate.py \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
   --target_tree_test="set0-test.tok.eng.random_bina" \
-  --beam_size=20 \
+  --beam_size=10 \
   --max_len=500 \
   --n_train_sents=10000 \
   --merge_bpe \
   --poly_norm_m=1 \
-  --out_file="beam20_m1" \
+  --out_file="beam10_m1" \
   --max_tree_len=3000 \
   --no_lhs \
   --pos=1 \
@@ -126,12 +126,12 @@ python3.6 src/translate.py \
   --source_test="set0-test.tok.piece.orm" \
   --target_test="set0-test.tok.piece.eng" \
   --target_tree_test="set0-test.tok.eng.random_bina" \
-  --beam_size=20 \
+  --beam_size=10 \
   --max_len=500 \
   --n_train_sents=10000 \
   --merge_bpe \
   --poly_norm_m=1 \
-  --out_file="beam20_m1" \
+  --out_file="beam10_m1" \
   --max_tree_len=3000 \
   --no_lhs \
   --pos=1 \

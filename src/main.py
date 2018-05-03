@@ -77,6 +77,8 @@ parser.add_argument("--seed", type=int, default=19920206, help="random seed")
 parser.add_argument("--init_range", type=float, default=0.1, help="L2 init range")
 parser.add_argument("--init_type", type=str, default="uniform", help="uniform|xavier_uniform|xavier_normal|kaiming_uniform|kaiming_normal")
 
+parser.add_argument("--loss_type", type=str, default="total", help="total|rule|word")
+
 parser.add_argument("--label_smooth", type=float, default=0, help="label smoothing, float from (0,1)")
 parser.add_argument("--raml_tau", type=float, default=0.9, help="temperature for raml")
 parser.add_argument("--raml_rule", action="store_true", help="use raml for rules")
@@ -84,7 +86,10 @@ parser.add_argument("--raml_rule", action="store_true", help="use raml for rules
 parser.add_argument("--single_readout", action="store_true", help="use only one Mlp for readout")
 parser.add_argument("--single_attn", action="store_true", help="use only one Mlp for attention")
 parser.add_argument("--share_emb_softmax", action="store_true", help="weight tieing")
+parser.add_argument("--reset_hparams", action="store_true", help="whether to reload the hparams")
+parser.add_argument("--no_word_to_rule", action="store_true", help="use only one Mlp for attention")
 args = parser.parse_args()
+
 def eval(model, data, crit, step, hparams, eval_bleu=False,
          valid_batch_size=20, tr_logits=None):
   valid_batch_size = 2
@@ -209,7 +214,8 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
   return val_ppl, valid_bleu
 
 def train():
-  if args.load_model:
+  if args.load_model and (not args.reset_hparams):
+    print("load hparams..")
     hparams_file_name = os.path.join(args.output_dir, "hparams.pt")
     hparams = torch.load(hparams_file_name)
   else:
@@ -256,6 +262,7 @@ def train():
       pos=args.pos,
       share_emb_softmax=args.share_emb_softmax,
       attn=args.attn,
+      no_word_to_rule=args.no_word_to_rule,
     )
   data = DataLoader(hparams=hparams)
   hparams.add_param("source_vocab_size", data.source_vocab_size)
@@ -306,7 +313,8 @@ def train():
     best_val_bleu = 0
     cur_attempt = 0
     lr = hparams.lr
-
+  if args.reset_hparams:
+    lr = args.lr
   crit = get_criterion(hparams)
   trainable_params = [
     p for p in model.parameters() if p.requires_grad]
@@ -370,14 +378,16 @@ def train():
     total_loss += tr_loss.data[0]
     total_corrects += tr_acc.data[0]
     step += 1
-    #print(tr_loss)
-    #print(tr_loss.div_(batch_size))
-    #time.sleep(10)
-    tr_loss.div_(batch_size)
-    #torch.cuda.synchronize()
-    tr_loss.backward()
+    if args.trdec and args.loss_type == "rule":
+      rule_loss.div_(batch_size)
+      rule_loss.backward()
+    elif args.trdec and args.loss_type == "word":
+      word_loss.div_(batch_size)
+      word_loss.backward()
+    else:
+      tr_loss.div_(batch_size)
+      tr_loss.backward()
     grad_norm = torch.nn.utils.clip_grad_norm(model.parameters(), args.clip_grad)
-    #grad_norm = 0
     optim.step()
     # clean up GPU memory
     if step % args.clean_mem_every == 0:
