@@ -2,6 +2,7 @@ from tree_utils import *
 import argparse
 import os
 import random
+import re
 
 def make_binary_tree(word_list, left, right):
   if left == right:
@@ -39,19 +40,61 @@ def make_random_binary_tree(word_list, left, right):
   root.children = [left, right]
   return root
 
+def make_phrase_tree(string):
+  def _bina_list(node_list, left, right):
+    if left == right:
+      return node_list[left]
+    root = TreeNode("ROOT", [])
+    mid = int((left + right) / 2)
+    left = _bina_list(node_list, left, mid)
+    right = _bina_list(node_list, mid+1, right)
+    root.children = [left, right]
+    return root
+
+  #words = re.findall(r"[\w]+|[^\s\w]", string)
+  #puncs =  re.findall(r"[^\s\w]", string)
+  #print(string)
+  split_points = []
+  for match in re.finditer(r"[\s\w]+", string):
+    if match.group().strip():
+      #print(match.span(), match.group())
+      split_points.append(match.span()[0])
+  split_points = split_points[1:]
+  nodes = []
+  start = 0
+  for s in split_points:
+    cur_str = string[start:s].split()
+    if string[s] != " ":
+      if cur_str[-1] == "'":
+        if string[s] == "s": 
+          continue
+        else:
+          cur_str[-1] = cur_str[-1][:-1]
+          s -= 1
+      else:
+        continue
+    nodes.append(make_binary_tree(cur_str, 0, len(cur_str)-1))
+    #print(string[start:s])
+    start = s
+  cur_str = string[start:].split()
+  nodes.append(make_binary_tree(cur_str, 0, len(cur_str)-1))
+  #print(string[start:])
+  root = _bina_list(nodes, 0, len(nodes)-1)
+  return root
 
 parser = argparse.ArgumentParser(description="build trees")
 
 parser.add_argument("--data_dir", type=str, help="directory of the data")
 parser.add_argument("--file_name",type=str, help="name of the file to parse")
-parser.add_argument("--tree_type",type=str, help="[random_bina|tri|bina|right_branch]")
+parser.add_argument("--tree_type",type=str, help="[phrase|random_bina|tri|bina|right_branch]")
 parser.add_argument("--parse_file_name",type=str, help="name of the file to parse")
 
-tree_type = "random_bina"
+tree_type = "phrase"
 #data_dir="data/kftt_data/"
 #input_files = ["kyoto-train.lower.en", "kyoto-dev.lower.en", "kyoto-test.lower.en"]
 data_dir="data/orm_data/"
 input_files = ["set0-trainunfilt.tok.eng", "set0-dev.tok.eng", "set0-test.tok.eng"]
+#input_files = ["debug.tok.eng"]
 output_files = []
 for f in input_files:
   output_files.append(f + "." + tree_type)
@@ -84,6 +127,9 @@ for in_file, out_file in zip(input_files, output_files):
         out_file.write(root.to_parse_string() + '\n')
       elif tree_type == "random_bina":
         root = make_random_binary_tree(words, 0, len(words)-1)
+        out_file.write(root.to_parse_string() + '\n')
+      elif tree_type == "phrase":
+        root =  make_phrase_tree(line)
         out_file.write(root.to_parse_string() + '\n')
       else:
         print("Not implemented")

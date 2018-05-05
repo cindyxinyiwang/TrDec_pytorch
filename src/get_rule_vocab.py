@@ -3,9 +3,9 @@ from tree_utils import *
 from hparams import HParams
 
 piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
-tree_file = "data/orm_data/set0-trainunfilt.tok.eng.random_bina"
-rule_vocab_file = "data/orm_data/vocab.random_bina_rule.eng"
-word_vocab_file = "data/orm_data/vocab.random_bina_word.eng"
+tree_file = "data/orm_data/set0-trainunfilt.tok.eng.phrase"
+rule_vocab_file = "data/orm_data/vocab.phrase_rule.eng"
+word_vocab_file = "data/orm_data/vocab.phrase_word.eng"
 #
 #piece_file = "data/kftt_data/kyoto-train.lowpiece.en"
 #tree_file = "data/kftt_data/kyoto-train.lower.en.bina"
@@ -24,6 +24,8 @@ for piece_line, tree_line in zip(piece_file, tree_file):
   #remove_preterminal_POS(tree.root)
   #merge_depth(tree.root, 4, 0)
   pieces = sent_piece_segs(piece_line)
+  #print(pieces)
+  #print(tree.root.to_string())
   split_sent_piece(tree.root, pieces, 0)
   add_preterminal_wordswitch(tree.root, add_eos=True)
   remove_lhs(tree.root, 'ROOT')
