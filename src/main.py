@@ -89,6 +89,7 @@ parser.add_argument("--share_emb_softmax", action="store_true", help="weight tie
 parser.add_argument("--reset_hparams", action="store_true", help="whether to reload the hparams")
 parser.add_argument("--no_word_to_rule", action="store_true", help="use only one Mlp for attention")
 parser.add_argument("--single_inp_readout", action="store_true", help="use only rule for rule readout, and word for word readout")
+parser.add_argument("--rule_tanh", type=float, default=0, help="temperature for raml")
 args = parser.parse_args()
 
 def eval(model, data, crit, step, hparams, eval_bleu=False,
@@ -265,6 +266,7 @@ def train():
       attn=args.attn,
       no_word_to_rule=args.no_word_to_rule,
       single_inp_readout=args.single_inp_readout,
+      rule_tanh=args.rule_tanh,
     )
   data = DataLoader(hparams=hparams)
   hparams.add_param("source_vocab_size", data.source_vocab_size)
