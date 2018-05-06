@@ -10,7 +10,7 @@ from utils import *
 from models import *
 import gc
 
-class TreeDecoder(nn.Module):
+class TreeDecoderAtt(nn.Module):
   def __init__(self, hparams):
     super(TreeDecoder, self).__init__()
     self.hparams = hparams
@@ -18,43 +18,31 @@ class TreeDecoder(nn.Module):
     self.emb = nn.Embedding(self.target_vocab_size,
                             self.hparams.d_word_vec,
                             padding_idx=hparams.pad_id)
-    if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
-      if self.hparams.attn == "mlp":
-        self.attention = MlpAttn(hparams)
-      else:
-        self.attention = DotProdAttn(hparams)
+    if self.hparams.attn == "mlp":
+      self.rule_attention = MlpAttn(hparams)
+      self.word_attention = MlpAttn(hparams)
+      self.rule_to_word_attn = MlpAttn(hparams)
+      self.word_to_rule_attn = MlpAttn(hparams)
     else:
-      if self.hparams.attn == "mlp":
-        self.rule_attention = MlpAttn(hparams)
-        self.word_attention = MlpAttn(hparams)
-      else:
-        self.rule_attention = DotProdAttn(hparams)
-        self.word_attention = DotProdAttn(hparams)
+      self.rule_attention = DotProdAttn(hparams)
+      self.word_attention = DotProdAttn(hparams)
+      self.rule_to_word_attn = DotProdAttn(hparams)
+      self.word_to_rule_attn = DotProdAttn(hparams)
     # transform [word_ctx, word_h_t, rule_ctx, rule_h_t] to readout state vectors before softmax
-    if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
-      inp_dim = hparams.d_model * 3
-    else:
-      inp_dim = hparams.d_model * 6
-    if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
-      self.ctx_to_readout = nn.Linear(inp_dim, hparams.d_model, bias=False)
-    else:
-      self.rule_ctx_to_readout = nn.Linear(inp_dim, hparams.d_model, bias=False)
-      self.word_ctx_to_readout = nn.Linear(inp_dim, hparams.d_model, bias=False)
+    self.rule_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
+    self.word_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
 
     self.readout = nn.Linear(hparams.d_model, 
                                   self.target_vocab_size, 
                                   bias=False)  
     if self.hparams.share_emb_softmax:
       self.emb.weight = self.readout.weight
-    # input: [y_t-1, parent_state, input_feed, word_state]
+    # input: [y_t-1, input_feed, word_state_ctx]
     rule_inp = hparams.d_word_vec + hparams.d_model * 3
-    word_inp = hparams.d_word_vec + hparams.d_model * 2
-    #if hparams.parent_feed:
-    word_inp += hparams.d_model
-    if hparams.rule_parent_feed:
-      rule_inp += hparams.d_model
+    # input: [y_t-1, input_feed, rule_state_ctx]
+    word_inp = hparams.d_word_vec + hparams.d_model * 3
+
     self.rule_lstm_cell = nn.LSTMCell(rule_inp, hparams.d_model)
-    # input: [y_t-1, parent_state, input_feed]
     self.word_lstm_cell = nn.LSTMCell(word_inp, hparams.d_model)
     self.dropout = nn.Dropout(hparams.dropout)
 
@@ -65,16 +53,13 @@ class TreeDecoder(nn.Module):
       self.rule_vocab_mask = self.rule_vocab_mask.cuda()
       self.word_vocab_mask = self.word_vocab_mask.cuda()
       self.emb = self.emb.cuda()
-      if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
-        self.attention = self.attention.cuda()
-      else:
-        self.rule_attention = self.rule_attention.cuda()
-        self.word_attention = self.word_attention.cuda()
-      if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
-        self.ctx_to_readout = self.ctx_to_readout.cuda()
-      else:
-        self.rule_ctx_to_readout = self.rule_ctx_to_readout.cuda()
-        self.word_ctx_to_readout = self.word_ctx_to_readout.cuda()
+      self.rule_attention = self.rule_attention.cuda()
+      self.word_attention = self.word_attention.cuda()
+      self.rule_to_word_attn = self.rule_to_word_attn.cuda()
+      self.word_to_rule_attn = self.word_to_rule_attn.cuda()
+
+      self.rule_ctx_to_readout = self.rule_ctx_to_readout.cuda()
+      self.word_ctx_to_readout = self.word_ctx_to_readout.cuda()
       self.readout = self.readout.cuda()
       self.rule_lstm_cell = self.rule_lstm_cell.cuda()
       self.word_lstm_cell = self.word_lstm_cell.cuda()
@@ -85,13 +70,22 @@ class TreeDecoder(nn.Module):
     """
     x_enc: [batch_size, max_x_len, d_model * 2]
     """
-    batch_size_x = x_enc.size()[0]
+    batch_size_x, x_max_len, d_x = x_enc.size()
     batch_size, y_max_len, data_len = y_train.size()
     assert batch_size_x == batch_size
     #print(y_train)
     input_feed_zeros = torch.zeros(batch_size, self.hparams.d_model * 2)
+    rule_states = torch.zeros(batch_size, x_max_len, self.hparams.d_model)
+    word_states = torch.zeros(batch_size, x_max_len, self.hparams.d_model)
+    rule_states_mask = torch.ones(batch_size, x_max_len)
+    word_states_mask = torch.ones(batch_size, x_max_len)
     if self.hparams.cuda:
       input_feed_zeros = input_feed_zeros.cuda()
+      rule_states = rule_states.cuda()
+      word_states = word_states.cuda()
+      rule_states_mask = rule_states_mask.cuda()
+      word_states_mask = word_states_mask.cuda()
+
     rule_hidden = dec_init 
     word_hidden = dec_init
     rule_input_feed = Variable(input_feed_zeros, requires_grad=False)
@@ -102,87 +96,43 @@ class TreeDecoder(nn.Module):
     # [batch_size, y_len, d_word_vec]
     trg_emb = self.emb(y_train[:, :, 0])
     logits = []
-    if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
-      pre_readouts = []
-    else:
-      rule_pre_readouts = []
-      word_pre_readouts = []
-    if self.hparams.parent_feed:
-      all_state = Variable(torch.zeros(batch_size, self.hparams.d_model),  requires_grad=False)
+    rule_pre_readouts = []
+    word_pre_readouts = []
     offset = torch.arange(batch_size).long() 
     if self.hparams.cuda:
       offset = offset.cuda()
-      if self.hparams.parent_feed:
-        all_state = all_state.cuda()
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
-      
-      if self.hparams.parent_feed:
-        state_idx_t = t 
-        state_idx_t += 1
-        parent_t = y_train.data[:, t, 1] + state_idx_t * offset # [batch_size,]
-        parent_t = Variable(parent_t, requires_grad=False)
-        parent_state = torch.index_select(all_state.view(state_idx_t*batch_size, self.hparams.d_model), dim=0, index=parent_t) # [batch_size, d_model]
-      
       word_mask = y_train[:, t, 2].unsqueeze(1).float() # (1 is word, 0 is rule)
       
-      if self.hparams.parent_feed:
-        word_input = torch.cat([y_emb_tm1, parent_state, word_input_feed], dim=1)
-      else:
-        word_input = torch.cat([y_emb_tm1, rule_hidden[0], word_input_feed], dim=1)
+      word_to_rule_ctx = self.word_to_rule_attn(word_h_t, rule_states, rule_states, attn_mask=rule_states_mask)
+      word_input = torch.cat([y_emb_tm1, word_input_feed, word_to_rule_ctx], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
 
       word_h_t = word_h_t * word_mask + word_hidden[0] * (1-word_mask)
       word_c_t = word_c_t * word_mask + word_hidden[1] * (1-word_mask)
 
-      if self.hparams.rule_parent_feed:
-        rule_input = torch.cat([y_emb_tm1, parent_state, rule_input_feed, word_h_t], dim=1)
-      else:
-        rule_input = torch.cat([y_emb_tm1, rule_input_feed, word_h_t], dim=1)
+      rule_to_word_ctx = self.rule_to_word_attn(rule_h_t, word_states, word_states, attn_mask=word_states_mask)
+      rule_input = torch.cat([y_emb_tm1, rule_input_feed, rule_to_word_ctx], dim=1)
       rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
 
-      if hasattr(self.hparams, "no_word_to_rule") and self.hparams.no_word_to_rule:
-        eos_mask = (y_train[:, t, 0] == self.hparams.eos_id).unsqueeze(1).float()
-        word_mask = word_mask - eos_mask
-        rule_h_t = rule_h_t * (1-word_mask) + rule_hidden[0] * word_mask
-        rule_c_t = rule_c_t * (1-word_mask) + rule_hidden[1] * word_mask
+      eos_mask = (y_train[:, t, 0] == self.hparams.eos_id).unsqueeze(1).float()
+      word_mask = word_mask - eos_mask
+      rule_h_t = rule_h_t * (1-word_mask) + rule_hidden[0] * word_mask
+      rule_c_t = rule_c_t * (1-word_mask) + rule_hidden[1] * word_mask
 
-      if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
-        rule_ctx = self.attention(rule_h_t, x_enc_k, x_enc, attn_mask=x_mask)
-        word_ctx = self.attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
-      else:
-        rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc, attn_mask=x_mask)
-        word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
+      rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc, attn_mask=x_mask)
+      word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
 
-      if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
-        r_inp = torch.cat([rule_h_t, rule_ctx], dim=1)
-        w_inp = torch.cat([word_h_t, word_ctx], dim=1)
-      else:
-        r_inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
-        w_inp = r_inp
-      rule_pre_readout = F.tanh(self.rule_ctx_to_readout(r_inp))
-      word_pre_readout = F.tanh(self.word_ctx_to_readout(w_inp))
+      inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
+      rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))
+      word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
       
       rule_pre_readout = self.dropout(rule_pre_readout)
       word_pre_readout = self.dropout(word_pre_readout)
       
       rule_pre_readouts.append(rule_pre_readout)
       word_pre_readouts.append(word_pre_readout)
-
-      #inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
-      #if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
-      #  pre_readout = F.tanh(self.ctx_to_readout(r_inp))
-      #  pre_readout = self.dropout(pre_readout)
-      #  pre_readouts.append(pre_readout)
-      #else:
-      #  rule_pre_readout = F.tanh(self.rule_ctx_to_readout(r_inp))
-      #  word_pre_readout = F.tanh(self.word_ctx_to_readout(w_inp))
-      #  
-      #  rule_pre_readout = self.dropout(rule_pre_readout)
-      #  word_pre_readout = self.dropout(word_pre_readout)
-      #  
-      #  rule_pre_readouts.append(rule_pre_readout)
-      #  word_pre_readouts.append(word_pre_readout)
    
       rule_input_feed = rule_ctx
       word_input_feed = word_ctx
@@ -191,19 +141,15 @@ class TreeDecoder(nn.Module):
       word_hidden = (word_h_t, word_c_t)
       if self.hparams.parent_feed:
         all_state = torch.cat([all_state, rule_h_t], dim=1)
-    if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
-      readouts = self.readout(torch.stack(pre_readouts))
-      logits = readouts.transpose(0, 1).contiguous()
-    else:
-      # [len_y, batch_size, trg_vocab_size]
-      rule_readouts = self.readout(torch.stack(rule_pre_readouts))[:,:,-self.hparams.target_rule_vocab_size:]
-      word_readouts = self.readout(torch.stack(word_pre_readouts))[:,:,:self.hparams.target_word_vocab_size]
-      if self.hparams.label_smooth > 0:
-        smooth = self.hparams.label_smooth
-        rule_probs = (1.0 - smooth) * F.softmax(rule_readouts, dim=2) + smooth / self.hparams.target_rule_vocab_size
-        rule_readouts = torch.log(rule_probs) 
-      # [batch_size, len_y, trg_vocab_size]
-      logits = torch.cat([word_readouts, rule_readouts], dim=2).transpose(0, 1).contiguous()
+    # [len_y, batch_size, trg_vocab_size]
+    rule_readouts = self.readout(torch.stack(rule_pre_readouts))[:,:,-self.hparams.target_rule_vocab_size:]
+    word_readouts = self.readout(torch.stack(word_pre_readouts))[:,:,:self.hparams.target_word_vocab_size]
+    if self.hparams.label_smooth > 0:
+      smooth = self.hparams.label_smooth
+      rule_probs = (1.0 - smooth) * F.softmax(rule_readouts, dim=2) + smooth / self.hparams.target_rule_vocab_size
+      rule_readouts = torch.log(rule_probs) 
+    # [batch_size, len_y, trg_vocab_size]
+    logits = torch.cat([word_readouts, rule_readouts], dim=2).transpose(0, 1).contiguous()
     score_mask = score_mask.unsqueeze(2).float().data
     mask_t = self.word_vocab_mask * (1-score_mask) + self.rule_vocab_mask * score_mask
     logits.data.masked_fill_(mask_t.byte(), -float("inf"))
@@ -258,14 +204,11 @@ class TreeDecoder(nn.Module):
     else:
       rule_ctx = hyp.rule_ctx_tm1
 
+    inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
     mask = torch.ones(1, self.target_vocab_size).byte()
     if cur_nonterm.label == '*':
       word_index = torch.arange(self.hparams.target_word_vocab_size).long()
       mask.index_fill_(1, word_index, 0)
-      if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
-        inp = torch.cat([word_h_t, word_ctx], dim=1)
-      else:
-        inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
       if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
         word_pre_readout = F.tanh(self.ctx_to_readout(inp))
       else:
@@ -281,10 +224,6 @@ class TreeDecoder(nn.Module):
       num_rule_index = len(rule_with_lhs)
       rule_index = torch.arange(self.hparams.target_rule_vocab_size).long() + self.hparams.target_word_vocab_size
       mask.index_fill_(1, rule_index, 0)
-      if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
-        inp = torch.cat([rule_h_t, rule_ctx], dim=1)
-      else:
-        inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
       if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
         rule_pre_readout = F.tanh(self.ctx_to_readout(inp))  
       else:
