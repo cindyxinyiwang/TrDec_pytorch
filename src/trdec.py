@@ -181,6 +181,8 @@ class TreeDecoder(nn.Module):
     else:
       # [len_y, batch_size, trg_vocab_size]
       rule_readouts = self.readout(torch.stack(rule_pre_readouts))[:,:,-self.hparams.target_rule_vocab_size:]
+      if self.hparams.rule_tanh > 0:
+        rule_readouts = self.hparams.rule_tanh * torch.tanh(rule_readouts)
       word_readouts = self.readout(torch.stack(word_pre_readouts))[:,:,:self.hparams.target_word_vocab_size]
       if self.hparams.label_smooth > 0:
         smooth = self.hparams.label_smooth
