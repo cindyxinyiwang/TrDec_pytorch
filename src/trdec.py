@@ -155,13 +155,12 @@ class TreeDecoder(nn.Module):
         word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc, attn_mask=x_mask)
 
       if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
-        r_inp = torch.cat([rule_h_t, rule_ctx], dim=1)
-        w_inp = torch.cat([word_h_t, word_ctx], dim=1)
+        rule_pre_readout = F.tanh(self.rule_ctx_to_readout(torch.cat([rule_h_t, rule_ctx], dim=1)))
+        word_pre_readout = F.tanh(self.word_ctx_to_readout(torch.cat([word_h_t, word_ctx], dim=1)))
       else:
-        r_inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
-        w_inp = r_inp
-      rule_pre_readout = F.tanh(self.rule_ctx_to_readout(r_inp))
-      word_pre_readout = F.tanh(self.word_ctx_to_readout(w_inp))
+        inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
+        rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))
+        word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
       
       rule_pre_readout = self.dropout(rule_pre_readout)
       word_pre_readout = self.dropout(word_pre_readout)
