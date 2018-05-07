@@ -16,6 +16,7 @@ from hparams import *
 from utils import *
 from models import *
 from trdec import *
+from trdec_attn import *
 
 parser = argparse.ArgumentParser(description="Neural MT")
 
@@ -90,6 +91,9 @@ parser.add_argument("--reset_hparams", action="store_true", help="whether to rel
 parser.add_argument("--no_word_to_rule", action="store_true", help="use only one Mlp for attention")
 parser.add_argument("--single_inp_readout", action="store_true", help="use only rule for rule readout, and word for word readout")
 parser.add_argument("--rule_tanh", type=float, default=0, help="temperature for raml")
+
+
+parser.add_argument("--trdec_attn", action="store_true", help="temperature for raml")
 args = parser.parse_args()
 
 def eval(model, data, crit, step, hparams, eval_bleu=False,
@@ -301,7 +305,10 @@ def train():
     step, best_val_ppl, best_val_bleu, cur_attempt, lr = torch.load(extra_file_name)
   else:
     if args.trdec:
-      model = TrDec(hparams=hparams)
+      if args.trdec_attn:
+        model = TrDecAttn(hparams=hparams)
+      else:
+        model = TrDec(hparams=hparams)
     else:
       model = Seq2Seq(hparams=hparams)
     if args.init_type == "uniform":

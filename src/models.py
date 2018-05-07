@@ -24,7 +24,7 @@ class MlpAttn(nn.Module):
     batch_size, len_v, d_v = v.size()
     # v is bi-directional encoding of source
     assert d_k == d_q 
-    assert 2*d_k == d_v
+    #assert 2*d_k == d_v
     assert len_k == len_v
     # (batch_size, len_k, d_k)
     att_src_hidden = nn.functional.tanh(k + self.w_trg(q).unsqueeze(1))
