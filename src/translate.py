@@ -17,6 +17,7 @@ from hparams import *
 from utils import *
 from models import *
 from trdec import *
+from trdec_attn import *
 from tree_utils import *
 
 import torch
@@ -41,7 +42,7 @@ add_argument(parser, "max_len", type="int", default=300, help="maximum len consi
 add_argument(parser, "max_tree_len", type="int", default=1000, help="maximum len of rule derivations considered on the target side")
 add_argument(parser, "poly_norm_m", type="float", default=0, help="m in polynormial normalization")
 add_argument(parser, "non_batch_translate", type="bool", default=False, help="use non-batched translation")
-add_argument(parser, "batch_size", type="int", default=32, help="")
+add_argument(parser, "batch_size", type="int", default=1, help="")
 add_argument(parser, "merge_bpe", type="bool", default=True, help="")
 add_argument(parser, "source_vocab", type="str", default=None, help="name of source vocab file")
 add_argument(parser, "target_vocab", type="str", default=None, help="name of target vocab file")
@@ -150,12 +151,12 @@ if args.debug:
     logits = logits.view(-1, hparams.target_rule_vocab_size+hparams.target_word_vocab_size)
     labels = y_test[:,1:,0].contiguous().view(-1)
     val_loss, val_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count =  \
-        get_performance(crit, logits, labels, hparams)
-    #print("train forward:", val_loss.data)
-    #print("train label:", labels.data)
-    #logit_score = []
-    #for i,l in enumerate(labels): logit_score.append(logits[i][l].data[0])
-    #print("train_logit", logit_score)
+        get_performance(crit, logits, labels, hparams, sum_loss=False)
+    print("train forward:", val_loss.data)
+    print("train label:", labels.data)
+    logit_score = []
+    for i,l in enumerate(labels): logit_score.append(logits[i][l].data[0])
+    print("train_logit", logit_score)
     #print("train_label", labels)
     forward_scores.append(val_loss.sum().data[0])
     # The normal, correct way:

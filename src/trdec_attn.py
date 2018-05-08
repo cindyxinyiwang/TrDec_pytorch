@@ -192,19 +192,26 @@ class TreeDecoderAttn(nn.Module):
       # word
       word_input = torch.cat([y_emb_tm1, word_input_feed, word_to_rule_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
-      word_ctx = self.word_attention(word_h_t, x_enc_k, x_enc)
-      word_to_rule_ctx = self.word_to_rule_attention(word_h_t, x_enc_k, x_enc)
-      rule_ctx = hyp.rule_ctx_tm1
-      rule_to_word_ctx = hyp.rule_to_word_ctx_tm1
-    else:
-      rule_input = torch.cat([y_emb_tm1, rule_input_feed, word_h_t], dim=1)
-      rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
-      rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc)
-      rule_to_word_ctx = self.rule_to_word_attention(rule_h_t, x_enc_k, x_enc)
-      word_ctx = hyp.word_ctx_tm1
-      word_to_rule_ctx = hyp.word_to_rule_ctx_tm1
+      if hyp.rule_states is None:
+        hyp.rule_states = rule_h_t.unsqueeze(1)
+      if hyp.word_states is None:
+        # [1, 1, d_model]
+        hyp.word_states = word_h_t.unsqueeze(1)
+      else:
+        if hyp.y[-1] != self.hparams.eos_id:
+          hyp.word_states = torch.cat([hyp.word_states, word_h_t.unsqueeze(1)], dim=1)
 
-    inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
+    if hyp.y[-1] == self.hparams.eos_id or hyp.y[-1] >= self.hparams.target_word_vocab_size:
+      rule_input = torch.cat([y_emb_tm1, rule_input_feed, rule_to_word_input_feed], dim=1)
+      rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
+      hyp.rule_states = torch.cat([hyp.rule_states, rule_h_t.unsqueeze(1)], dim=1)
+
+    hyp.rule_ctx_tm1 = self.rule_attention(rule_h_t, x_enc_k, x_enc)
+    hyp.word_ctx_tm1 = self.word_attention(word_h_t, x_enc_k, x_enc)
+    hyp.rule_to_word_ctx_tm1 = self.rule_to_word_attn(rule_h_t, hyp.word_states, hyp.word_states)
+    hyp.word_to_rule_ctx_tm1 = self.word_to_rule_attn(word_h_t, hyp.rule_states, hyp.rule_states)
+
+    inp = torch.cat([rule_h_t, hyp.rule_ctx_tm1, word_h_t, hyp.word_ctx_tm1], dim=1)
     mask = torch.ones(1, self.target_vocab_size).byte()
     if cur_nonterm.label == '*':
       word_index = torch.arange(self.hparams.target_word_vocab_size).long()
@@ -229,7 +236,11 @@ class TreeDecoderAttn(nn.Module):
     score_t.data.masked_fill_(mask, -float("inf"))
     rule_hidden = (rule_h_t, rule_c_t)
     word_hidden = (word_h_t, word_c_t)
-    return score_t, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_select_index
+
+    hyp.rule_hidden = rule_hidden
+    hyp.word_hidden = word_hidden
+
+    return score_t, num_rule_index, rule_select_index
 
 class TrDecAttn(nn.Module):
   def __init__(self, hparams):
@@ -283,19 +294,22 @@ class TrDecAttn(nn.Module):
     length = 0
     completed_hyp = []
     input_feed_zeros = torch.zeros(1, self.hparams.d_model * 2)
-    state_zeros = torch.zeros(1, self.hparams.d_model)
+    to_input_feed_zeros = torch.zeros(1, self.hparams.d_model)
+    #state_zeros = torch.zeros(1, 1, self.hparams.d_model)
     if self.hparams.cuda:
       input_feed_zeros = input_feed_zeros.cuda()
-      state_zeros = state_zeros.cuda()
-    rule_input_feed = Variable(input_feed_zeros, requires_grad=False)
-    word_input_feed = Variable(input_feed_zeros, requires_grad=False)
-    active_hyp = [TrHyp(rule_hidden=dec_init,
+      to_input_feed_zeros = to_input_feed_zeros.cuda()
+      #state_zeros = state_zeros.cuda()
+    active_hyp = [TrAttnHyp(rule_hidden=dec_init,
                   word_hidden=dec_init,
                   y=[self.hparams.bos_id], 
-                  rule_ctx_tm1=rule_input_feed, 
-                  word_ctx_tm1=word_input_feed,
-                  open_nonterms=[OpenNonterm(label=self.hparams.root_label, 
-                    parent_state=Variable(state_zeros, requires_grad=False))],
+                  rule_ctx_tm1= Variable(input_feed_zeros, requires_grad=False), 
+                  word_ctx_tm1=Variable(input_feed_zeros, requires_grad=False),
+                  rule_to_word_ctx_tm1=Variable(to_input_feed_zeros, requires_grad=False), 
+                  word_to_rule_ctx_tm1= Variable(to_input_feed_zeros, requires_grad=False),
+                  rule_states=None,
+                  word_states=None,
+                  open_nonterms=[OpenNonterm(label=self.hparams.root_label)],
                   score=0.)]
     nll_score = []
     if y_label is not None:
@@ -304,12 +318,8 @@ class TrDecAttn(nn.Module):
       length += 1
       new_active_hyp = []
       for i, hyp in enumerate(active_hyp):
-        logits, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_index = self.decoder.step(x_enc, 
+        logits, num_rule_index, rule_index = self.decoder.step(x_enc, 
           x_enc_k, hyp, target_rule_vocab)
-        hyp.rule_hidden = rule_hidden
-        hyp.word_hidden = word_hidden
-        hyp.rule_ctx_tm1 = rule_ctx 
-        hyp.word_ctx_tm1 = word_ctx
 
         rule_index = set(rule_index)
         logits = logits.view(-1)
@@ -322,6 +332,7 @@ class TrDecAttn(nn.Module):
           top_ids = [y_label[length-1][0]]
           nll = -(p_t[top_ids[0]])
           nll_score.append(nll)
+          print("logit dedcode", logits[top_ids[0]])
         else:
           num_select = beam_size
           if num_rule_index >= 0: num_select = min(num_select, num_rule_index)
@@ -332,9 +343,8 @@ class TrDecAttn(nn.Module):
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
             cur_nonterm = open_nonterms.pop()
-            parent_state = hyp.rule_hidden[0]
             for c in reversed(rule.rhs):
-              open_nonterms.append(OpenNonterm(label=c, parent_state=parent_state))
+              open_nonterms.append(OpenNonterm(label=c))
           else:
             if open_nonterms[-1].label != '*':
               print(open_nonterms[-1].label, word_id, new_hyp_scores[word_id])
@@ -343,14 +353,17 @@ class TrDecAttn(nn.Module):
             assert open_nonterms[-1].label == '*'
             if word_id == self.hparams.eos_id: 
               open_nonterms.pop()
-          new_hyp = TrHyp(rule_hidden=(hyp.rule_hidden[0], hyp.rule_hidden[1]), 
+          new_hyp = TrAttnHyp(rule_hidden=(hyp.rule_hidden[0], hyp.rule_hidden[1]), 
                     word_hidden=(hyp.word_hidden[0], hyp.word_hidden[1]),
                     y=hyp.y+[word_id], 
                     rule_ctx_tm1=hyp.rule_ctx_tm1, 
                     word_ctx_tm1=hyp.word_ctx_tm1,
+                    rule_to_word_ctx_tm1=hyp.rule_to_word_ctx_tm1, 
+                    word_to_rule_ctx_tm1=hyp.word_to_rule_ctx_tm1,
+                    rule_states=hyp.rule_states, 
+                    word_states=hyp.word_states, 
                     open_nonterms=open_nonterms,
-                    score=new_hyp_scores[word_id],
-                    c_p=p_t[word_id])
+                    score=new_hyp_scores[word_id])
           new_active_hyp.append(new_hyp)
       if y_label is None:
         live_hyp_num = beam_size - len(completed_hyp)
@@ -370,19 +383,25 @@ class TrDecAttn(nn.Module):
       completed_hyp.append(active_hyp[0])
     return sorted(completed_hyp, key=lambda x: x.score, reverse=True), nll_score
 
-class TrHyp(object):
-  def __init__(self, rule_hidden, word_hidden, y, rule_ctx_tm1, word_ctx_tm1, score, open_nonterms, c_p=0):
+class TrAttnHyp(object):
+  def __init__(self, rule_hidden, word_hidden, y, 
+          rule_ctx_tm1, word_ctx_tm1,
+          rule_to_word_ctx_tm1, word_to_rule_ctx_tm1,
+          rule_states, word_states, score, open_nonterms):
     self.rule_hidden = rule_hidden
     self.word_hidden = word_hidden
+    self.rule_states = rule_states
+    self.word_states = word_states
     # [length_y, 2], each element (index, is_word)
     self.y = y 
     self.rule_ctx_tm1 = rule_ctx_tm1
     self.word_ctx_tm1 = word_ctx_tm1
+    self.rule_to_word_ctx_tm1 = rule_to_word_ctx_tm1
+    self.word_to_rule_ctx_tm1 = word_to_rule_ctx_tm1
     self.score = score
     self.open_nonterms = open_nonterms
-    self.c_p = c_p
 
 class OpenNonterm(object):
-  def __init__(self, label, parent_state):
+  def __init__(self, label, parent_state=None):
     self.label = label
     self.parent_state = parent_state

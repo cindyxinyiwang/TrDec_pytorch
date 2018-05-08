@@ -196,7 +196,7 @@ class TreeDecoder(nn.Module):
     else:
       # [len_y, batch_size, trg_vocab_size]
       rule_readouts = self.readout(torch.stack(rule_pre_readouts))[:,:,-self.hparams.target_rule_vocab_size:]
-      if self.hparams.rule_tanh > 0:
+      if hasattr(self.hparams, "rule_tanh") and self.hparams.rule_tanh > 0:
         rule_readouts = self.hparams.rule_tanh * torch.tanh(rule_readouts)
       word_readouts = self.readout(torch.stack(word_pre_readouts))[:,:,:self.hparams.target_word_vocab_size]
       if self.hparams.label_smooth > 0:
@@ -252,12 +252,16 @@ class TreeDecoder(nn.Module):
       else:
         rule_input = torch.cat([y_emb_tm1, rule_input_feed, word_h_t], dim=1)
       rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
-      if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
-        rule_ctx = self.attention(rule_h_t, x_enc_k, x_enc)
-      else:
-        rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc)
+    #  if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
+    #    rule_ctx = self.attention(rule_h_t, x_enc_k, x_enc)
+    #  else:
+    #    rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc)
+    #else:
+    #  rule_ctx = hyp.rule_ctx_tm1
+    if hasattr(self.hparams, "single_attn") and self.hparams.single_attn:
+      rule_ctx = self.attention(rule_h_t, x_enc_k, x_enc)
     else:
-      rule_ctx = hyp.rule_ctx_tm1
+      rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc)
 
     mask = torch.ones(1, self.target_vocab_size).byte()
     if cur_nonterm.label == '*':
@@ -392,6 +396,7 @@ class TrDec(nn.Module):
           top_ids = [y_label[length-1][0]]
           nll = -(p_t[top_ids[0]])
           nll_score.append(nll)
+          print(logits[top_ids[0]])
         else:
           num_select = beam_size
           if num_rule_index >= 0: num_select = min(num_select, num_rule_index)
