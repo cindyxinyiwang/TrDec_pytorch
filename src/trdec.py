@@ -39,7 +39,7 @@ class TreeDecoder(nn.Module):
       self.ctx_to_readout = nn.Linear(inp_dim, hparams.d_model, bias=False)
     else:
       self.rule_ctx_to_readout = nn.Linear(inp_dim, hparams.d_model, bias=False)
-      self.word_ctx_to_readout = nn.Linear(inp_dim, hparams.d_model, bias=False)
+      self.word_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
 
     self.readout = nn.Linear(hparams.d_model, 
                                   self.target_vocab_size, 
@@ -156,7 +156,7 @@ class TreeDecoder(nn.Module):
 
       if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
         rule_pre_readout = F.tanh(self.rule_ctx_to_readout(torch.cat([rule_h_t, rule_ctx], dim=1)))
-        word_pre_readout = F.tanh(self.word_ctx_to_readout(torch.cat([word_h_t, word_ctx], dim=1)))
+        word_pre_readout = F.tanh(self.word_ctx_to_readout(torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)))
       else:
         inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
         rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))
@@ -267,10 +267,11 @@ class TreeDecoder(nn.Module):
     if cur_nonterm.label == '*':
       word_index = torch.arange(self.hparams.target_word_vocab_size).long()
       mask.index_fill_(1, word_index, 0)
-      if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
-        inp = torch.cat([word_h_t, word_ctx], dim=1)
-      else:
-        inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
+      #if hasattr(self.hparams, "single_inp_readout") and self.hparams.single_inp_readout:
+      #  inp = torch.cat([word_h_t, word_ctx], dim=1)
+      #else:
+      #  inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
+      inp = torch.cat([rule_h_t, rule_ctx, word_h_t, word_ctx], dim=1)
       if hasattr(self.hparams, "single_readout") and self.hparams.single_readout:
         word_pre_readout = F.tanh(self.ctx_to_readout(inp))
       else:
