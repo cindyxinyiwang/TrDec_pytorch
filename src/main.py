@@ -16,7 +16,7 @@ from hparams import *
 from utils import *
 from models import *
 from trdec import *
-from trdec_attn import *
+from trdec_attn_v2 import *
 
 parser = argparse.ArgumentParser(description="Neural MT")
 
