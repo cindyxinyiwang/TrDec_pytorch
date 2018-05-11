@@ -106,32 +106,42 @@ class TreeDecoderAttn(nn.Module):
     logits = []
     rule_pre_readouts = []
     word_pre_readouts = []
-    offset = torch.arange(batch_size).long() 
+    offset = torch.arange(batch_size).long()
+
+    word_mask_total = y_train[:, :, 2].float()
+    eos_mask_total = (y_train[:, :, 0] == self.hparams.eos_id).float()
+    word_mask_neos_total = word_mask_total - eos_mask_total
+
     if self.hparams.cuda:
       offset = offset.cuda()
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
-      word_mask = y_train[:, t, 2].unsqueeze(1).float() # (1 is word, 0 is rule)
-      
+      #word_mask = y_train[:, t, 2].unsqueeze(1).float() # (1 is word, 0 is rule)
+      word_mask = word_mask_total[:, t].unsqueeze(1)
+
       word_input = torch.cat([y_emb_tm1, word_input_feed, word_to_rule_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
 
+      word_h_t = word_h_t * word_mask + word_hidden[0] * (1-word_mask)
+      word_c_t = word_c_t * word_mask + word_hidden[1] * (1-word_mask)
+
       rule_input = torch.cat([y_emb_tm1, rule_input_feed, rule_to_word_input_feed], dim=1)
       rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
-      if t > 0:
-        word_h_t = word_h_t * word_mask + word_hidden[0] * (1-word_mask)
-        word_c_t = word_c_t * word_mask + word_hidden[1] * (1-word_mask)
-        eos_mask = (y_train[:, t, 0] == self.hparams.eos_id).unsqueeze(1).float()
-        word_mask_t = word_mask - eos_mask
-        rule_h_t = rule_h_t * (1-word_mask_t) + rule_hidden[0] * word_mask_t
-        rule_c_t = rule_c_t * (1-word_mask_t) + rule_hidden[1] * word_mask_t
+
+      #eos_mask = (y_train[:, t, 0] == self.hparams.eos_id).unsqueeze(1).float()
+      #word_mask_neos = word_mask - eos_mask
+      word_mask_neos = word_mask_neos_total[:, t].unsqueeze(1)
+      # do not update rule_rnn for eos
+      rule_h_t = rule_h_t * (1-word_mask) + rule_hidden[0] * word_mask
+      rule_c_t = rule_c_t * (1-word_mask) + rule_hidden[1] * word_mask
 
       rule_states.data[:, t, :] = rule_h_t.data
       word_states.data[:, t, :] = word_h_t.data
       # word_mask: 1 is word, 0 is rule
       if t > 0:
         rule_states_mask[:, t] = word_mask.byte().data
-        word_states_mask[:, t] = (1-word_mask).byte().data
+        # do not attend to eos states
+        word_states_mask[:, t] = (1-word_mask_neos).byte().data
 
       rule_to_word_ctx = self.rule_to_word_attn(rule_h_t, word_states, word_states, attn_mask=word_states_mask)
       word_to_rule_ctx = self.word_to_rule_attn(word_h_t, rule_states, rule_states, attn_mask=rule_states_mask)
@@ -191,20 +201,20 @@ class TreeDecoderAttn(nn.Module):
       # word
       word_input = torch.cat([y_emb_tm1, word_input_feed, word_to_rule_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
+      if hyp.rule_states is None:
+        hyp.rule_states = rule_h_t.unsqueeze(1)
       if hyp.word_states is None:
+        # [1, 1, d_model]
         hyp.word_states = word_h_t.unsqueeze(1)
       else:
-        hyp.word_states = torch.cat([hyp.word_states, word_h_t.unsqueeze(1)], dim=1)
-      
-    if hyp.y[-1] == self.hparams.bos_id or hyp.y[-1] == self.hparams.eos_id or hyp.y[-1] >= self.hparams.target_word_vocab_size:
+        if hyp.y[-1] != self.hparams.eos_id:
+          hyp.word_states = torch.cat([hyp.word_states, word_h_t.unsqueeze(1)], dim=1)
+
+    if hyp.y[-1] >= self.hparams.target_word_vocab_size:
       rule_input = torch.cat([y_emb_tm1, rule_input_feed, rule_to_word_input_feed], dim=1)
       rule_h_t, rule_c_t = self.rule_lstm_cell(rule_input, rule_hidden)
-      if hyp.y[-1] != self.hparams.eos_id:
-        if hyp.rule_states is None:
-          hyp.rule_states = rule_h_t.unsqueeze(1)
-        else:
-          hyp.rule_states = torch.cat([hyp.rule_states, rule_h_t.unsqueeze(1)], dim=1)
-    
+      hyp.rule_states = torch.cat([hyp.rule_states, rule_h_t.unsqueeze(1)], dim=1)
+
     hyp.rule_ctx_tm1 = self.rule_attention(rule_h_t, x_enc_k, x_enc)
     hyp.word_ctx_tm1 = self.word_attention(word_h_t, x_enc_k, x_enc)
     hyp.rule_to_word_ctx_tm1 = self.rule_to_word_attn(rule_h_t, hyp.word_states, hyp.word_states)

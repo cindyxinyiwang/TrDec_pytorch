@@ -283,8 +283,12 @@ class TrDecAttn(nn.Module):
       if self.hparams.cuda:
         x = x.cuda()
       hyp, nll_score = self.translate_sent(x, target_rule_vocab, max_len=max_len, beam_size=beam_size, y_label=y, poly_norm_m=poly_norm_m)
-      hyp = hyp[0]
-      hyps.append(hyp.y[1:])
+      if hasattr(self.hparams, "nbest") and self.hparams.nbest:
+        nbest = [h.y[1:] for h in hyp]
+        hyps.append(nbest)
+      else:
+        hyp = hyp[0]
+        hyps.append(hyp.y[1:])
       scores.append(sum(nll_score))
       #print(hyp.y)
       #print("trans score:", nll_score)
@@ -332,10 +336,19 @@ class TrDecAttn(nn.Module):
         rule_index = set(rule_index)
         logits = logits.view(-1)
         p_t = F.log_softmax(logits, dim=0).data
-        if poly_norm_m > 0 and length > 1:
-          new_hyp_scores = (hyp.score * pow(length-1, poly_norm_m) + p_t) / pow(length, poly_norm_m)
+
+        if hasattr(self.hparams, "ignore_rule_len") and self.hparams.ignore_rule_len:
+          l = (np.array(hyp.y) < self.hparams.target_word_vocab_size).sum()
+          if poly_norm_m > 0 and l > 1:
+            new_hyp_scores = (hyp.score * pow(l-1, poly_norm_m) + p_t) / pow(l, poly_norm_m)
+          else:
+            new_hyp_scores = hyp.score + p_t
         else:
-          new_hyp_scores = hyp.score + p_t
+          if poly_norm_m > 0 and length > 1:
+            new_hyp_scores = (hyp.score * pow(length-1, poly_norm_m) + p_t) / pow(length, poly_norm_m)
+          else:
+            new_hyp_scores = hyp.score + p_t
+
         if y_label is not None:
           top_ids = [y_label[length-1][0]]
           nll = -(p_t[top_ids[0]])
@@ -350,6 +363,10 @@ class TrDecAttn(nn.Module):
           open_nonterms = hyp.open_nonterms[:]
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
+            # force the first rule to be not preterminal
+            if hasattr(self.hparams, "force_rule") and self.hparams.force_rule: 
+              if length == 1 and rule.rhs[0] == "*": 
+                continue
             cur_nonterm = open_nonterms.pop()
             for c in reversed(rule.rhs):
               open_nonterms.append(OpenNonterm(label=c))
