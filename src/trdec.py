@@ -388,10 +388,17 @@ class TrDec(nn.Module):
         rule_index = set(rule_index)
         logits = logits.view(-1)
         p_t = F.log_softmax(logits, dim=0).data
-        if poly_norm_m > 0 and length > 1:
-          new_hyp_scores = (hyp.score * pow(length-1, poly_norm_m) + p_t) / pow(length, poly_norm_m)
+        if hasattr(self.hparams, "ignore_rule_len") and self.hparams.ignore_rule_len:
+          l = (np.array(hyp.y) < self.hparams.target_word_vocab_size).sum() 
+          if poly_norm_m > 0 and l > 1:
+            new_hyp_scores = (hyp.score * pow(l-1, poly_norm_m) + p_t) / pow(l, poly_norm_m)
+          else:
+            new_hyp_scores = hyp.score + p_t
         else:
-          new_hyp_scores = hyp.score + p_t
+          if poly_norm_m > 0 and length > 1:
+            new_hyp_scores = (hyp.score * pow(length-1, poly_norm_m) + p_t) / pow(length, poly_norm_m)
+          else:
+            new_hyp_scores = hyp.score + p_t
         if y_label is not None:
           top_ids = [y_label[length-1][0]]
           nll = -(p_t[top_ids[0]])
