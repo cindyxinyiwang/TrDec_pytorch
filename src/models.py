@@ -12,6 +12,7 @@ class MlpAttn(nn.Module):
   def __init__(self, hparams):
     super(MlpAttn, self).__init__()
     self.hparams = hparams
+    self.dropout = nn.Dropout(hparams.dropout)
     self.w_trg = nn.Linear(self.hparams.d_model, self.hparams.d_model)
     self.w_att = nn.Linear(self.hparams.d_model, 1)
     if self.hparams.cuda:
@@ -33,8 +34,25 @@ class MlpAttn(nn.Module):
     if not attn_mask is None:
       att_src_weights.data.masked_fill_(attn_mask, -self.hparams.inf)
     att_src_weights = F.softmax(att_src_weights, dim=-1)
+    att_src_weights = self.dropout(att_src_weights)
     ctx = torch.bmm(att_src_weights.unsqueeze(1), v).squeeze(1)
     return ctx
+
+
+class LayerNormalization(nn.Module):
+  def __init__(self, d_hid, eps=1e-9):
+    super(LayerNormalization, self).__init__()
+
+    self.d_hid = d_hid
+    self.eps = eps
+    self.scale = nn.Parameter(torch.ones(self.d_hid), requires_grad=True)
+    self.offset= nn.Parameter(torch.zeros(self.d_hid), requires_grad=True)
+
+  def forward(self, x):
+    assert x.dim() >= 2
+    mean = x.mean(dim=-1, keepdim=True)
+    std = x.std(dim=-1, keepdim=True)
+    return self.scale * (x - mean) / (std + self.eps) + self.offset
 
 class DotProdAttn(nn.Module):
   def __init__(self, hparams):
@@ -43,6 +61,7 @@ class DotProdAttn(nn.Module):
     #self.src_enc_linear = nn.Linear(hparams.d_model * 2, hparams.d_model)
     self.softmax = nn.Softmax(dim=-1)
     self.hparams = hparams
+    self.temp = np.power(hparams.d_model, 0.5)
 
   def forward(self, q, k, v, attn_mask = None):
     """ 
@@ -65,13 +84,91 @@ class DotProdAttn(nn.Module):
     # [batch_size, len_k, d_model]
     #k_vec = self.src_enc_linear(k)
     # [batch_size, len_k]
-    attn_weight = torch.bmm(k, q.unsqueeze(2)).squeeze(2)
+    attn_weight = torch.bmm(k, q.unsqueeze(2)).squeeze(2) / self.temp
     if not attn_mask is None:
       attn_weight.data.masked_fill_(attn_mask, -self.hparams.inf)
     attn_weight = self.softmax(attn_weight)
+    attn_weight = self.dropout(attn_weight)
     # [batch_size, d_v]
     ctx = torch.bmm(attn_weight.unsqueeze(1), v).squeeze(1)
     return ctx
+
+class MultiHeadAttn(nn.Module):
+  def __init__(self, hparams):
+    super(MultiHeadAttn, self).__init__()
+
+    self.hparams = hparams
+
+    self.attention = DotProdAttn(hparams)
+    self.layer_norm = LayerNormalization(hparams.d_model)
+
+    # projection of concatenated attn
+    n_heads = self.hparams.n_heads
+    d_model = self.hparams.d_model
+    d_q = self.hparams.d_k
+    d_k = self.hparams.d_k
+    d_v = self.hparams.d_v
+
+    Q, K, V = [], [], []
+    for head_id in range(n_heads):
+      q = nn.Linear(d_model, d_q, bias=False)
+      k = nn.Linear(d_model, d_k, bias=False)
+      v = nn.Linear(d_model, d_v, bias=False)
+      init_param(q.weight, init_type="uniform", init_range=hparams.init_range)
+      init_param(k.weight, init_type="uniform", init_range=hparams.init_range)
+      init_param(v.weight, init_type="uniform", init_range=hparams.init_range)
+      Q.append(q)
+      K.append(k)
+      V.append(v)
+    self.Q = nn.ModuleList(Q)
+    self.K = nn.ModuleList(K)
+    self.V = nn.ModuleList(V)
+    if self.hparams.cuda:
+      self.Q = self.Q.cuda()
+      self.K = self.K.cuda()
+      self.V = self.V.cuda()
+
+    self.w_proj = nn.Linear(n_heads * d_v, d_model, bias=False)
+    init_param(self.w_proj.weight, init_type="uniform", init_range=hparams.init_range)
+    if self.hparams.cuda:
+      self.w_proj = self.w_proj.cuda()
+
+  def forward(self, q, k, v, attn_mask=None):
+    """Performs the following computations:
+         head[i] = Attention(q * w_q[i], k * w_k[i], v * w_v[i])
+         outputs = concat(all head[i]) * self.w_proj
+    Args:
+      q: [batch_size, len_q, d_q].
+      k: [batch_size, len_k, d_k].
+      v: [batch_size, len_v, d_v].
+    Must have: len_k == len_v
+    Note: This batch_size is in general NOT the training batch_size, as
+      both sentences and time steps are batched together for efficiency.
+    Returns:
+      outputs: [batch_size, len_q, d_model].
+    """
+
+    residual = q 
+
+    n_heads = self.hparams.n_heads
+    d_model = self.hparams.d_model
+    d_q = self.hparams.d_k
+    d_k = self.hparams.d_k
+    d_v = self.hparams.d_v
+    batch_size = q.size(0)
+
+    heads = []
+    for Q, K, V in zip(self.Q, self.K, self.V):
+      head_q, head_k, head_v = Q(q), K(k), V(v)
+      head = self.attention(head_q, head_k, head_v, attn_mask=attn_mask)
+      heads.append(head)
+
+    outputs = torch.cat(heads, dim=-1).contiguous().view(batch_size, n_heads * d_v)
+    outputs = self.w_proj(outputs)
+    outputs = self.layer_norm(outputs + residual)
+    outputs = self.layer_norm(outputs)
+
+    return outputs
 
 class Encoder(nn.Module):
   def __init__(self, hparams, *args, **kwargs):

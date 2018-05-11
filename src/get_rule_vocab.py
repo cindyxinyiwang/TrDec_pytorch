@@ -2,15 +2,15 @@ import sys
 from tree_utils import *
 from hparams import HParams
 
-piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
-tree_file = "data/orm_data/set0-trainunfilt.tok.eng.phrase"
-rule_vocab_file = "data/orm_data/vocab.phrase_rule.eng"
-word_vocab_file = "data/orm_data/vocab.phrase_word.eng"
-#
-#piece_file = "data/kftt_data/kyoto-train.lowpiece.en"
-#tree_file = "data/kftt_data/kyoto-train.lower.en.bina"
-#rule_vocab_file = "data/kftt_data/vocab.bina_rule.en"
-#word_vocab_file = "data/kftt_data/vocab.bina_word.en"
+#piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
+#tree_file = "data/orm_data/set0-trainunfilt.tok.eng.phrase"
+#rule_vocab_file = "data/orm_data/vocab.phrase_rule.eng"
+#word_vocab_file = "data/orm_data/vocab.phrase_word.eng"
+
+piece_file = "data/kftt_data/kyoto-train.lowpiece.en"
+tree_file = "data/kftt_data/kyoto-train.lowparse.en"
+rule_vocab_file = "data/kftt_data/vocab.no-lhs-rule.en"
+word_vocab_file = "data/kftt_data/vocab.no-lhs-word.en"
 
 
 hp = HParams()
