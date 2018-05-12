@@ -24,6 +24,7 @@ parser.add_argument("--trdec", action="store_true", help="use the trdec model")
 parser.add_argument("--parent_feed",type=int, default=1, help="whether to enable input feeding [0|1]")
 parser.add_argument("--rule_parent_feed",type=int, default=1, help="whether to enable input feeding for rules [0|1]")
 parser.add_argument("--attn",type=str, default="mlp", help="type of attention layer [mlp|dot_prod]")
+parser.add_argument("--self_attn",type=str, default="mlp", help="type of attention layer [mlp|dot_prod]")
 
 parser.add_argument("--load_model", action="store_true", help="load an existing model")
 parser.add_argument("--reset_output_dir", action="store_true", help="delete output directory if it exists")
@@ -42,6 +43,11 @@ parser.add_argument("--n_train_sents", type=int, default=None, help="max number 
 
 parser.add_argument("--d_word_vec", type=int, default=288, help="size of word and positional embeddings")
 parser.add_argument("--d_model", type=int, default=288, help="size of hidden states")
+parser.add_argument("--n_heads", type=int, default=3, help="number of attention heads")
+parser.add_argument("--d_k", type=int, default=64, help="size of attention head")
+parser.add_argument("--d_v", type=int, default=64, help="size of attention head")
+parser.add_argument("--residue", type=int, default=1, help="whether to use residue connection[0|1]")
+parser.add_argument("--layer_norm", type=int, default=1, help="whether to use layer norm[0|1]")
 
 parser.add_argument("--data_path", type=str, default=None, help="path to all data")
 parser.add_argument("--source_train", type=str, default=None, help="source train file")
@@ -270,9 +276,15 @@ def train():
       pos=args.pos,
       share_emb_softmax=args.share_emb_softmax,
       attn=args.attn,
+      self_attn=args.self_attn,
       no_word_to_rule=args.no_word_to_rule,
       single_inp_readout=args.single_inp_readout,
       rule_tanh=args.rule_tanh,
+      n_heads=args.n_heads,
+      d_k=args.d_k,
+      d_v=args.d_v,
+      residue=args.residue,
+      layer_norm=args.layer_norm,
     )
   data = DataLoader(hparams=hparams)
   hparams.add_param("source_vocab_size", data.source_vocab_size)

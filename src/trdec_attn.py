@@ -21,13 +21,21 @@ class TreeDecoderAttn(nn.Module):
     if self.hparams.attn == "mlp":
       self.rule_attention = MlpAttn(hparams)
       self.word_attention = MlpAttn(hparams)
-      self.rule_to_word_attn = MlpAttn(hparams)
-      self.word_to_rule_attn = MlpAttn(hparams)
     else:
       self.rule_attention = DotProdAttn(hparams)
       self.word_attention = DotProdAttn(hparams)
+
+    if self.hparams.self_attn == "mlp":
+      self.rule_to_word_attn = MlpAttn(hparams)
+      self.word_to_rule_attn = MlpAttn(hparams)
+    elif self.hparams.self_attn == "dot_prod":
       self.rule_to_word_attn = DotProdAttn(hparams)
       self.word_to_rule_attn = DotProdAttn(hparams)
+    else:
+      print("mult head attn")
+      self.rule_to_word_attn = MultiHeadAttn(hparams)
+      self.word_to_rule_attn = MultiHeadAttn(hparams)
+
     # transform [word_ctx, word_h_t, rule_ctx, rule_h_t] to readout state vectors before softmax
     self.rule_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
     self.word_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
@@ -217,7 +225,7 @@ class TreeDecoderAttn(nn.Module):
       word_index = torch.arange(self.hparams.target_word_vocab_size).long()
       mask.index_fill_(1, word_index, 0)
       word_pre_readout = F.tanh(self.word_ctx_to_readout(inp))
-      #word_pre_readout = self.dropout(word_pre_readout)
+      word_pre_readout = self.dropout(word_pre_readout)
       score_t = self.readout(word_pre_readout)
       num_rule_index = -1
       rule_select_index = []
@@ -229,7 +237,7 @@ class TreeDecoderAttn(nn.Module):
       rule_index = torch.arange(self.hparams.target_rule_vocab_size).long() + self.hparams.target_word_vocab_size
       mask.index_fill_(1, rule_index, 0)
       rule_pre_readout = F.tanh(self.rule_ctx_to_readout(inp))  
-      #rule_pre_readout = self.dropout(rule_pre_readout)
+      rule_pre_readout = self.dropout(rule_pre_readout)
       score_t = self.readout(rule_pre_readout)
     if self.hparams.cuda:
       mask = mask.cuda()
