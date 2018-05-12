@@ -413,6 +413,10 @@ class TrDec(nn.Module):
           open_nonterms = hyp.open_nonterms[:]
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
+            # force the first rule to be not preterminal
+            if hasattr(self.hparams, "force_rule") and self.hparams.force_rule: 
+              if length <= self.hparams.force_rule_step and rule.rhs[0] == "*": 
+                continue
             cur_nonterm = open_nonterms.pop()
             parent_state = hyp.rule_hidden[0]
             for c in reversed(rule.rhs):

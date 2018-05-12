@@ -3,6 +3,51 @@ import argparse
 import os
 import random
 import re
+import numpy as np
+def bina_list(node_list, left, right):
+  if left == right:
+    return node_list[left]
+  root = TreeNode("ROOT", [])
+  mid = int((left + right) / 2)
+  left = bina_list(node_list, left, mid)
+  right = bina_list(node_list, mid+1, right)
+  root.children = [left, right]
+  return root
+
+def make_r_binary_tree(word_list, left, right):
+  ## make if fully binary except for the end of tree
+  def _bina_list(node_list, left, right):
+    if left == right:
+      return node_list[left]
+    root = TreeNode("ROOT", [])
+    mid = int((left + right) / 2)
+    left = _bina_list(node_list, left, mid)
+    right = _bina_list(node_list, mid+1, right)
+    root.children = [left, right]
+    return root
+  l = len(word_list)
+  num_preterm = int(pow(2, int(np.log2(l))) / 2)
+  preterms = []
+  for i in range(num_preterm-1):
+    lc = TreeNode("ROOT", [word_list[i*2]])
+    rc = TreeNode("ROOT", [word_list[i*2+1]])
+    preterms.append(TreeNode("ROOT", [lc, rc]))
+  preterms.append(make_binary_tree(word_list, (num_preterm-1)*2, right))
+  return _bina_list(preterms, 0, len(preterms)-1)
+
+def make_w_binary_tree(word_list):
+  ## first combine words then make trees 
+  l = len(word_list)
+  nodes = []
+  i = 0
+  while i < l-1:
+    lc = TreeNode("ROOT", [word_list[i]])
+    rc = TreeNode("ROOT", [word_list[i+1]])
+    nodes.append(TreeNode("ROOT", [lc, rc]))
+    i += 2
+  if l % 2 == 1:
+    nodes.append(TreeNode("ROOT", [word_list[-1]]))
+  return bina_list(nodes, 0, len(nodes)-1)
 
 def make_binary_tree(word_list, left, right):
   if left == right:
@@ -89,7 +134,7 @@ parser.add_argument("--file_name",type=str, help="name of the file to parse")
 parser.add_argument("--tree_type",type=str, help="[phrase|random_bina|tri|bina|right_branch]")
 parser.add_argument("--parse_file_name",type=str, help="name of the file to parse")
 
-tree_type = "phrase"
+tree_type = "w_bina"
 #data_dir="data/kftt_data/"
 #input_files = ["kyoto-train.lower.en", "kyoto-dev.lower.en", "kyoto-test.lower.en"]
 data_dir="data/orm_data/"
@@ -130,6 +175,12 @@ for in_file, out_file in zip(input_files, output_files):
         out_file.write(root.to_parse_string() + '\n')
       elif tree_type == "phrase":
         root =  make_phrase_tree(line)
+        out_file.write(root.to_parse_string() + '\n')
+      elif tree_type == "r_bina":
+        root =  make_r_binary_tree(words, 0, len(words)-1)
+        out_file.write(root.to_parse_string() + '\n')
+      elif tree_type == "w_bina":
+        root =  make_w_binary_tree(words)
         out_file.write(root.to_parse_string() + '\n')
       else:
         print("Not implemented")

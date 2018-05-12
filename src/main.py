@@ -71,6 +71,7 @@ parser.add_argument("--dropout", type=float, default=0., help="probability of dr
 parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
 parser.add_argument("--lr_dec", type=float, default=0.5, help="learning rate decay")
 parser.add_argument("--clip_grad", type=float, default=5., help="gradient clipping")
+parser.add_argument("--l2_reg", type=float, default=0., help="L2 regularization")
 parser.add_argument("--patience", type=int, default=-1, help="patience")
 
 parser.add_argument("--seed", type=int, default=19920206, help="random seed")
@@ -247,6 +248,7 @@ def train():
       dropout=args.dropout,
       lr=args.lr,
       lr_dec=args.lr_dec,
+      l2_reg=args.l2_reg,
       init_type=args.init_type,
       init_range=args.init_range,
       trdec=args.trdec,
@@ -297,7 +299,7 @@ def train():
     print("Loading optimizer from {}".format(optim_file_name))
     trainable_params = [
       p for p in model.parameters() if p.requires_grad]
-    optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
+    optim = torch.optim.Adam(trainable_params, lr=hparams.lr, weight_decay=hparams.l2_reg)
     optimizer_state = torch.load(optim_file_name)
     optim.load_state_dict(optimizer_state)
 
@@ -317,7 +319,7 @@ def train():
         p.data.uniform_(-args.init_range, args.init_range)
     trainable_params = [
       p for p in model.parameters() if p.requires_grad]
-    optim = torch.optim.Adam(trainable_params, lr=hparams.lr)
+    optim = torch.optim.Adam(trainable_params, lr=hparams.lr, weight_decay=hparams.l2_reg)
     #optim = torch.optim.Adam(trainable_params)
     step = 0
     best_val_ppl = 1e10

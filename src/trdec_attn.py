@@ -357,7 +357,7 @@ class TrDecAttn(nn.Module):
             rule = target_rule_vocab[word_id]
             # force the first rule to be not preterminal
             if hasattr(self.hparams, "force_rule") and self.hparams.force_rule: 
-              if length == 1 and rule.rhs[0] == "*": 
+              if length <= self.hparams.force_rule_step and rule.rhs[0] == "*": 
                 continue
             cur_nonterm = open_nonterms.pop()
             for c in reversed(rule.rhs):

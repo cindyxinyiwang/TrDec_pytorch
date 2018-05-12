@@ -59,6 +59,7 @@ add_argument(parser, "pos", type="int", default=0, help="whether to keep pos tag
 add_argument(parser, "ignore_rule_len", type="bool", default=False, help="whether to ignore rules when doing length norm")
 add_argument(parser, "nbest", type="bool", default=False, help="whether to return the nbest list")
 add_argument(parser, "force_rule", type="bool", default=False, help="whether to force rule selection for the first timestep")
+add_argument(parser, "force_rule_step", type="int", default=1, help="the depth to force rule")
 args = parser.parse_args()
 
 model_file_name = os.path.join(args.model_dir, "model.pt")
@@ -97,6 +98,7 @@ hparams = TranslationHparams(
   ignore_rule_len=args.ignore_rule_len,
   nbest=args.nbest,
   force_rule=args.force_rule,
+  force_rule_step=args.force_rule_step,
 )
  
 hparams.add_param("pad_id", model.hparams.pad_id)
@@ -112,6 +114,7 @@ model.hparams.root_label = args.root_label
 model.hparams.ignore_rule_len = args.ignore_rule_len
 model.hparams.nbest = args.nbest
 model.hparams.force_rule = args.force_rule
+model.hparams.force_rule_step = args.force_rule_step
 
 data = DataLoader(hparams=hparams, decode=True)
 filts = [model.hparams.pad_id, model.hparams.eos_id, model.hparams.bos_id]
