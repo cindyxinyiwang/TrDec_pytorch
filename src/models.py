@@ -165,8 +165,10 @@ class MultiHeadAttn(nn.Module):
 
     outputs = torch.cat(heads, dim=-1).contiguous().view(batch_size, n_heads * d_v)
     outputs = self.w_proj(outputs)
-    outputs = self.layer_norm(outputs + residual)
-    outputs = self.layer_norm(outputs)
+    if not hasattr(self.hparams, "residue") or self.hparams.residue == 1:
+      outputs = outputs + residual
+    if not hasattr(self.hparams, "layer_norm") or self.hparams.layer_norm == 1: 
+      outputs = self.layer_norm(outputs)
 
     return outputs
 
