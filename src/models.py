@@ -34,7 +34,7 @@ class MlpAttn(nn.Module):
     if not attn_mask is None:
       att_src_weights.data.masked_fill_(attn_mask, -self.hparams.inf)
     att_src_weights = F.softmax(att_src_weights, dim=-1)
-    att_src_weights = self.dropout(att_src_weights)
+    #att_src_weights = self.dropout(att_src_weights)
     ctx = torch.bmm(att_src_weights.unsqueeze(1), v).squeeze(1)
     return ctx
 

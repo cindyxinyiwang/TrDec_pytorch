@@ -4,6 +4,8 @@ import os
 import random
 import re
 import numpy as np
+import math
+
 def bina_list(node_list, left, right):
   if left == right:
     return node_list[left]
@@ -48,6 +50,18 @@ def make_w_binary_tree(word_list):
   if l % 2 == 1:
     nodes.append(TreeNode("ROOT", [word_list[-1]]))
   return bina_list(nodes, 0, len(nodes)-1)
+
+def make_right_binary_tree(word_list, left, right):
+  if left == right:
+    return TreeNode("ROOT", word_list[left])
+  root = TreeNode("ROOT", [])
+  mid = int((left + right) / 2)
+  if mid == left: mid += 1
+  left = make_right_binary_tree(word_list, left, mid-1)
+  right = make_right_binary_tree(word_list, mid, right)
+  root.children = [left, right]
+  return root
+
 
 def make_binary_tree(word_list, left, right):
   if left == right:
@@ -134,7 +148,7 @@ parser.add_argument("--file_name",type=str, help="name of the file to parse")
 parser.add_argument("--tree_type",type=str, help="[phrase|random_bina|tri|bina|right_branch]")
 parser.add_argument("--parse_file_name",type=str, help="name of the file to parse")
 
-tree_type = "w_bina"
+tree_type = "right_bina"
 #data_dir="data/kftt_data/"
 #input_files = ["kyoto-train.lower.en", "kyoto-dev.lower.en", "kyoto-test.lower.en"]
 data_dir="data/orm_data/"
@@ -166,6 +180,9 @@ for in_file, out_file in zip(input_files, output_files):
         out_file.write(root.to_parse_string() + '\n')
       elif tree_type == "bina":
         root = make_binary_tree(words, 0, len(words)-1)
+        out_file.write(root.to_parse_string() + '\n')
+      elif tree_type == "right_bina":
+        root = make_right_binary_tree(words, 0, len(words)-1)
         out_file.write(root.to_parse_string() + '\n')
       elif tree_type == "tri":
         root = make_tri_tree(words, 0, len(words)-1)
