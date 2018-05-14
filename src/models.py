@@ -12,7 +12,7 @@ class MlpAttn(nn.Module):
   def __init__(self, hparams):
     super(MlpAttn, self).__init__()
     self.hparams = hparams
-    self.dropout = nn.Dropout(hparams.dropout)
+    #self.dropout = nn.Dropout(hparams.dropout)
     self.w_trg = nn.Linear(self.hparams.d_model, self.hparams.d_model)
     self.w_att = nn.Linear(self.hparams.d_model, 1)
     if self.hparams.cuda:
@@ -34,7 +34,7 @@ class MlpAttn(nn.Module):
     if not attn_mask is None:
       att_src_weights.data.masked_fill_(attn_mask, -self.hparams.inf)
     att_src_weights = F.softmax(att_src_weights, dim=-1)
-    att_src_weights = self.dropout(att_src_weights)
+    #att_src_weights = self.dropout(att_src_weights)
     ctx = torch.bmm(att_src_weights.unsqueeze(1), v).squeeze(1)
     return ctx
 
