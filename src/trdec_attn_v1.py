@@ -10,9 +10,9 @@ from utils import *
 from models import *
 import gc
 
-class TreeDecoderAttn(nn.Module):
+class TreeDecoderAttn_v1(nn.Module):
   def __init__(self, hparams):
-    super(TreeDecoderAttn, self).__init__()
+    super(TreeDecoderAttn_v1, self).__init__()
     self.hparams = hparams
     self.target_vocab_size = self.hparams.target_word_vocab_size+self.hparams.target_rule_vocab_size
     self.emb = nn.Embedding(self.target_vocab_size,
@@ -21,14 +21,13 @@ class TreeDecoderAttn(nn.Module):
     if self.hparams.attn == "mlp":
       self.rule_attention = MlpAttn(hparams)
       self.word_attention = MlpAttn(hparams)
-      #self.rule_to_word_attn = MlpAttn(hparams)
-      #self.word_to_rule_attn = MlpAttn(hparams)
+      self.rule_to_word_attn = MlpAttn(hparams)
+      self.word_to_rule_attn = MlpAttn(hparams)
     else:
       self.rule_attention = DotProdAttn(hparams)
       self.word_attention = DotProdAttn(hparams)
-
-    self.rule_to_word_attn = DotProdAttn(hparams)
-    self.word_to_rule_attn = DotProdAttn(hparams)
+      self.rule_to_word_attn = DotProdAttn(hparams)
+      self.word_to_rule_attn = DotProdAttn(hparams)
     # transform [word_ctx, word_h_t, rule_ctx, rule_h_t] to readout state vectors before softmax
     self.rule_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
     self.word_ctx_to_readout = nn.Linear(hparams.d_model * 6, hparams.d_model, bias=False)
@@ -38,9 +37,9 @@ class TreeDecoderAttn(nn.Module):
                                   bias=False)  
     if self.hparams.share_emb_softmax:
       self.emb.weight = self.readout.weight
-    # input: [y_t-1, input_feed, word_state_ctx]
+    # input: [y_t-1, input_feed, rule_to_word, word_state_ctx]
     rule_inp = hparams.d_word_vec + hparams.d_model * 3
-    # input: [y_t-1, input_feed, rule_state_ctx]
+    # input: [y_t-1, input_feed, word_to_rule, rule_state_ctx]
     word_inp = hparams.d_word_vec + hparams.d_model * 3
 
     self.rule_lstm_cell = nn.LSTMCell(rule_inp, hparams.d_model)
@@ -113,7 +112,6 @@ class TreeDecoderAttn(nn.Module):
     for t in range(y_max_len):
       y_emb_tm1 = trg_emb[:, t, :]
       word_mask = y_train[:, t, 2].unsqueeze(1).float() # (1 is word, 0 is rule)
-      
       word_input = torch.cat([y_emb_tm1, word_input_feed, word_to_rule_input_feed], dim=1)
       word_h_t, word_c_t = self.word_lstm_cell(word_input, word_hidden)
 
@@ -132,12 +130,12 @@ class TreeDecoderAttn(nn.Module):
       word_states.data[:, t, :] = word_h_t.data
       # word_mask: 1 is word, 0 is rule
       if t > 0:
-        #rule_states_mask[:, t] = word_mask.byte().data
+        rule_states_mask[:, t] = word_mask.byte().data
         word_states_mask[:, t] = (1-word_mask).byte().data
-        idx = torch.LongTensor([t])
-        if self.hparams.cuda:
-          idx = idx.cuda()
-        rule_states_mask.index_fill_(1, idx, 0)
+        #idx = torch.LongTensor([t])
+        #if self.hparams.cuda:
+        #  idx = idx.cuda()
+        #rule_states_mask.index_fill_(1, idx, 0)
       rule_to_word_ctx = self.rule_to_word_attn(rule_h_t, word_states, word_states, attn_mask=word_states_mask)
       word_to_rule_ctx = self.word_to_rule_attn(word_h_t, rule_states, rule_states, attn_mask=rule_states_mask)
       rule_ctx = self.rule_attention(rule_h_t, x_enc_k, x_enc, attn_mask=x_mask)
@@ -205,7 +203,8 @@ class TreeDecoderAttn(nn.Module):
     if hyp.rule_states is None:
       hyp.rule_states = rule_h_t.unsqueeze(1)
     else:
-      hyp.rule_states = torch.cat([hyp.rule_states, rule_h_t.unsqueeze(1)], dim=1)
+      if hyp.y[-1] >= self.hparams.target_word_vocab_size:
+        hyp.rule_states = torch.cat([hyp.rule_states, rule_h_t.unsqueeze(1)], dim=1)
     hyp.rule_ctx_tm1 = self.rule_attention(rule_h_t, x_enc_k, x_enc)
     hyp.word_ctx_tm1 = self.word_attention(word_h_t, x_enc_k, x_enc)
     hyp.rule_to_word_ctx_tm1 = self.rule_to_word_attn(rule_h_t, hyp.word_states, hyp.word_states)
@@ -242,11 +241,11 @@ class TreeDecoderAttn(nn.Module):
 
     return score_t, num_rule_index, rule_select_index
 
-class TrDecAttn(nn.Module):
+class TrDecAttn_v1(nn.Module):
   def __init__(self, hparams):
-    super(TrDecAttn, self).__init__()
+    super(TrDecAttn_v1, self).__init__()
     self.encoder = Encoder(hparams)
-    self.decoder = TreeDecoderAttn(hparams)
+    self.decoder = TreeDecoderAttn_v1(hparams)
     # transform encoder state vectors into attention key vector
     self.enc_to_k = nn.Linear(hparams.d_model * 2, hparams.d_model, bias=False)
     self.hparams = hparams

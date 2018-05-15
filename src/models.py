@@ -12,7 +12,7 @@ class MlpAttn(nn.Module):
   def __init__(self, hparams):
     super(MlpAttn, self).__init__()
     self.hparams = hparams
-    self.dropout = nn.Dropout(hparams.dropout)
+    #self.dropout = nn.Dropout(hparams.dropout)
     self.w_trg = nn.Linear(self.hparams.d_model, self.hparams.d_model)
     self.w_att = nn.Linear(self.hparams.d_model, 1)
     if self.hparams.cuda:

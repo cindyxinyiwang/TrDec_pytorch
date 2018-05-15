@@ -278,7 +278,6 @@ class DataLoader(object):
     lengths = [len(sentence) for sentence in sentences]
     sum_len = sum(lengths)
     max_len = max(lengths)
-
     padded_sentences = [
       sentence + ([pad_id] * (max_len - len(sentence)))
       for sentence in sentences]
@@ -404,7 +403,6 @@ class DataLoader(object):
       target_tokens = target_line.split()
       if is_training and len(target_line) > self.hparams.max_len:
         continue
-
       total_sents += 1
 
       for source_token in source_tokens:
@@ -571,9 +569,12 @@ class DataLoader(object):
         remove_preterminal_POS(tree.root)
       if self.hparams.max_tree_depth > 0:
         merge_depth(tree.root, self.hparams.max_tree_depth, 0)
-      pieces = sent_piece_segs(target_line)
-      split_sent_piece(tree.root, pieces, 0)
-      add_preterminal_wordswitch(tree.root, add_eos=True)
+      if hasattr(self.hparams, "no_piece_tree") and self.hparams.no_piece_tree:
+        add_preterminal_wordswitch(tree.root, add_eos=False)
+      else:
+        pieces = sent_piece_segs(target_line)
+        split_sent_piece(tree.root, pieces, 0)
+        add_preterminal_wordswitch(tree.root, add_eos=True)
       if self.hparams.no_lhs:
         remove_lhs(tree.root, self.hparams.root_label)
         tree.root.label = 'XXX'

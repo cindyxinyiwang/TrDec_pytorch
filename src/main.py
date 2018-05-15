@@ -14,9 +14,11 @@ from torch.autograd import Variable
 from data_utils import DataLoader
 from hparams import *
 from utils import *
+from tree_utils import *
 from models import *
 from trdec import *
 from trdec_attn import *
+from trdec_attn_v1 import *
 
 parser = argparse.ArgumentParser(description="Neural MT")
 
@@ -34,6 +36,10 @@ parser.add_argument("--eval_every", type=int, default=500, help="how many steps 
 parser.add_argument("--clean_mem_every", type=int, default=10, help="how many steps to clean memory")
 parser.add_argument("--eval_bleu", action="store_true", help="if calculate BLEU score for dev set")
 parser.add_argument("--beam_size", type=int, default=5, help="beam size for dev BLEU")
+parser.add_argument("--poly_norm_m", type=float, default=1, help="beam size for dev BLEU")
+parser.add_argument("--ppl_thresh", type=float, default=20, help="beam size for dev BLEU")
+parser.add_argument("--max_trans_len", type=int, default=300, help="beam size for dev BLEU")
+parser.add_argument("--merge_bpe", action="store_true", help="if calculate BLEU score for dev set")
 
 parser.add_argument("--cuda", action="store_true", help="GPU or not")
 
@@ -100,12 +106,16 @@ parser.add_argument("--single_inp_readout", action="store_true", help="use only 
 parser.add_argument("--rule_tanh", type=float, default=0, help="temperature for raml")
 
 
+parser.add_argument("--no_piece_tree", action="store_true", help="do not split sentence piece")
+
 parser.add_argument("--trdec_attn", action="store_true", help="temperature for raml")
+parser.add_argument("--trdec_attn_v1", action="store_true", help="temperature for raml")
+parser.add_argument("--self_attn_input_feed", action="store_true", help="temperature for raml")
 args = parser.parse_args()
 
 def eval(model, data, crit, step, hparams, eval_bleu=False,
          valid_batch_size=20, tr_logits=None):
-  valid_batch_size = 2
+  valid_batch_size = 10
   print("Eval at step {0}. valid_batch_size={1}".format(step, valid_batch_size))
 
   model.eval()
@@ -121,6 +131,9 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
   if eval_bleu:
     valid_hyp_file = os.path.join(args.output_dir, "dev.trans_{0}".format(step))
     out_file = open(valid_hyp_file, 'w', encoding='utf-8')
+    if args.trdec:
+      valid_parse_file = valid_hyp_file + ".parse"
+      out_parse_file = open(valid_parse_file, 'w', encoding='utf-8')
   while True:
     # clear GPU memory
     gc.collect()
@@ -184,14 +197,41 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     x_valid = data.x_valid.tolist()
     #print(x_valid)
     #x_valid = Variable(torch.LongTensor(x_valid), volatile=True)
-    hyps = model.translate(
-      x_valid, beam_size=args.beam_size, max_len=args.max_len)
+    if args.trdec:
+      hyps, scores = model.translate(
+            x_valid, target_rule_vocab=data.target_tree_vocab,
+            beam_size=args.beam_size, max_len=args.max_trans_len, y_label=None, poly_norm_m=args.poly_norm_m)
+    else:
+      hyps = model.translate(
+            x_valid, beam_size=args.beam_size, max_len=args.max_trans_len, poly_norm_m=args.poly_norm_m)
     for h in hyps:
-      h_best_words = map(lambda wi: data.target_index_to_word[wi], h)
-      line = ''.join(h_best_words)
-      line = line.replace('▁', ' ').strip()
-      out_file.write(line + '\n')
-
+      if args.trdec:
+        deriv = []
+        for w in h:
+          if w < data.target_word_vocab_size:
+            deriv.append([data.target_word_vocab[w], False])
+          else:
+            deriv.append([data.target_tree_vocab[w], False])
+        tree = Tree.from_rule_deriv(deriv)
+        line = tree.to_string()
+        if hparams.merge_bpe:
+          line = line.replace(' ', '')
+          line = line.replace('▁', ' ').strip()
+        out_file.write(line + '\n')
+        out_file.flush()
+        out_parse_file.write(tree.to_parse_string() + '\n')
+        out_parse_file.flush()
+      else:
+        h_best_words = map(lambda wi: data.target_index_to_word[wi],
+                         filter(lambda wi: wi not in hparams.filtered_tokens, h))
+        if hparams.merge_bpe:
+          line = ''.join(h_best_words)
+          line = line.replace('▁', ' ')
+        else:
+          line = ' '.join(h_best_words)
+        line = line.strip()
+        out_file.write(line + '\n')
+        out_file.flush()
   if args.trdec:
     val_ppl = np.exp(valid_loss / valid_word_count)
     log_string = "val_step={0:<6d}".format(step)
@@ -201,7 +241,8 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     log_string += " num_word={} num_rule={} num_eos={}".format(valid_word_count, valid_rule_count, valid_eos_count)
     log_string += " ppl_word={0:<8.2f}".format(np.exp(valid_word_loss / valid_word_count))
     log_string += " ppl_rule={0:<8.2f}".format(np.exp(valid_rule_loss / valid_rule_count))
-    log_string += " ppl_eos={0:<8.2f}".format(np.exp(valid_eos_loss / valid_eos_count))
+    if not args.no_piece_tree:
+      log_string += " ppl_eos={0:<8.2f}".format(np.exp(valid_eos_loss / valid_eos_count))
   else:
     val_ppl = np.exp(valid_loss / valid_words)
     log_string = "val_step={0:<6d}".format(step)
@@ -210,6 +251,8 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     log_string += " val_ppl={0:<.2f}".format(val_ppl)
   if eval_bleu:
     out_file.close()
+    if args.trdec:
+      out_parse_file.close()
     if args.target_valid_ref:
       ref_file = os.path.join(hparams.data_path, args.target_valid_ref)
     else:
@@ -219,7 +262,10 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
     log_string += "\n{}".format(bleu_str)
     bleu_str = bleu_str.split('\n')[-1].strip()
     reg = re.compile("BLEU = ([^,]*).*")
-    valid_bleu = float(reg.match(bleu_str).group(1))
+    try:
+      valid_bleu = float(reg.match(bleu_str).group(1))
+    except:
+      valid_bleu = 0.
     log_string += " val_bleu={0:<.2f}".format(valid_bleu)
   print(log_string)
   model.train()
@@ -285,6 +331,14 @@ def train():
       d_v=args.d_v,
       residue=args.residue,
       layer_norm=args.layer_norm,
+      no_piece_tree=args.no_piece_tree,
+      self_attn_input_feed=args.self_attn_input_feed,
+      trdec_attn_v1=args.trdec_attn_v1,
+      merge_bpe=args.merge_bpe,
+      ignore_rule_len=False,
+      nbest=False,
+      force_rule=True,
+      force_rule_step=1,
     )
   data = DataLoader(hparams=hparams)
   hparams.add_param("source_vocab_size", data.source_vocab_size)
@@ -321,6 +375,8 @@ def train():
     if args.trdec:
       if args.trdec_attn:
         model = TrDecAttn(hparams=hparams)
+      elif args.trdec_attn_v1:
+        model = TrDecAttn_v1(hparams=hparams)
       else:
         model = TrDec(hparams=hparams)
     else:
@@ -432,7 +488,8 @@ def train():
         log_string += " ppl={0:<8.2f}".format(np.exp(total_loss / target_words))
         log_string += " ppl_word={0:<8.2f}".format(np.exp(total_word_loss / target_words))
         log_string += " ppl_rule={0:<8.2f}".format(np.exp(total_rule_loss / target_rules))
-        log_string += " ppl_eos={0:<8.2f}".format(np.exp(total_eos_loss / target_eos))
+        if not args.no_piece_tree:
+          log_string += " ppl_eos={0:<8.2f}".format(np.exp(total_eos_loss / target_eos))
         log_string += " acc={0:<5.4f}".format(total_corrects / target_total)
       else:
         log_string += " ppl={0:<8.2f}".format(np.exp(total_loss / target_words))
@@ -442,8 +499,8 @@ def train():
       log_string += " time(min)={0:<5.2f}".format(since_start)
       print(log_string)
     if step % args.eval_every == 0:
-      val_ppl, val_bleu = eval(model, data, crit, step, hparams, eval_bleu=args.eval_bleu, valid_batch_size=20, tr_logits=logits)	
-      based_on_bleu = args.eval_bleu
+      based_on_bleu = args.eval_bleu and best_val_ppl <= args.ppl_thresh
+      val_ppl, val_bleu = eval(model, data, crit, step, hparams, eval_bleu=based_on_bleu, valid_batch_size=20, tr_logits=logits)	
       if based_on_bleu:
         if best_val_bleu <= val_bleu:
           save = True 
