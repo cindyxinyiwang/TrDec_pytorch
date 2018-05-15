@@ -77,6 +77,7 @@ parser.add_argument("--pos", type=int, default=0, help="preserve pos tag on tree
 parser.add_argument("--root_label", type=str, default="ROOT", help="name of the nonterminal to start a tree")
 
 parser.add_argument("--batch_size", type=int, default=32, help="batch_size")
+parser.add_argument("--valid_batch_size", type=int, default=20, help="batch_size")
 parser.add_argument("--batcher", type=str, default="sent", help="sent|word. Batch either by number of words or number of sentences")
 parser.add_argument("--n_train_steps", type=int, default=100000, help="n_train_steps")
 parser.add_argument("--dropout", type=float, default=0., help="probability of dropping")
@@ -115,7 +116,6 @@ args = parser.parse_args()
 
 def eval(model, data, crit, step, hparams, eval_bleu=False,
          valid_batch_size=20, tr_logits=None):
-  valid_batch_size = 10
   print("Eval at step {0}. valid_batch_size={1}".format(step, valid_batch_size))
 
   model.eval()
@@ -500,7 +500,7 @@ def train():
       print(log_string)
     if step % args.eval_every == 0:
       based_on_bleu = args.eval_bleu and best_val_ppl <= args.ppl_thresh
-      val_ppl, val_bleu = eval(model, data, crit, step, hparams, eval_bleu=based_on_bleu, valid_batch_size=20, tr_logits=logits)	
+      val_ppl, val_bleu = eval(model, data, crit, step, hparams, eval_bleu=based_on_bleu, valid_batch_size=args.valid_batch_size, tr_logits=logits)	
       if based_on_bleu:
         if best_val_bleu <= val_bleu:
           save = True 

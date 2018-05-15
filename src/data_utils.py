@@ -572,7 +572,7 @@ class DataLoader(object):
       if self.hparams.max_tree_depth > 0:
         merge_depth(tree.root, self.hparams.max_tree_depth, 0)
       if hasattr(self.hparams, "no_piece_tree") and self.hparams.no_piece_tree:
-        add_preterminal_wordswitch(tree.root, add_eos=False)
+        add_preterminal_wordswitch(tree.root, add_eos=True)
       else:
         pieces = sent_piece_segs(target_line)
         split_sent_piece(tree.root, pieces, 0)
