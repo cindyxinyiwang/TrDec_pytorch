@@ -17,6 +17,7 @@ from utils import *
 from tree_utils import *
 from models import *
 from trdec import *
+from trdec_single import *
 from trdec_attn import *
 from trdec_attn_v1 import *
 
@@ -112,6 +113,7 @@ parser.add_argument("--no_piece_tree", action="store_true", help="do not split s
 parser.add_argument("--trdec_attn", action="store_true", help="temperature for raml")
 parser.add_argument("--trdec_attn_v1", action="store_true", help="temperature for raml")
 parser.add_argument("--self_attn_input_feed", action="store_true", help="temperature for raml")
+parser.add_argument("--trdec_single", action="store_true", help="temperature for raml")
 args = parser.parse_args()
 
 def eval(model, data, crit, step, hparams, eval_bleu=False,
@@ -377,6 +379,8 @@ def train():
         model = TrDecAttn(hparams=hparams)
       elif args.trdec_attn_v1:
         model = TrDecAttn_v1(hparams=hparams)
+      elif args.trdec_single:
+        model = TrDecSingle(hparams=hparams)
       else:
         model = TrDec(hparams=hparams)
     else:

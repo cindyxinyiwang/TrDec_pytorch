@@ -17,6 +17,7 @@ from hparams import *
 from utils import *
 from models import *
 from trdec import *
+from trdec_single import *
 from trdec_attn import *
 from tree_utils import *
 
@@ -72,7 +73,7 @@ model.eval()
 out_file = os.path.join(args.model_dir, args.out_file)
 if args.trdec:
   out_parse_file = os.path.join(args.model_dir, args.out_file+".parse")
-
+print("writing translation to " + out_file)
 hparams = TranslationHparams(
   data_path=args.data_path,
   source_vocab=args.source_vocab,
@@ -122,8 +123,10 @@ if args.ccg_tag_file:
   ccg_tag_file = os.path.join(args.data_path, args.ccg_tag_file)
   with open(ccg_tag_file, 'r') as tag_file:
     for line in tag_file:
-      f_id = data.target_word_to_index[line.strip()]
-      filts.append(f_id)
+      line = line.strip()
+      if line in data.target_word_to_index:
+        f_id = data.target_word_to_index[line]
+        filts.append(f_id)
 hparams.add_param("filtered_tokens", set(filts))
 if args.debug:
   hparams.add_param("target_word_vocab_size", data.target_word_vocab_size)
