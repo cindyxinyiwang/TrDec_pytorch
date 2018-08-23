@@ -12,19 +12,18 @@ import time
 
 import numpy as np
 
-#DATA_PATH = "/projects/tir2/users/xinyiw1/kftt-data-1.0/data/tok/"
-#DATA_PATH = "data/kftt_data/"
-#INP_NAMES = ["kyoto-train.interleave.null.en.filt"]
-#OUT_NAMES = ["full-vocab.ccg.null.en"]
+DATA_PATH = "/projects/tir1/users/xinyiw1/work/kin-r_2018/data/kin_all/"
+INP_NAMES = ["setR-train.interleave.null.en.filt"]
+OUT_NAMES = ["full-vocab.ccg.null.en"]
 
 #DATA_PATH = "data/orm_data/"
 #DATA_PATH = "/projects/tir2/users/xinyiw1/loreili/orm-eng/data/"
 #INP_NAMES = ["set0-trainunfilt.interleave.null.eng"]
 #OUT_NAMES = ["vocab.ccg.null.eng"]
 
-DATA_PATH = "data/de16_data/"
-INP_NAMES = ["train.tok.en", "train.tok.de"]
-OUT_NAMES = ["vocab.en", "vocab.de"]
+#DATA_PATH = "data/de16_data/"
+#INP_NAMES = ["train.tok.en", "train.tok.de"]
+#OUT_NAMES = ["vocab.en", "vocab.de"]
 
 
 def main():

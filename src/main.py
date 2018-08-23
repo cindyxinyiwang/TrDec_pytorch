@@ -178,9 +178,9 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
       #exit(0)
       val_loss, val_acc, rule_loss, word_loss, eos_loss, rule_count, word_count, eos_count =  \
         get_performance(crit, logits, labels, hparams)
-      valid_word_loss += word_loss.data[0]
-      valid_rule_loss += rule_loss.data[0]
-      valid_eos_loss += eos_loss.data[0]
+      valid_word_loss += word_loss.item()
+      valid_rule_loss += rule_loss.item()
+      valid_eos_loss += eos_loss.item()
     else:
       logits = model.forward(
         x_valid, x_mask, x_len,
@@ -189,8 +189,8 @@ def eval(model, data, crit, step, hparams, eval_bleu=False,
       labels = y_valid[:,1:].contiguous().view(-1)
       val_loss, val_acc = get_performance(crit, logits, labels, hparams)
     n_batches += 1
-    valid_loss += val_loss.data[0]
-    valid_acc += val_acc.data[0]
+    valid_loss += val_loss.item()
+    valid_acc += val_acc.item()
     # print("{0:<5d} / {1:<5d}".format(val_acc.data[0], y_count))
     if end_of_epoch:
       break
@@ -447,12 +447,12 @@ def train():
       #print((y_train[:,:,0] >= hparams.target_word_vocab_size).long().sum().data[0])
       #print(y_rule_count)
       #print(rule_count.data[0])
-      assert y_rule_count == rule_count.data[0], "data rule count {}, performance rule count {}".format(y_rule_count, rule_count.data[0])
-      assert y_eos_count == eos_count.data[0], "data eos count {}, performance eos count {}".format(y_eos_count, eos_count.data[0])
-      assert y_word_count - batch_size == word_count.data[0], "data word count {}, performance word count {}".format(y_word_count-batch_size, word_count.data[0])
-      total_word_loss += word_loss.data[0]
-      total_rule_loss += rule_loss.data[0]
-      total_eos_loss += eos_loss.data[0]
+      assert y_rule_count == rule_count.item(), "data rule count {}, performance rule count {}".format(y_rule_count, rule_count.item())
+      assert y_eos_count == eos_count.item(), "data eos count {}, performance eos count {}".format(y_eos_count, eos_count.item())
+      assert y_word_count - batch_size == word_count.item(), "data word count {}, performance word count {}".format(y_word_count-batch_size, word_count.item())
+      total_word_loss += word_loss.item()
+      total_rule_loss += rule_loss.item()
+      total_eos_loss += eos_loss.item()
     else:
       target_words += (y_count - batch_size)
 
@@ -460,8 +460,8 @@ def train():
       logits = logits.view(-1, hparams.target_vocab_size)
       labels = y_train[:,1:].contiguous().view(-1)
       tr_loss, tr_acc = get_performance(crit, logits, labels, hparams)
-    total_loss += tr_loss.data[0]
-    total_corrects += tr_acc.data[0]
+    total_loss += tr_loss.item()
+    total_corrects += tr_acc.item()
     step += 1
     if args.trdec and args.loss_type == "rule":
       rule_loss.div_(batch_size)
@@ -485,7 +485,7 @@ def train():
       log_string = "ep={0:<3d}".format(epoch)
       log_string += " steps={0:<6.2f}".format(step / 1000)
       log_string += " lr={0:<9.7f}".format(lr)
-      log_string += " loss={0:<7.2f}".format(tr_loss.data[0])
+      log_string += " loss={0:<7.2f}".format(tr_loss.item())
       log_string += " |g|={0:<5.2f}".format(grad_norm)
       if args.trdec:
         log_string += " num_word={} num_rule={} num_eos={}".format(target_words, target_rules, target_eos)

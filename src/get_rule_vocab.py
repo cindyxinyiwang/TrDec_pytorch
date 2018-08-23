@@ -3,9 +3,24 @@ from tree_utils import *
 from hparams import HParams
 
 #piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
+#tree_file = "data/orm_data/set0-trainunfilt.tok.eng.dep"
+#rule_vocab_file = "data/orm_data/vocab.dep_rule.eng"
+#word_vocab_file = "data/orm_data/vocab.dep_word.eng"
+
+#piece_file = "data/de16_data/train.piece.en"
+#tree_file = "data/de16_data/train.tok.en.dep"
+#rule_vocab_file = "data/de16_data/vocab.dep_rule.en"
+#word_vocab_file = "data/de16_data/vocab.dep_word.en"
+
+#piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
 #tree_file = "data/orm_data/set0-trainunfilt.tok.eng.phrase"
 #rule_vocab_file = "data/orm_data/vocab.phrase_rule.eng"
 #word_vocab_file = "data/orm_data/vocab.phrase_word.eng"
+
+piece_file = "data/kftt_data/train.piece.en"
+tree_file = "data/kftt_data/train.dep"
+rule_vocab_file = "data/kftt_old/vocab.dep_rule.en"
+word_vocab_file = "data/kftt_old/vocab.dep_word.en"
 
 #piece_file = "data/kftt_data/kyoto-train.lowpiece.en"
 #tree_file = "data/kftt_data/kyoto-train.lowparse.en"
@@ -17,10 +32,10 @@ from hparams import HParams
 #rule_vocab_file = "/home/xinyiw/nan-mt/data/raw/de-en/vocab.bina_rule.en"
 #word_vocab_file = "/home/xinyiw/nan-mt/data/raw/de-en/vocab.bina_word.en"
 
-piece_file = "data/de16_data/train.piece.en"
-tree_file = "data/de16_data/train.tok.en.bina"
-rule_vocab_file = "data/de16_data/vocab.bina_rule.en"
-word_vocab_file = "data/de16_data/vocab.bina_word.en"
+#piece_file = "data/de16_data/train.piece.en"
+#tree_file = "data/de16_data/train.tok.en.bina"
+#rule_vocab_file = "data/de16_data/vocab.bina_rule.en"
+#word_vocab_file = "data/de16_data/vocab.bina_word.en"
 
 hp = HParams()
 rule_vocab = RuleVocab(hparams=hp, frozen=False)
@@ -37,7 +52,7 @@ for piece_line, tree_line in zip(piece_file, tree_file):
   #print(tree.root.to_string())
   split_sent_piece(tree.root, pieces, 0)
   add_preterminal_wordswitch(tree.root, add_eos=True)
-  remove_lhs(tree.root, 'ROOT')
+  #remove_lhs(tree.root, 'ROOT')
   tree.root.label = "XXX"
   tree.reset_timestep()
   tree.get_data_root(rule_vocab, word_vocab)

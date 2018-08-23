@@ -261,7 +261,8 @@ class DataLoader(object):
     #print(x_len)
     return x[index], y[index]
 
-  def _pad(self, sentences, pad_id, volatile=False):
+  def _pad(self, sentences, pad_id, volatile=False, 
+           raml=False, raml_tau=1., vocab_size=None):
     """Pad all instances in [data] to the longest length.
 
     Args:
@@ -293,7 +294,33 @@ class DataLoader(object):
       padded_sentences = padded_sentences.cuda()
       mask = mask.cuda()
 
-    return padded_sentences, mask, lengths, sum_len
+    if not raml:
+      return padded_sentences, mask, lengths, sum_len
+
+    assert vocab_size is not None
+    logits = torch.arange(max_len)
+    if self.hparams.cuda:
+      logits = logits.cuda()
+    probs = self.softmax(logits.mul_(raml_tau))
+    num_words = torch.distributions.Categorical(probs).sample()
+
+    lengths = torch.FloatTensor(lengths)
+    if self.hparams.cuda:
+      lengths = lengths.cuda()
+    corrupt_pos = num_words.data.float().div_(lenngths).unsqueeze(1).expand_as(padded_sentences).contiguous().masked_fill_(mask, -self.hparams.inf)
+    corrupt_pos = torch.bernoulli(corrupt_pos, out=corrupt_pos).byte()
+    total_words = int(corrupt_pos.sum())
+    
+    corrupt_val = torch.LongTensor(total_words)
+    corrupts = torch.zeros(batch_size, max_len).long()
+
+    if self.hparams.cuda:
+      corrupt_val = corrupt_val.long().cuda()
+      corrupts = corrupts.cuda()
+      corrupt_pos = corrupt_pos.cuda()
+    corrupts = corrupts.masked_scatter_(corrupt_pos, corrupt_val)
+    sample_sentences = padded_sentences.add(Variable(corrupts)).remainder_(vocab_size).masked_fill_(Variable(mask), pad_id)
+    return sample_sentences, mask, lengths, sum_len
 
   def _pad_tree(self, sentences, pad_id, volatile=False, raml_rule=False):
     lengths = [len(sentence) for sentence in sentences]
@@ -317,16 +344,16 @@ class DataLoader(object):
     num_rule = rule_mask.long().sum()
     #print(num_rule)
     num_eos = (padded_sentences[:,:,0] == self.hparams.eos_id).long().sum()
-    num_word = sum_len - num_rule.data[0] - num_eos.data[0]
+    num_word = sum_len - num_rule.item() - num_eos.item()
     #print(num_rule.data[0] + num_word + num_eos.data[0] + num_padding.data[0])
     #print(max_len * len(sentences))
-    assert num_rule.data[0] + num_word + num_eos.data[0] + num_padding.data[0] == max_len * len(sentences)
+    assert num_rule.item() + num_word + num_eos.item() + num_padding.item() == max_len * len(sentences)
 
     if self.hparams.cuda:
       padded_sentences = padded_sentences.cuda()
       mask = mask.cuda()
     if not raml_rule:
-      return padded_sentences, mask, lengths, sum_len, num_rule.data[0], num_word, num_eos.data[0]
+      return padded_sentences, mask, lengths, sum_len, num_rule.item(), num_word, num_eos.item()
 
     # sample the number of words to corrupt
     logits = torch.arange(max_len)
@@ -370,7 +397,7 @@ class DataLoader(object):
     #print(corrupt_pos)
     #print(corrupt_val)
     #exit(0)
-    return padded_sentences, mask, lengths, sum_len, num_rule.data[0], num_word, num_eos.data[0]
+    return padded_sentences, mask, lengths, sum_len, num_rule.item(), num_word, num_eos.item()
 
   def _build_parallel(self, source_file, target_file, is_training, sort=False):
     """Build pair of data."""

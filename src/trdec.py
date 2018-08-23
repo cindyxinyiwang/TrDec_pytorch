@@ -346,6 +346,7 @@ class TrDec(nn.Module):
       #print("trans label:", y)
       i += 1
       gc.collect()
+      print(i)
     return hyps, scores
 
   def translate_sent(self, x_train, target_rule_vocab, max_len=100, beam_size=5, y_label=None, poly_norm_m=1.):
@@ -376,6 +377,7 @@ class TrDec(nn.Module):
       max_len = len(y_label)
     while len(completed_hyp) < beam_size and length < max_len:
       length += 1
+      print(length, len(completed_hyp))
       new_active_hyp = []
       for i, hyp in enumerate(active_hyp):
         logits, rule_hidden, word_hidden, rule_ctx, word_ctx, num_rule_index, rule_index = self.decoder.step(x_enc, 
@@ -415,7 +417,8 @@ class TrDec(nn.Module):
             rule = target_rule_vocab[word_id]
             # force the first rule to be not preterminal
             if hasattr(self.hparams, "force_rule") and self.hparams.force_rule: 
-              if length <= self.hparams.force_rule_step and rule.rhs[0] == "*": 
+              #if length <= self.hparams.force_rule_step and rule.rhs[0] == "*": 
+              if length <= self.hparams.force_rule_step and len(rule.rhs) == 1: 
                 continue
             cur_nonterm = open_nonterms.pop()
             parent_state = hyp.rule_hidden[0]
