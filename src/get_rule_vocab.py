@@ -2,10 +2,10 @@ import sys
 from tree_utils import *
 from hparams import HParams
 
-#piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
-#tree_file = "data/orm_data/set0-trainunfilt.tok.eng.dep"
-#rule_vocab_file = "data/orm_data/vocab.dep_rule.eng"
-#word_vocab_file = "data/orm_data/vocab.dep_word.eng"
+piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
+tree_file = "data/orm_data/set0-trainunfilt.tok.eng.dep"
+rule_vocab_file = "data/orm_data/vocab.dep_rule.eng"
+word_vocab_file = "data/orm_data/vocab.dep_word.eng"
 
 #piece_file = "data/de16_data/train.piece.en"
 #tree_file = "data/de16_data/train.tok.en.dep"
@@ -17,10 +17,10 @@ from hparams import HParams
 #rule_vocab_file = "data/orm_data/vocab.phrase_rule.eng"
 #word_vocab_file = "data/orm_data/vocab.phrase_word.eng"
 
-piece_file = "data/kftt_data/train.piece.en"
-tree_file = "data/kftt_data/train.dep"
-rule_vocab_file = "data/kftt_old/vocab.dep_rule.en"
-word_vocab_file = "data/kftt_old/vocab.dep_word.en"
+#piece_file = "data/kftt_data/train.piece.en"
+#tree_file = "data/kftt_data/train.dep"
+#rule_vocab_file = "data/kftt_old/vocab.dep_rule.en"
+#word_vocab_file = "data/kftt_old/vocab.dep_word.en"
 
 #piece_file = "data/kftt_data/kyoto-train.lowpiece.en"
 #tree_file = "data/kftt_data/kyoto-train.lowparse.en"

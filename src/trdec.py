@@ -410,8 +410,11 @@ class TrDec(nn.Module):
           num_select = beam_size
           if num_rule_index >= 0: num_select = min(num_select, num_rule_index)
           top_ids = (-new_hyp_scores).cpu().numpy().argsort()[:num_select]
+        #print("top ids" )
         for word_id in top_ids:
+          #print(word_id)
           if y_label is None and len(rule_index) > 0 and word_id not in rule_index: continue
+          #print("pass through")
           open_nonterms = hyp.open_nonterms[:]
           if word_id >= self.hparams.target_word_vocab_size:
             rule = target_rule_vocab[word_id]
