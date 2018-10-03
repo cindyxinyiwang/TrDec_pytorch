@@ -7,36 +7,6 @@ tree_file = "data/orm_data/set0-trainunfilt.tok.eng.dep"
 rule_vocab_file = "data/orm_data/vocab.dep_rule.eng"
 word_vocab_file = "data/orm_data/vocab.dep_word.eng"
 
-#piece_file = "data/de16_data/train.piece.en"
-#tree_file = "data/de16_data/train.tok.en.dep"
-#rule_vocab_file = "data/de16_data/vocab.dep_rule.en"
-#word_vocab_file = "data/de16_data/vocab.dep_word.en"
-
-#piece_file = "data/orm_data/set0-trainunfilt.tok.piece.eng"
-#tree_file = "data/orm_data/set0-trainunfilt.tok.eng.phrase"
-#rule_vocab_file = "data/orm_data/vocab.phrase_rule.eng"
-#word_vocab_file = "data/orm_data/vocab.phrase_word.eng"
-
-#piece_file = "data/kftt_data/train.piece.en"
-#tree_file = "data/kftt_data/train.dep"
-#rule_vocab_file = "data/kftt_old/vocab.dep_rule.en"
-#word_vocab_file = "data/kftt_old/vocab.dep_word.en"
-
-#piece_file = "data/kftt_data/kyoto-train.lowpiece.en"
-#tree_file = "data/kftt_data/kyoto-train.lowparse.en"
-#rule_vocab_file = "data/kftt_data/vocab.no-lhs-rule.en"
-#word_vocab_file = "data/kftt_data/vocab.no-lhs-word.en"
-
-#piece_file = "/home/xinyiw/nan-mt/data/raw/de-en/train.tok.en.bina"
-#tree_file = "/home/xinyiw/nan-mt/data/raw/de-en/train.tok.en.bina"
-#rule_vocab_file = "/home/xinyiw/nan-mt/data/raw/de-en/vocab.bina_rule.en"
-#word_vocab_file = "/home/xinyiw/nan-mt/data/raw/de-en/vocab.bina_word.en"
-
-#piece_file = "data/de16_data/train.piece.en"
-#tree_file = "data/de16_data/train.tok.en.bina"
-#rule_vocab_file = "data/de16_data/vocab.bina_rule.en"
-#word_vocab_file = "data/de16_data/vocab.bina_word.en"
-
 hp = HParams()
 rule_vocab = RuleVocab(hparams=hp, frozen=False)
 word_vocab = Vocab(hparams=hp, frozen=False)
